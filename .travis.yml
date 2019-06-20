@@ -4,11 +4,19 @@ matrix:
     - os: linux
     - os: osx
 
+env:
+  global:
+    - CMAKE_VERSION=3.14.5
+
 before_install:
+  - mkdir -p 3rdparty/fakeroot;
+  - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
       sudo apt-get update -y;
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
       brew update;
     fi
 
