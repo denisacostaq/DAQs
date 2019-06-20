@@ -1,12 +1,37 @@
+dist: xenial
+
 language: cpp
-matrix:
-  include:
-    - os: linux
-    - os: osx
 
 env:
   global:
     - CMAKE_VERSION=3.14.5
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-7
+          packages:
+            - clang-7
+      env:
+        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
 
 before_install:
   - mkdir -p 3rdparty/fakeroot;
@@ -19,6 +44,7 @@ before_install:
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
       brew update;
     fi
+  - eval "${MATRIX_EVAL}"
 
 install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
@@ -31,7 +57,7 @@ install:
 script:
   - mkdir build
   - pushd build
-  - cmake ..
+  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ..
   - make
   - popd
 
