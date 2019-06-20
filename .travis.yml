@@ -1,0 +1,32 @@
+language: cpp
+matrix:
+  include:
+    - os: linux
+    - os: osx
+
+before_install:
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      sudo apt-get update -y;
+    fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      brew update;
+    fi
+
+install:
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      sudo apt-get install clang ninja-build -y;
+    fi
+  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+      brew install ninja;
+    fi
+
+script:
+  - mkdir build
+  - pushd build
+  - cmake ..
+  - make -j$(nproc)
+  - popd
+
+notifications:
+  email:
+    - denisacostaq@gmail.com
