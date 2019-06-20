@@ -28,10 +28,19 @@ matrix:
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
+    #On macOS, the version of clang is controlled by the choice of osx_image. You can find here the list of available osx_image
+    #https://docs.travis-ci.com/user/languages/c/#clang-on-macos
+    #https://docs.travis-ci.com/user/reference/osx/#macos-version
+    #https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L160-L164
     - os: osx
-      osx_image: xcode8
+      osx_image: xcode7.3 #clang-7
       env:
-        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+    - os: osx
+      osx_image: xcode8.3
+      env:
+        - MATRIX_EVAL="brew install gcc@7 && CC=gcc-7 && CXX=g++-7"
 
 before_install:
   - mkdir -p 3rdparty/fakeroot;
@@ -48,10 +57,10 @@ before_install:
 
 install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      sudo apt-get install clang ninja-build -y;
+      ls;
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      brew install ninja;
+      ls;
     fi
 
 script:
