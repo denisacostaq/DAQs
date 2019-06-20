@@ -18,6 +18,7 @@ ExternalProject_Add(sqlite_project
     INSTALL_COMMAND echo "Skipping install"
 )
 add_library(sqlite STATIC IMPORTED)
+add_dependencies(sqlite sqlite_project)
 set_property(TARGET sqlite
     PROPERTY IMPORTED_LOCATION 
     "${CMAKE_CURRENT_BINARY_DIR}/sqlite/.libs/libsqlite3.a")
