@@ -24,7 +24,7 @@ script:
   - mkdir build
   - pushd build
   - cmake ..
-  - make -j$(nproc)
+  - make
   - popd
 
 notifications:
