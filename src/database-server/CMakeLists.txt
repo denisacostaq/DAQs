@@ -30,5 +30,5 @@ endif(NOT CMAKE_USE_PTHREADS_INIT)
 
 add_library(dataaccess
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
-target_include_directories(dataaccess PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/SQLiteCpp-${SQLiteCppVersion})
+target_include_directories(dataaccess PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3)
 target_link_libraries(dataaccess sqlite Threads::Threads ${CMAKE_DL_LIBS})
