@@ -13,6 +13,6 @@ project(DAQ
     HOMEPAGE_URL "https://github.com/denisacostaq/DAQs"
     LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
-
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ClangFormat.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)

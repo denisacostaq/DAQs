@@ -25,6 +25,7 @@ matrix:
             - llvm-toolchain-xenial-7
           packages:
             - clang-7
+            - clang-format-7
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
@@ -55,18 +56,11 @@ before_install:
     fi
   - eval "${MATRIX_EVAL}"
 
-install:
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      ls;
-    fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      ls;
-    fi
-
 script:
-  - mkdir build
-  - pushd build
-  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ..
+  - mkdir 3rdparty/build
+  - pushd 3rdparty/build
+  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ../../
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
   - make
   - popd
 
