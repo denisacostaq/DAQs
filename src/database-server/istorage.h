@@ -2,13 +2,13 @@
     \file istorage.h
     \author Alvaro Denis <denisacostaq@gmail.com>
     \date 6/19/2019
-    
+
     \copyright
     \attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
     [<strong>denisacostaq</strong>][denisacostaq-URL].
     All rights reserved.</center></h1>
     \attention This file is part of [<strong>DAQs</strong>][DAQs-URL].
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
@@ -20,7 +20,7 @@
     - 3. Neither the name of the University nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
-      
+
     THIS PRODUCT IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -31,7 +31,7 @@
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-    
+
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
@@ -42,10 +42,7 @@
 
 class IStorage {
  public:
-  enum class Err {
-    Ok,
-    Failed
-  };
+  enum class Err { Ok, Failed };
 
   IStorage() = default;
   virtual ~IStorage() = default;
@@ -56,7 +53,8 @@ class IStorage {
 
   virtual Err create_scheme() = 0;
   virtual Err add_variable(const std::string& name) = 0;
-  virtual Err add_variable_value(const std::string& var_name, float var_value) = 0;
+  virtual Err add_variable_value(const std::string& var_name,
+                                 float var_value) = 0;
 };
 
-#endif //  DATABASE_SERVER_ISTORAGE_H
+#endif  //  DATABASE_SERVER_ISTORAGE_H

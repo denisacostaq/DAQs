@@ -79,7 +79,7 @@ IStorage::Err SQLiteWrapper::create_scheme() {
     char *err = nullptr;
     int rc = sqlite3_exec(db_, s.c_str(), nullptr, nullptr, &err);
     if (rc != SQLITE_OK) {
-      std::cerr<< "SQL error: " << err << "\n";
+      std::cerr << "SQL error: " << err << "\n";
       sqlite3_free(err);
       return Err::Failed;
     } else {
