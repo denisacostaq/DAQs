@@ -11,21 +11,27 @@ matrix:
     - os: linux
       addons:
         apt:
+          update: true
           sources:
+            - sourceline: 'ppa:mhier/libboost-latest'
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
     - os: linux
       addons:
         apt:
+          update: true
           sources:
+            - sourceline: 'ppa:mhier/libboost-latest'
             - llvm-toolchain-xenial-7
           packages:
             - clang-7
             - clang-format-7
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
@@ -48,11 +54,11 @@ before_install:
   - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
-      sudo apt-get update -y;
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
       brew update;
+      brew upgrade boost;
     fi
   - eval "${MATRIX_EVAL}"
 
