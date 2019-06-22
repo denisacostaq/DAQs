@@ -40,16 +40,78 @@
 
 #include <string>
 
-#include "src/database-server/istorage.h"
+#include "src/database-server/idatamodel.h"
 
 class sqlite3;
-class SQLiteWrapper : public IStorage {
+class SQLiteWrapper : public IDataModel {
  public:
+  /**
+   * @brief SQLiteWrapper create a sqlite3 connection.
+   * @throw exception if any error happen.
+   * @param db_path the path to the sqlite3 db file
+   * @sa IDataModel
+   */
   SQLiteWrapper(const std::string& db_path);
-  ~SQLiteWrapper();
+
+  /**
+   * @brief ~SQLiteWrapper release the sqlite3 connection.
+   * @sa SQLiteWrapper
+   */
+  ~SQLiteWrapper() override;
+
+  /**
+   * @brief create_scheme creates the database schema for sqlite3
+   * @details a table with posible variables, a table with variable values and a
+   * relation betwen the two (a variable have many variable values).
+   * @return Err::Ok on success.
+   * @sa IDataModel::create_scheme
+   */
   Err create_scheme() override;
+
+  /**
+   * @brief add_variable add an entry to the variable table.
+   * @param name of the variable.
+   * @return Err::Ok on success.
+   * @sa IDataModel::add_variable
+   */
   Err add_variable(const std::string& name) override;
-  Err add_variable_value(const std::string& var_name, float var_value) override;
+
+  /**
+   * @brief add_variable_value add an entry ti the vriable value table, related
+   * to an entry in the variable table.
+   * @param var_name related entry in the variable table.
+   * @param var_value value of the variable for the variable value table.
+   * @return Err::Ok on success.
+   * @sa IDataModel::add_variable_value
+   */
+  Err add_variable_value(const std::string& var_name,
+                         double var_value) override;
+
+  /**
+   * @brief fetch_variable_values get all values related to a variable.
+   * @param var_name variable to get related values from.
+   * @param send_vale get values one at a time from this callback.
+   * @return Err::Ok on success.
+   * @sa IDataModel::fetch_variable_values
+   */
+  Err fetch_variable_values(
+      const std::string& var_name,
+      const std::function<void(double value)>& send_vale) override;
+
+  /**
+   * @brief fetch_variable_values_in_date_period get all values related to a
+   * variable in a date range.
+   * @param var_name variable to get related values from.
+   * @param start_data begin of the date range.
+   * @param end_date end of the date range.
+   * @param send_vale get values one at a time from this callback.
+   * @return
+   */
+  Err fetch_variable_values_in_date_period(
+      const std::string& var_name,
+      const std::chrono::system_clock::time_point& start_data,
+      const std::chrono::system_clock::time_point& end_date,
+      const std::function<void(double value)>& send_vale) override;
 
  private:
   sqlite3* db_;
