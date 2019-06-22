@@ -74,7 +74,8 @@ IDataModel::Err SQLiteWrapper::create_scheme() {
       "VAL         DOUBLE   NOT NULL,"
       "TIMESTAMP   INTEGER NOT NULL,"
       "VARIABLE_ID INT      NOT NULL,"
-      "FOREIGN KEY (VARIABLE_ID) REFERENCES VARIABLE(ID));";  // FIXME(denisacostaq@gmail.com): add constrints
+      "FOREIGN KEY (VARIABLE_ID) REFERENCES VARIABLE(ID));";  // FIXME(denisacostaq@gmail.com):
+                                                              // add constrints
   stataments.push_back(sql);
   for (const auto &s : stataments) {
     char *err = nullptr;
