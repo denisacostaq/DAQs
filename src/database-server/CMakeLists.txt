@@ -6,7 +6,7 @@ if(NOT MAKE_EXE)
 endif(NOT MAKE_EXE)
 
 include(ExternalProject)
-ExternalProject_Add(sqlite_project
+ExternalProject_Add(sqlite3_project
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite3
     URL https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
@@ -14,11 +14,14 @@ ExternalProject_Add(sqlite_project
     BUILD_COMMAND ${MAKE_EXE} -C ${CMAKE_CURRENT_BINARY_DIR}/sqlite3 -j${N_PROC}
     INSTALL_COMMAND echo "Skipping install"
 )
-add_library(sqlite STATIC IMPORTED)
-add_dependencies(sqlite sqlite_project)
-set_property(TARGET sqlite
-    PROPERTY IMPORTED_LOCATION 
-    "${CMAKE_CURRENT_BINARY_DIR}/sqlite3/.libs/libsqlite3.a")
+ExternalProject_Get_Property(sqlite3_project source_dir)
+set(SQLITE3_INCLUDE_DIR ${source_dir}/include)
+ExternalProject_Get_Property(sqlite3_project binary_dir)
+set(SQLITE3_LIBRARY sqlite3)
+set(SQLITE3_LIBRARY_PATH ${binary_dir}/.libs/${CMAKE_FIND_LIBRARY_PREFIXES}${SQLITE3_LIBRARY}.a)
+add_library(${SQLITE3_LIBRARY} STATIC IMPORTED)
+add_dependencies(${SQLITE3_LIBRARY} sqlite3_project)
+set_property(TARGET ${SQLITE3_LIBRARY} PROPERTY IMPORTED_LOCATION ${SQLITE3_LIBRARY_PATH})
 
 set(CMAKE_THREAD_PREFER_PTHREAD ON)
 find_package(Threads REQUIRED)
@@ -28,5 +31,5 @@ endif(NOT CMAKE_USE_PTHREADS_INIT)
 
 add_library(sqlitedatamodel
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
-target_include_directories(sqlitedatamodel PUBLIC ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3)
-target_link_libraries(sqlitedatamodel sqlite Threads::Threads ${CMAKE_DL_LIBS})
+target_include_directories(sqlitedatamodel PUBLIC ${SQLITE3_INCLUDE_DIR})
+target_link_libraries(sqlitedatamodel ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
