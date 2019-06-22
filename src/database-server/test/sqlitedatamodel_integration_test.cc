@@ -1,7 +1,8 @@
-/*! \brief This file have the implementation for sqlitedatamodel integration tests
-    \file sqlitedatamodel_integration_test.cc
-    \author Alvaro Denis <denisacostaq@gmail.com>
-    \date 6/22/2019
+/*! @brief This file have the implementation for sqlitedatamodel integration
+   tests
+    @file sqlitedatamodel_integration_test.cc
+    @author Alvaro Denis <denisacostaq@gmail.com>
+    @date 6/22/2019
 
     \copyright
     \attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -46,7 +47,6 @@
 #include "src/database-server/sqlitewrapper.h"
 #include "src/database-server/test/testutil.h"
 
-
 class SQLiteWrapperTest : public ::testing::Test {
  protected:
   void SetUp() override {
@@ -54,9 +54,7 @@ class SQLiteWrapperTest : public ::testing::Test {
     EXPECT_EQ(IDataModel::Err::Ok, dm_->create_scheme());
   }
 
-  void TearDown() override {
-    delete dm_;
-  }
+  void TearDown() override { delete dm_; }
 
   IDataModel* dm_ = nullptr;
 };
@@ -76,13 +74,13 @@ TEST_F(SQLiteWrapperTest, AddVariableValue) {
 
 TEST(NotInitializedSchema, CanNotAddVariable) {
   IDataModel* dm = nullptr;
-   try {
-     dm = new SQLiteWrapper(get_random_sqlite_file_path());
-   } catch (std::string msg) {
-     std::cerr << msg << "\n";
-   } catch (...) {
-     std::cerr << "Unextpected error\n";
-   }
+  try {
+    dm = new SQLiteWrapper(get_random_sqlite_file_path());
+  } catch (std::string msg) {
+    std::cerr << msg << "\n";
+  } catch (...) {
+    std::cerr << "Unextpected error\n";
+  }
   EXPECT_NE(IDataModel::Err::Ok, dm->add_variable("temp"));
   delete dm;
 }

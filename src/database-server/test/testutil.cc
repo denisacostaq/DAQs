@@ -31,7 +31,7 @@
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-    
+
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
@@ -41,9 +41,10 @@
 #include <boost/filesystem.hpp>
 
 std::string get_random_sqlite_file_path() noexcept {
-    const auto &fileRel = boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.db");
-    const auto &dirAbs = boost::filesystem::temp_directory_path() / "DAQs";
-    boost::filesystem::create_directories(dirAbs);
-    const auto &fileAbs = dirAbs / fileRel;
-    return fileAbs.string();
+  const auto &fileRel =
+      boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.db");
+  const auto &dirAbs = boost::filesystem::temp_directory_path() / "DAQs";
+  boost::filesystem::create_directories(dirAbs);
+  const auto &fileAbs = dirAbs / fileRel;
+  return fileAbs.string();
 }
