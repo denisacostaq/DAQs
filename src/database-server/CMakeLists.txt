@@ -35,6 +35,11 @@ target_include_directories(sqlitedatamodel SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(sqlitedatamodel ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
 
 if(BUILD_TESTING)
+  find_package(Boost 1.67 REQUIRED filesystem)
+  add_library(test_util ${CMAKE_CURRENT_SOURCE_DIR}/test/testutil.cc)
+  target_include_directories(test_util SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
+  target_link_libraries(test_util PUBLIC ${Boost_LIBRARIES})
+  include(GoogleTest)
   ExternalProject_Add(googletest_project
       SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/gtest
       BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/gtest
