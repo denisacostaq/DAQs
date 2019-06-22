@@ -15,7 +15,7 @@ ExternalProject_Add(sqlite3_project
     INSTALL_COMMAND echo "Skipping install"
 )
 ExternalProject_Get_Property(sqlite3_project source_dir)
-set(SQLITE3_INCLUDE_DIR ${source_dir}/include)
+set(SQLITE3_INCLUDE_DIR ${source_dir})
 ExternalProject_Get_Property(sqlite3_project binary_dir)
 set(SQLITE3_LIBRARY sqlite3)
 set(SQLITE3_LIBRARY_PATH ${binary_dir}/.libs/${CMAKE_FIND_LIBRARY_PREFIXES}${SQLITE3_LIBRARY}.a)
