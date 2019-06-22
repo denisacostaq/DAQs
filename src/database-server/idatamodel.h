@@ -1,5 +1,5 @@
 /*! @brief This file have the interface for the IDataModel class.
-    @file IDataModel.h
+    @file idatamodel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/19/2019
 
