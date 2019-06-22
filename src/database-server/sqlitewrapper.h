@@ -51,6 +51,14 @@ class SQLiteWrapper : public IStorage {
   Err add_variable(const std::string& name) override;
   Err add_variable_value(const std::string& var_name,
                          double var_value) override;
+  Err fetch_variable_values(
+      const std::string& var_name,
+      const std::function<void(double value)>& send_vale) override;
+  Err fetch_variable_values_in_date_period(
+      const std::string& var_name,
+      const std::chrono::system_clock::time_point& start_data,
+      const std::chrono::system_clock::time_point& end_date,
+      const std::function<void(double value)>& send_vale) override;
 
  private:
   sqlite3* db_;
