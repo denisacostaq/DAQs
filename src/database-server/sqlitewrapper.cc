@@ -60,21 +60,21 @@ SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
 
 SQLiteWrapper::~SQLiteWrapper() { sqlite3_close(db_); }
 
-IStorage::Err SQLiteWrapper::create_scheme() {
+IDataModel::Err SQLiteWrapper::create_scheme() {
   std::vector<std::string> stataments;
   stataments.reserve(2);
   std::string sql =
       "CREATE TABLE VARIABLE("
       "ID   INTEGER  PRIMARY KEY AUTOINCREMENT,"
-      "NAME CHAR(50) NOT NULL);";
+      "NAME CHAR(50) NOT NULL UNIQUE);";
   stataments.push_back(sql);
   sql =
       "CREATE TABLE VARIABLE_VALUE("
       "ID          INTEGER  PRIMARY KEY AUTOINCREMENT,"
-      "VAL         REAL,"
-      "TIMESTAMP   DATETIME DEFAULT CURRENT_TIMESTAMP,"
-      "VARIABLE_ID INT,"
-      "FOREIGN KEY (VARIABLE_ID) REFERENCES VARIABLE(ID));";
+      "VAL         DOUBLE   NOT NULL,"
+      "TIMESTAMP   INTEGER NOT NULL,"
+      "VARIABLE_ID INT      NOT NULL,"
+      "FOREIGN KEY (VARIABLE_ID) REFERENCES VARIABLE(ID));";  // FIXME(denisacostaq@gmail.com): add constrints
   stataments.push_back(sql);
   for (const auto &s : stataments) {
     char *err = nullptr;
@@ -84,19 +84,19 @@ IStorage::Err SQLiteWrapper::create_scheme() {
       sqlite3_free(err);
       return Err::Failed;
     } else {
-      fprintf(stdout, "Table created successfully\n");
+      std::clog << "Table created successfully\n";
     }
   }
   return Err::Ok;
 }
 
-IStorage::Err SQLiteWrapper::add_variable(const std::string &name) {
+IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) {
   std::string sql =
       sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')", name.c_str());
   char *err = nullptr;
   int res = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err);
   if (res != SQLITE_OK) {
-    std::cerr << "Can not inser " << name << ". " << err << "\n";
+    std::cerr << "Can not insert " << name << ". " << err << "\n";
     sqlite3_free(err);
     return Err::Failed;
   }
@@ -105,7 +105,7 @@ IStorage::Err SQLiteWrapper::add_variable(const std::string &name) {
 }
 
 IDataModel::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
-                                                double var_value) {
+                                                  double var_value) {
   char *err_msg = nullptr;
   std::string sql = sqlite3_mprintf(
       "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
