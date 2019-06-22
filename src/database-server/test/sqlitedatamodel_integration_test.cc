@@ -36,24 +36,53 @@
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
 
-#include <gtest/gtest.h> // googletest header file
-
+#include <chrono>
+#include <ctime>
+#include <iostream>
 #include <string>
-using std::string;
 
-const char *actualValTrue  = "hello gtest";
-const char *actualValFalse = "hello world";
-const char *expectVal      = "hello gtest";
+#include <gtest/gtest.h>
 
-TEST(StrCompare, CStrEqual) {
-    EXPECT_STREQ(expectVal, actualValTrue);
+#include "src/database-server/sqlitewrapper.h"
+#include "src/database-server/test/testutil.h"
+
+
+class SQLiteWrapperTest : public ::testing::Test {
+ protected:
+  void SetUp() override {
+    dm_ = new SQLiteWrapper(get_random_sqlite_file_path());
+    EXPECT_EQ(IDataModel::Err::Ok, dm_->create_scheme());
+  }
+
+  void TearDown() override {
+    delete dm_;
+  }
+
+  IDataModel* dm_ = nullptr;
+};
+
+TEST_F(SQLiteWrapperTest, AddVariable) {
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable("var1"));
+  EXPECT_NE(IDataModel::Err::Ok, dm_->add_variable("var1"));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable("var2"));
 }
 
-TEST(StrCompare, CStrNotEqual) {
-    EXPECT_STREQ(expectVal, actualValFalse);
+TEST_F(SQLiteWrapperTest, AddVariableValue) {
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable("var1"));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value("var1", 23.1));
+  EXPECT_NE(IDataModel::Err::Ok, dm_->add_variable_value("varNone", 13.1));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value("var1", 21.1));
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv); 
-    return RUN_ALL_TESTS();
+TEST(NotInitializedSchema, CanNotAddVariable) {
+  IDataModel* dm = nullptr;
+   try {
+     dm = new SQLiteWrapper(get_random_sqlite_file_path());
+   } catch (std::string msg) {
+     std::cerr << msg << "\n";
+   } catch (...) {
+     std::cerr << "Unextpected error\n";
+   }
+  EXPECT_NE(IDataModel::Err::Ok, dm->add_variable("temp"));
+  delete dm;
 }
