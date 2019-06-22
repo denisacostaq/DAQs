@@ -9,9 +9,9 @@ ExternalProject_Add(sqlite3_project
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite3
     URL https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
-    CONFIGURE_COMMAND ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3/configure
+    CONFIGURE_COMMAND ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3/configure --enable-threadsafe=true
     BUILD_COMMAND ${MAKE_EXE} -C ${CMAKE_CURRENT_BINARY_DIR}/sqlite3 -j${N_PROC}
-    INSTALL_COMMAND echo "Skipping install"
+    INSTALL_COMMAND echo "Skipping install sqlite3"
 )
 ExternalProject_Get_Property(sqlite3_project source_dir)
 set(SQLITE3_INCLUDE_DIR ${source_dir})
@@ -33,7 +33,7 @@ add_library(sqlitedatamodel
 target_include_directories(sqlitedatamodel SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(sqlitedatamodel PUBLIC ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
 
-if(BUILD_TESTING)
+if(BUILD_TESTING AND SQLITEDATAMODEL_TEST_ENABLED)
   find_package(Boost 1.67 REQUIRED filesystem)
   add_library(test_util ${CMAKE_CURRENT_SOURCE_DIR}/test/testutil.cc)
   target_include_directories(test_util SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
@@ -43,4 +43,4 @@ if(BUILD_TESTING)
   target_include_directories(sqlitedatamodel_test SYSTEM PRIVATE ${GTEST_INCLUDE_DIR})
   target_link_libraries(sqlitedatamodel_test PRIVATE ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} sqlitedatamodel test_util)
   gtest_add_tests(sqlitedatamodel_test "" AUTO)
-endif(BUILD_TESTING)
+endif(BUILD_TESTING AND SQLITEDATAMODEL_TEST_ENABLED)

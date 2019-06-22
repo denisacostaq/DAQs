@@ -133,11 +133,10 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
 
 TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   std::string var1 = "var1";
-  std::vector<double> var1OrgValues;
   const int ammount = 100;
+  std::vector<double> var1OrgValues;
   var1OrgValues.reserve(100);
   EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var1));
-  ;
   for (int i = 0; i < ammount; ++i) {
     var1OrgValues.push_back(i);
   }

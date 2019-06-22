@@ -7,6 +7,7 @@ env:
     - CMAKE_VERSION=3.14.5
 
 matrix:
+  fast_finish: true
   include:
     - os: linux
       addons:
@@ -64,10 +65,15 @@ before_install:
 script:
   - mkdir 3rdparty/build
   - pushd 3rdparty/build
-  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON ../../
+  - if [[ ( $TRAVIS_OS_NAME == 'osx' ) && ( $CXX == 'g++-7' ) ]];then
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DSQLITEDATAMODEL_TEST_ENABLED=OFF ../../;
+    else
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON ../../;
+    fi
   - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
   - make
   - make test
+  - cat Testing/Temporary/LastTest.log
   - popd
 
 notifications:
