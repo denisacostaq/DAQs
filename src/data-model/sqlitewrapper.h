@@ -40,7 +40,7 @@
 
 #include <string>
 
-#include "src/database-server/idatamodel.h"
+#include "src/data-model/idatamodel.h"
 
 class sqlite3;
 class SQLiteWrapper : public IDataModel {

@@ -44,8 +44,8 @@
 
 #include <gtest/gtest.h>
 
-#include "src/database-server/sqlitewrapper.h"
-#include "src/database-server/test/testutil.h"
+#include "src/data-model/sqlitewrapper.h"
+#include "src/data-model/test/testutil.h"
 
 TEST(NotInitializedSchema, CanNotAddVariable) {
   IDataModel* dm = nullptr;
