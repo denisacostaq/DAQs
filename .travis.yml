@@ -59,9 +59,10 @@ before_install:
 script:
   - mkdir 3rdparty/build
   - pushd 3rdparty/build
-  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ../../
+  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON ../../
   - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
   - make
+  - make test
   - popd
 
 notifications:
