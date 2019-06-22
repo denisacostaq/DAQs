@@ -38,6 +38,8 @@
 #ifndef DATABASE_SERVER_ISTORAGE_H
 #define DATABASE_SERVER_ISTORAGE_H
 
+#include <chrono>
+#include <functional>
 #include <string>
 
 class IStorage {
@@ -54,7 +56,7 @@ class IStorage {
   virtual Err create_scheme() = 0;
   virtual Err add_variable(const std::string& name) = 0;
   virtual Err add_variable_value(const std::string& var_name,
-                                 float var_value) = 0;
+                                 double var_value) = 0;
 };
 
 #endif  //  DATABASE_SERVER_ISTORAGE_H

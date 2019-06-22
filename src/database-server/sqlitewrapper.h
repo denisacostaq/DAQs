@@ -49,7 +49,8 @@ class SQLiteWrapper : public IStorage {
   ~SQLiteWrapper();
   Err create_scheme() override;
   Err add_variable(const std::string& name) override;
-  Err add_variable_value(const std::string& var_name, float var_value) override;
+  Err add_variable_value(const std::string& var_name,
+                         double var_value) override;
 
  private:
   sqlite3* db_;

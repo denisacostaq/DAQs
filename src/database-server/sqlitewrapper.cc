@@ -42,6 +42,7 @@
 #include <exception>
 #include <iostream>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <sqlite3.h>
@@ -104,6 +105,18 @@ IStorage::Err SQLiteWrapper::add_variable(const std::string &name) {
 }
 
 IStorage::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
-                                                float var_value) {
+                                                double var_value) {
+  char *err_msg = nullptr;
+  std::string sql = sqlite3_mprintf(
+      "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
+      "(SELECT ID FROM "
+      "VARIABLE WHERE NAME = '%q'))",
+      var_value, std::chrono::system_clock::now().time_since_epoch().count(),
+      var_name.c_str());
+  if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &err_msg) != SQLITE_OK) {
+    std::cerr << "error " << err_msg << "\n";
+    sqlite3_free(err_msg);
+    return Err::Failed;
+  }
   return Err::Ok;
 }
