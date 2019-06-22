@@ -31,7 +31,7 @@ endif(NOT CMAKE_USE_PTHREADS_INIT)
 
 add_library(sqlitedatamodel
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
-target_include_directories(sqlitedatamodel PUBLIC ${SQLITE3_INCLUDE_DIR})
+target_include_directories(sqlitedatamodel SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(sqlitedatamodel ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
 
 if(BUILD_TESTING)
@@ -42,11 +42,15 @@ if(BUILD_TESTING)
       INSTALL_COMMAND echo "Skipping install"
   )
   ExternalProject_Get_Property(googletest_project source_dir)
-  set(GTEST_INCLUDE_DIR ${source_dir}/include)
+  set(GTEST_INCLUDE_DIR ${source_dir}/googletest/include)
   ExternalProject_Get_Property(googletest_project binary_dir)
   set(GTEST_LIBRARY gtest)
   set(GTEST_LIBRARY_PATH ${binary_dir}/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}${GTEST_LIBRARY}.a)
   add_library(${GTEST_LIBRARY} STATIC IMPORTED)
   set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION ${GTEST_LIBRARY_PATH} )
   add_dependencies(${GTEST_LIBRARY} googletest_project)
+  add_executable(sqlitedatamodel_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/sqlitedatamodel_integration_test.cc)
+  target_include_directories(sqlitedatamodel_test SYSTEM PRIVATE ${GTEST_INCLUDE_DIR})
+  target_link_libraries(sqlitedatamodel_test ${GTEST_LIBRARY} sqlitedatamodel)
 endif(BUILD_TESTING)
