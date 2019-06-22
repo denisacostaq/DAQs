@@ -1,5 +1,5 @@
-/*! @brief This file have the interface for the IStorage class.
-    @file istorage.h
+/*! @brief This file have the interface for the IDataModel class.
+    @file IDataModel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/19/2019
 
@@ -35,30 +35,30 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATABASE_SERVER_ISTORAGE_H
-#define DATABASE_SERVER_ISTORAGE_H
+#ifndef DATABASE_SERVER_IDATAMODEL_H
+#define DATABASE_SERVER_IDATAMODEL_H
 
 #include <chrono>
 #include <functional>
 #include <string>
 
 /**
- * @brief The IStorage class is an interface for the data model
+ * @brief The IDataModel class is an interface for the data model
  * @details A variable is related for example for sensors, like temperature,
  * luminosity, ... A value is for example the numerica value for a
  * temperature sensor.
  * @sa add_variable_value, add_variable_value
  */
-class IStorage {
+class IDataModel {
  public:
   enum class Err { Ok, Failed };
 
-  IStorage() = default;
-  virtual ~IStorage() = default;
-  IStorage(const IStorage&) = delete;
-  IStorage& operator=(const IStorage&) = delete;
-  IStorage(IStorage&&) = default;
-  IStorage& operator=(IStorage&&) = default;
+  IDataModel() = default;
+  virtual ~IDataModel() = default;
+  IDataModel(const IDataModel&) = delete;
+  IDataModel& operator=(const IDataModel&) = delete;
+  IDataModel(IDataModel&&) = default;
+  IDataModel& operator=(IDataModel&&) = default;
 
   /**
    * @brief create_scheme create data storage persistence, e.g. schema for a
@@ -112,4 +112,4 @@ class IStorage {
       const std::function<void(double value)>& send_vale) = 0;
 };
 
-#endif  //  DATABASE_SERVER_ISTORAGE_H
+#endif  //  DATABASE_SERVER_IDATAMODEL_H

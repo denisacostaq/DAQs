@@ -40,13 +40,13 @@
 
 #include <string>
 
-#include "src/database-server/istorage.h"
+#include "src/database-server/IDataModel.h"
 
 class sqlite3;
-class SQLiteWrapper : public IStorage {
+class SQLiteWrapper : public IDataModel {
  public:
   SQLiteWrapper(const std::string& db_path);
-  ~SQLiteWrapper();
+  ~SQLiteWrapper() override;
   Err create_scheme() override;
   Err add_variable(const std::string& name) override;
   Err add_variable_value(const std::string& var_name,

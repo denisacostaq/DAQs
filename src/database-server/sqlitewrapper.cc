@@ -47,7 +47,7 @@
 
 #include <sqlite3.h>
 
-SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IStorage() {
+SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
   int err = sqlite3_open(db_path.c_str(), &db_);
   if (err != SQLITE_OK) {
     std::cerr << sqlite3_errmsg(db_) << "\n";
@@ -104,7 +104,7 @@ IStorage::Err SQLiteWrapper::add_variable(const std::string &name) {
   return Err::Ok;
 }
 
-IStorage::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
+IDataModel::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
                                                 double var_value) {
   char *err_msg = nullptr;
   std::string sql = sqlite3_mprintf(
@@ -121,7 +121,7 @@ IStorage::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
   return Err::Ok;
 }
 
-IStorage::Err SQLiteWrapper::fetch_variable_values(
+IDataModel::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
     const std::function<void(double value)> &send_vale) {
   char *err_msg = nullptr;
@@ -160,7 +160,7 @@ IStorage::Err SQLiteWrapper::fetch_variable_values(
   return Err::Ok;
 }
 
-IStorage::Err SQLiteWrapper::fetch_variable_values_in_date_period(
+IDataModel::Err SQLiteWrapper::fetch_variable_values_in_date_period(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,
