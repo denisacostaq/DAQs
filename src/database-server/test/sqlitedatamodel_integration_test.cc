@@ -49,8 +49,16 @@
 
 class SQLiteWrapperTest : public ::testing::Test {
  protected:
+    SQLiteWrapperTest() : dm_{nullptr}{}
   void SetUp() override {
-    dm_ = new SQLiteWrapper(get_random_sqlite_file_path());
+    try {
+      dm_ = new SQLiteWrapper(get_random_sqlite_file_path());
+    } catch (std::string msg) {
+      std::cerr << msg << "\n";
+    } catch (...) {
+      std::cerr << "Unextpected error\n";
+    }
+    EXPECT_NE(nullptr, dm_);
     EXPECT_EQ(IDataModel::Err::Ok, dm_->create_scheme());
   }
 
@@ -81,6 +89,7 @@ TEST(NotInitializedSchema, CanNotAddVariable) {
   } catch (...) {
     std::cerr << "Unextpected error\n";
   }
+  EXPECT_NE(nullptr, dm);
   EXPECT_NE(IDataModel::Err::Ok, dm->add_variable("temp"));
   delete dm;
 }
