@@ -33,3 +33,20 @@ add_library(sqlitedatamodel
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
 target_include_directories(sqlitedatamodel PUBLIC ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(sqlitedatamodel ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
+
+if(BUILD_TESTING)
+  ExternalProject_Add(googletest_project
+      SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/gtest
+      BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/gtest
+      URL https://github.com/google/googletest/archive/release-1.8.1.tar.gz
+      INSTALL_COMMAND echo "Skipping install"
+  )
+  ExternalProject_Get_Property(googletest_project source_dir)
+  set(GTEST_INCLUDE_DIR ${source_dir}/include)
+  ExternalProject_Get_Property(googletest_project binary_dir)
+  set(GTEST_LIBRARY gtest)
+  set(GTEST_LIBRARY_PATH ${binary_dir}/googlemock/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}${GTEST_LIBRARY}.a)
+  add_library(${GTEST_LIBRARY} STATIC IMPORTED)
+  set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION ${GTEST_LIBRARY_PATH} )
+  add_dependencies(${GTEST_LIBRARY} googletest_project)
+endif(BUILD_TESTING)
