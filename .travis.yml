@@ -15,12 +15,10 @@ matrix:
           update: true
           sources:
             - sourceline: 'ppa:mhier/libboost-latest'
-            - sourceline: 'ppa:maarten-fonville/protobuf'
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
             - boost1.67
-            - protobuf
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
@@ -30,13 +28,11 @@ matrix:
           update: true
           sources:
             - sourceline: 'ppa:mhier/libboost-latest'
-            - sourceline: 'ppa:maarten-fonville/protobuf'
             - llvm-toolchain-xenial-7
           packages:
             - clang-7
             - clang-format-7
             - boost1.67
-            - protobuf
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
@@ -65,6 +61,11 @@ before_install:
       brew update;
     fi
   - eval "${MATRIX_EVAL}"
+
+install:
+  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
+      wget --show-progress http://ppa.launchpad.net/maarten-fonville/protobuf/ubuntu/pool/main/p/protobuf/protobuf-compiler_3.6.1-1~maarten0+cosmic_amd64.deb -O 3rdparty/protobuf.deb | sudo dpkg -i 3rdparty/protobuf.deb
+    fi
 
 script:
   - mkdir 3rdparty/build
