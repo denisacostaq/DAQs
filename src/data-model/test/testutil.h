@@ -42,4 +42,4 @@
 
 std::string get_random_sqlite_file_path() noexcept;
 
-#endif  // TESTUTIL_H
+#endif  //  DAQ_TESTUTIL_H
