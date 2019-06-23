@@ -101,7 +101,7 @@ IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
     sqlite3_free(err);
     return Err::Failed;
   }
-  std::clog << "Insertio ok\n";
+  std::clog << "Insertion ok\n";
   return Err::Ok;
 }
 

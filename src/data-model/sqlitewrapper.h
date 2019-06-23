@@ -35,8 +35,8 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATABASE_SERVER_SQLITEWRAPPER_H
-#define DATABASE_SERVER_SQLITEWRAPPER_H
+#ifndef DATAMODEL_SQLITEWRAPPER_H
+#define DATAMODEL_SQLITEWRAPPER_H
 
 #include <string>
 
@@ -111,10 +111,10 @@ class SQLiteWrapper : public IDataModel {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(double value)>& send_vale) override;
+      const std::function<void(double value)>& send_vale) noexcept override;
 
  private:
   sqlite3* db_;
 };
 
-#endif  //  DATABASE_SERVER_SQLITEWRAPPER_H
+#endif  //  DATAMODEL_SQLITEWRAPPER_H
