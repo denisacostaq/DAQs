@@ -51,7 +51,7 @@ TEST(NotInitializedSchema, CanNotAddVariable) {
   IDataModel* dm = nullptr;
   try {
     dm = new SQLiteWrapper(get_random_sqlite_file_path());
-  } catch (std::string msg) {
+  } catch (const std::string& msg) {
     std::cerr << msg << "\n";
   } catch (...) {
     std::cerr << "Unextpected error\n";
@@ -76,7 +76,7 @@ class SQLiteWrapperTest : public ::testing::Test {
   void SetUp() override {
     try {
       dm_ = new SQLiteWrapper(get_random_sqlite_file_path());
-    } catch (std::string msg) {
+    } catch (const std::string& msg) {
       std::cerr << msg << "\n";
     } catch (...) {
       std::cerr << "Unextpected error\n";
