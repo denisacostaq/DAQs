@@ -7,25 +7,32 @@ env:
     - CMAKE_VERSION=3.14.5
 
 matrix:
+  fast_finish: true
   include:
     - os: linux
       addons:
         apt:
+          update: true
           sources:
+            - sourceline: 'ppa:mhier/libboost-latest'
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
 
     - os: linux
       addons:
         apt:
+          update: true
           sources:
+            - sourceline: 'ppa:mhier/libboost-latest'
             - llvm-toolchain-xenial-7
           packages:
             - clang-7
             - clang-format-7
+            - boost1.67
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
 
@@ -34,12 +41,12 @@ matrix:
     #https://docs.travis-ci.com/user/reference/osx/#macos-version
     #https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L160-L164
     - os: osx
-      osx_image: xcode7.3 #clang-7
+      osx_image: xcode10.1 #clang-10, boost 1.67
       env:
         - MATRIX_EVAL="CC=clang && CXX=clang++"
 
     - os: osx
-      osx_image: xcode8.3
+      osx_image: xcode10.1
       env:
         - MATRIX_EVAL="brew install gcc@7 && CC=gcc-7 && CXX=g++-7"
 
@@ -48,7 +55,6 @@ before_install:
   - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
-      sudo apt-get update -y;
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
@@ -59,9 +65,15 @@ before_install:
 script:
   - mkdir 3rdparty/build
   - pushd 3rdparty/build
-  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} ../../
+  - if [[ ( $TRAVIS_OS_NAME == 'osx' ) && ( $CXX == 'g++-7' ) ]];then
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DSQLITEDATAMODEL_TEST_ENABLED=OFF ../../;
+    else
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON ../../;
+    fi
   - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
   - make
+  - make test
+  - cat Testing/Temporary/LastTest.log
   - popd
 
 notifications:

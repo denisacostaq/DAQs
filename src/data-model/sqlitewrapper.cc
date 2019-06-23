@@ -35,7 +35,7 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include "src/database-server/sqlitewrapper.h"
+#include "src/data-model/sqlitewrapper.h"
 
 #include <cerrno>
 #include <cstring>
@@ -60,7 +60,7 @@ SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
 
 SQLiteWrapper::~SQLiteWrapper() { sqlite3_close(db_); }
 
-IDataModel::Err SQLiteWrapper::create_scheme() {
+IDataModel::Err SQLiteWrapper::create_scheme() noexcept {
   std::vector<std::string> stataments;
   stataments.reserve(2);
   std::string sql =
@@ -91,7 +91,7 @@ IDataModel::Err SQLiteWrapper::create_scheme() {
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) {
+IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
   std::string sql =
       sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')", name.c_str());
   char *err = nullptr;
@@ -101,12 +101,12 @@ IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) {
     sqlite3_free(err);
     return Err::Failed;
   }
-  std::clog << "Insertio ok\n";
+  std::clog << "Insertion ok\n";
   return Err::Ok;
 }
 
 IDataModel::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
-                                                  double var_value) {
+                                                  double var_value) noexcept {
   char *err_msg = nullptr;
   std::string sql = sqlite3_mprintf(
       "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
@@ -124,7 +124,7 @@ IDataModel::Err SQLiteWrapper::add_variable_value(const std::string &var_name,
 
 IDataModel::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
-    const std::function<void(double value)> &send_vale) {
+    const std::function<void(double value)> &send_vale) noexcept {
   char *err_msg = nullptr;
   std::string query = sqlite3_mprintf(
       "SELECT VAL FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
@@ -165,7 +165,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values_in_date_period(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,
-    const std::function<void(double value)> &send_vale) {
+    const std::function<void(double value)> &send_vale) noexcept {
   char *err_msg = nullptr;
   const std::int64_t sd = start_date.time_since_epoch().count();
   const std::int64_t ed = end_date.time_since_epoch().count();

@@ -21,4 +21,15 @@ endif(N_PROC EQUAL 0)
 set(CMAKE_BUILD_PARALLEL_LEVEL ${N_PROC})
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ClangFormat.cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+option(BUILD_TESTING "Build tests" OFF)
+include(CMakeDependentOption)
+cmake_dependent_option(SQLITEDATAMODEL_TEST_ENABLED
+	"Build sqlite datamodel integration tests" ON
+	"BUILD_TESTING" ON)
+
+option(SQLITEDATAMODEL_TEST_ENABLED ON)
+if(BUILD_TESTING)
+    include(CTest)
+endif(BUILD_TESTING)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
