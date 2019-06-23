@@ -74,7 +74,7 @@ DataAccess::fetch_variable_values(const std::string& var_name,
 }
 
 std::tuple<std::vector<double>, IDataAccess::Err>
-DataAccess::fetch_variable_values_in_date_period(
+DataAccess::fetch_variable_values(
     const std::string& var_name,
     const std::chrono::system_clock::time_point& start_date,
     const std::chrono::system_clock::time_point& end_date,
@@ -88,10 +88,10 @@ DataAccess::fetch_variable_values_in_date_period(
       return std::make_tuple(std::vector<double>{}, Err::InvalidArgument);
     }
   }
-  if (dm_->fetch_variable_values_in_date_period(var_name, start_date, end_date,
-                                                [&values](double val) {
-                                                  values.push_back(val);
-                                                }) != IDataModel::Err::Ok) {
+  if (dm_->fetch_variable_values(var_name, start_date, end_date,
+                                 [&values](double val) {
+                                   values.push_back(val);
+                                 }) != IDataModel::Err::Ok) {
     return std::make_tuple(std::vector<double>{}, Err::Failed);
   }
   values.shrink_to_fit();

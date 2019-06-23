@@ -91,17 +91,15 @@ class IDataAccess {
       size_t max_len = std::numeric_limits<size_t>::infinity()) noexcept = 0;
 
   /**
-   * @brief fetch_variable_values_in_date_period get values for a variable in a
-   * date range.
+   * @brief fetch_variable_values get values for a variable in a date range.
    * @param var_name variable name.
    * @param start_date start date of the period.
    * @param end_date end date of the period.
    * @param max_len max result len (for data compression for example).
    * @return a vector with the variable values.
-   * @sa IDataModel::fetch_variable_values_in_date_period
+   * @sa IDataModel::fetch_variable_values
    */
-  virtual std::tuple<std::vector<double>, Err>
-  fetch_variable_values_in_date_period(
+  virtual std::tuple<std::vector<double>, Err> fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,

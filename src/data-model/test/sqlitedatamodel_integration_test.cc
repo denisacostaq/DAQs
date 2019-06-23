@@ -164,22 +164,22 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   laps.push_back(std::chrono::system_clock::now());
   int count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values_in_date_period(
-                var1, laps[0], laps[1], [&count](double) { ++count; }));
+            dm_->fetch_variable_values(var1, laps[0], laps[1],
+                                       [&count](double) { ++count; }));
   EXPECT_EQ(31, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values_in_date_period(
-                var1, laps[1], laps[2], [&count](double) { ++count; }));
+            dm_->fetch_variable_values(var1, laps[1], laps[2],
+                                       [&count](double) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values_in_date_period(
-                var1, laps[2], laps[3], [&count](double) { ++count; }));
+            dm_->fetch_variable_values(var1, laps[2], laps[3],
+                                       [&count](double) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values_in_date_period(
-                var1, laps[3], laps[4], [&count](double) { ++count; }));
+            dm_->fetch_variable_values(var1, laps[3], laps[4],
+                                       [&count](double) { ++count; }));
   EXPECT_EQ(9, count);
 }

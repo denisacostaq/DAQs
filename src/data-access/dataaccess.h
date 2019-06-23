@@ -75,16 +75,15 @@ class DataAccess : public IDataAccess {
       const std::string& var_name, size_t max_len) noexcept override;
 
   /**
-   * @brief fetch_variable_values_in_date_period get values for a given variable
-   * in a period.
+   * @brief fetch_variable_values get values for a given variable in a period.
    * @param var_name variable name.
    * @param start_date start date.
    * @param end_date end date
    * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
    * @return a vector of values if any and an error code.
-   * @sa IDataAccess::fetch_variable_values_in_date_period
+   * @sa IDataAccess::fetch_variable_values
    */
-  std::tuple<std::vector<double>, Err> fetch_variable_values_in_date_period(
+  std::tuple<std::vector<double>, Err> fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,

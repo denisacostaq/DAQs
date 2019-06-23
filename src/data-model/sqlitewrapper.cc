@@ -161,7 +161,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::fetch_variable_values_in_date_period(
+IDataModel::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,

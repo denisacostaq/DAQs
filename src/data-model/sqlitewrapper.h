@@ -99,15 +99,15 @@ class SQLiteWrapper : public IDataModel {
       const std::function<void(double value)>& send_vale) noexcept override;
 
   /**
-   * @brief fetch_variable_values_in_date_period get all values related to a
-   * variable in a date range.
+   * @brief fetch_variable_values get all values related to a variable in a date
+   * range.
    * @param var_name variable to get related values from.
    * @param start_data begin of the date range.
    * @param end_date end of the date range.
    * @param send_vale get values one at a time from this callback.
    * @return
    */
-  Err fetch_variable_values_in_date_period(
+  Err fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
