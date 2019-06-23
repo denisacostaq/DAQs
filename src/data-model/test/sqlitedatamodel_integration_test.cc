@@ -61,6 +61,15 @@ TEST(NotInitializedSchema, CanNotAddVariable) {
   delete dm;
 }
 
+TEST(OpenDb, CanOpenDb) {
+  auto path = get_random_sqlite_file_path();
+  EXPECT_NO_THROW(SQLiteWrapper(path.c_str()));
+}
+
+TEST(OpenDb, CanNotOpenDb) {
+  EXPECT_THROW(SQLiteWrapper("/pepe"), std::string);
+}
+
 class SQLiteWrapperTest : public ::testing::Test {
  protected:
   SQLiteWrapperTest() : dm_{nullptr} {}
