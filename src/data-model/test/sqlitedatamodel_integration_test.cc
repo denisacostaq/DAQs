@@ -41,6 +41,7 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <gtest/gtest.h>
 
@@ -151,11 +152,13 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   }
   std::vector<std::chrono::system_clock::time_point> laps;
   laps.push_back(std::chrono::system_clock::now());
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
   for (size_t i = 0; i < var1OrgValues.size(); ++i) {
     EXPECT_EQ(IDataModel::Err::Ok,
               dm_->add_variable_value(var1, var1OrgValues[i]));
     if (i == 30 || i == 60 || i == 90) {
       laps.push_back(std::chrono::system_clock::now());
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
   }
   laps.push_back(std::chrono::system_clock::now());
