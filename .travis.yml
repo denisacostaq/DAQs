@@ -19,6 +19,7 @@ matrix:
           packages:
             - g++-7
             - boost1.67
+            - protobuf-compiler
             - libprotobuf-dev
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -34,6 +35,7 @@ matrix:
             - clang-7
             - clang-format-7
             - boost1.67
+            - protobuf-compiler
             - libprotobuf-dev
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
