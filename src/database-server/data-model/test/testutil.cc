@@ -36,7 +36,7 @@
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
 
-#include "src/data-model/test/testutil.h"
+#include "src/database-server/data-model/test/testutil.h"
 
 #include <boost/filesystem.hpp>
 

@@ -36,8 +36,8 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef IDATAACCESS_H
-#define IDATAACCESS_H
+#ifndef DATABASESERVER_IDATAACCESS_H
+#define DATABASESERVER_IDATAACCESS_H
 
 #include <chrono>
 #include <functional>
@@ -106,4 +106,4 @@ class IDataAccess {
       size_t max_len = std::numeric_limits<size_t>::infinity()) noexcept = 0;
 };
 
-#endif  //  IDATAACCESS_H
+#endif  // DATABASESERVER_IDATAACCESS_H

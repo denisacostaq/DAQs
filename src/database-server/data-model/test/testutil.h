@@ -35,11 +35,11 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DAQ_TESTUTIL_H
-#define DAQ_TESTUTIL_H
+#ifndef DATABASESERVER_TESTUTIL_H
+#define DATABASESERVER_TESTUTIL_H
 
 #include <string>
 
 std::string get_random_sqlite_file_path() noexcept;
 
-#endif  //  DAQ_TESTUTIL_H
+#endif  // DATABASESERVER_TESTUTIL_H

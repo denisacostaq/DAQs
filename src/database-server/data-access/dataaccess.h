@@ -35,12 +35,11 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATAACCESS_H
-#define DATAACCESS_H
+#ifndef DATABASESERVER_DATAACCESS_H
+#define DATABASESERVER_DATAACCESS_H
 
-#include "src/data-access/idataaccess.h"
-
-#include "src/data-model/idatamodel.h"
+#include "src/database-server/data-access/idataaccess.h"
+#include "src/database-server/data-model/idatamodel.h"
 
 class DataAccess : public IDataAccess {
  public:
@@ -92,4 +91,4 @@ class DataAccess : public IDataAccess {
  private:
   IDataModel* dm_;
 };
-#endif  // DATAACCESS_H
+#endif  // DATABASESERVER_DATAACCESS_H
