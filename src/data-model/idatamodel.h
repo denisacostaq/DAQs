@@ -97,15 +97,15 @@ class IDataModel {
       const std::function<void(double value)>& send_vale) noexcept = 0;
 
   /**
-   * @brief fetch_variable_values_in_date_period  get all values of a given
-   * variables in a date range
+   * @brief fetch_variable_values  get all values of a given variables in a date
+   * range
    * @param var_name variable name to get the values from
    * @param start_date begin of the date range
    * @param end_date end of the date range
    * @param send_vale the values will be send in this callback, one at a time
    * @return Err::Ok on succes
    */
-  virtual Err fetch_variable_values_in_date_period(
+  virtual Err fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
