@@ -12,8 +12,8 @@ enum ResponseStatus {
  * @next Failure
  */
 message SaveValue {
-  string variable = 1;
-  double value = 2;
+  required string variable = 1;
+  required double value = 2;
 }
 
 /**
@@ -21,8 +21,8 @@ message SaveValue {
  * @prev Any
  */
 message Failure {
-  ResponseStatus status = 1;
-  string msg = 2;
+  required ResponseStatus status = 1;
+  optional string msg = 2;
 }
 
 /**
@@ -31,8 +31,7 @@ message Failure {
  * @next ValuesResponse
  */
 message GetValues {
-  ResponseStatus status = 1;
-  string variable = 2;
+  required string variable = 1;
 }
 
 /**
@@ -40,5 +39,5 @@ message GetValues {
  * @prev GetValues
  */
 message ValuesResponse {
-  repeated double values = 2;
+  required repeated double values = 1;
 }
