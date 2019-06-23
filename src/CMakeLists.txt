@@ -22,5 +22,5 @@ if(BUILD_TESTING)
   add_dependencies(${GTEST_MAIN_LIBRARY} googletest_project)
 endif(BUILD_TESTING)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/data-model)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/data-access)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)

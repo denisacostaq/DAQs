@@ -1,0 +1,44 @@
+syntax = "proto3";
+package message;
+
+enum ResponseStatus {
+  OK = 0;
+  FAILED = 1;
+  INVALID_ARGUMENT = 2;
+}
+
+/**
+ * Request: Save a variable value.
+ * @next Failure
+ */
+message SaveValue {
+  string variable = 1;
+  double value = 2;
+}
+
+/**
+ * Rsponse: Return information about a failure if any or just ok.
+ * @prev Any
+ */
+message Failure {
+  ResponseStatus status = 1;
+  string msg = 2;
+}
+
+/**
+ * Request: Get variable values.
+ * @next Failure
+ * @next ValuesResponse
+ */
+message GetValues {
+  ResponseStatus status = 1;
+  string variable = 2;
+}
+
+/**
+ * Response: Return values.
+ * @prev GetValues
+ */
+message ValuesResponse {
+  repeated double values = 2;
+}
