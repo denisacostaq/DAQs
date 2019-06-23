@@ -40,5 +40,5 @@ message GetValues {
  * @prev GetValues
  */
 message ValuesResponse {
-  repeated double values = 2;
+  repeated double values = 1;
 }
