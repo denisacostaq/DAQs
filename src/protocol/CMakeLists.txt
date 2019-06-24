@@ -1,4 +1,4 @@
-find_package(Protobuf 3.6.1 REQUIRED)
+find_package(Protobuf 2.6 REQUIRED)
 set(PROTO_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/messages.proto)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
