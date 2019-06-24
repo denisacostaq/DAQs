@@ -1,6 +1,10 @@
 find_program(CLANG_FORMAT_EXE clang-format)
 if(CLANG_FORMAT_EXE)
-    file(GLOB_RECURSE ALL_DAQs_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
+    file(GLOB_RECURSE
+      ALL_DAQs_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/*.proto)
     add_custom_target(
       format
       COMMAND ${CLANG_FORMAT_EXE} -i -style=Google ${ALL_DAQs_SOURCES}

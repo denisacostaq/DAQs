@@ -1,0 +1,44 @@
+syntax = "proto2";
+package message;
+
+enum ResponseStatus {
+  OK = 0;
+  FAILED = 1;
+  INVALID_ARGUMENT = 2;
+}
+
+/**
+ * Request: Save a variable value.
+ * @next Failure
+ */
+message SaveValue {
+  required string variable = 1;
+  required double value = 2;
+}
+
+/**
+ * Rsponse: Return information about a failure if any or just ok.
+ * @prev Any
+ */
+message Failure {
+  required ResponseStatus status = 1;
+  optional string msg = 2;
+}
+
+/**
+ * Request: Get variable values.
+ * @next Failure
+ * @next ValuesResponse
+ */
+message GetValues {
+  required string variable = 1;
+}
+
+/**
+ * Response: Return values.
+ * @prev GetValues
+ FIXME(denisacostaq@gmail.com): add required for values
+ */
+message ValuesResponse {
+  repeated double values = 1;
+}
