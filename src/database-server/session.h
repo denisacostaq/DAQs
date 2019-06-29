@@ -122,26 +122,7 @@ class Session : public std::enable_shared_from_this<Session> {
   }
 
   std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
-                                              std::size_t* out_fh_size) {
-    message::Header h_msg{};
-    h_msg.set_msg_type(message::RESPONSE_FAILURE);
-    h_msg.set_bodysize(b_size);
-    std::unique_ptr<std::uint8_t[]> h_buf{
-        new std::uint8_t[h_msg.ByteSizeLong()]};
-    h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
-    message::MetaHeader mh_msg{};
-    mh_msg.set_headersize(h_msg.ByteSizeLong());
-    std::unique_ptr<std::uint8_t[]> mh_buf{
-        new std::uint8_t[mh_msg.ByteSizeLong()]};
-    mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSize());
-    const auto fh_size{mh_msg.ByteSizeLong() + h_msg.ByteSizeLong()};
-    std::unique_ptr<std::uint8_t[]> fh_buf{new std::uint8_t[fh_size]};
-    std::memcpy(fh_buf.get(), mh_buf.get(), mh_msg.ByteSizeLong());
-    std::memcpy(&fh_buf.get()[mh_msg.ByteSizeLong()], h_buf.get(),
-                h_msg.ByteSizeLong());
-    *out_fh_size = fh_size;
-    return fh_buf;
-  }
+                                              std::size_t* out_fh_size);
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       const std::string& msg, message::ResponseStatus status,
