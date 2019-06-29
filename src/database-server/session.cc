@@ -90,3 +90,15 @@ void Session::send_status_response(const std::string &msg,
   auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
   send_msg(f_buf, fh_size + b_size);
 }
+
+std::unique_ptr<std::uint8_t[]> Session::build_b_response(
+    const std::string &msg, message::ResponseStatus status,
+    std::size_t *out_b_size) {
+  message::Failure b_msg{};
+  b_msg.set_status(status);
+  b_msg.set_msg(msg);
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
+  *out_b_size = b_msg.ByteSizeLong();
+  return b_buf;
+}

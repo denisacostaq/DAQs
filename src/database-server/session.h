@@ -145,16 +145,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       const std::string& msg, message::ResponseStatus status,
-      std::size_t* out_b_size) {
-    message::Failure b_msg{};
-    b_msg.set_status(status);
-    b_msg.set_msg(msg);
-    std::unique_ptr<std::uint8_t[]> b_buf{
-        new std::uint8_t[b_msg.ByteSizeLong()]};
-    b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
-    *out_b_size = b_msg.ByteSizeLong();
-    return b_buf;
-  }
+      std::size_t* out_b_size);
 
   void send_status_response(const std::string& msg,
                             message::ResponseStatus status);
