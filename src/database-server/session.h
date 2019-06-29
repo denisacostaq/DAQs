@@ -58,48 +58,7 @@ class Session : public std::enable_shared_from_this<Session> {
   void start() { do_read(); }
 
  private:
-  void read_header() {
-    auto mh_size_func = []() {
-      auto mh{message::MetaHeader{}};
-      mh.set_headersize(1);
-      return mh.ByteSizeLong();
-    };
-    // FIXME(denisacostaq@gmail.com): verify critical section.
-    static const auto mh_size{mh_size_func()};
-    std::shared_ptr<std::uint8_t[]> mh_buff{new std::uint8_t[mh_size]};
-    auto self(shared_from_this());
-    ba::async_read(
-        socket_, ba::buffer(mh_buff.get(), mh_size),
-        [this, self, mh_buff](boost::system::error_code ec,
-                              std::size_t length) {
-          if (!ec && length == mh_size) {
-            message::MetaHeader mh{};
-            mh.ParseFromArray(mh_buff.get(), static_cast<int>(mh_size));
-            std::clog << "mh.headersize() " << mh.headersize() << std::endl;
-            std::shared_ptr<std::uint8_t[]> h_buff{
-                new std::uint8_t[mh.headersize()]};
-            ba::async_read(
-                socket_, ba::buffer(h_buff.get(), mh.headersize()),
-                [this, self, h_size = mh.headersize(), h_buff](
-                    boost::system::error_code ec, std::size_t length) {
-                  if (!ec && length == h_size) {
-                    message::Header h{};
-                    h.ParseFromArray(h_buff.get(), static_cast<int>(h_size));
-                    std::clog << "h.bodysize() " << h.bodysize() << std::endl;
-                    read_body(h.msg_type(), h.bodysize());
-                  } else {
-                    std::cerr << "reading h_buff" << ec.message() << "\n";
-                    send_status_response("reading h_buff",
-                                         message::ResponseStatus::FAILED);
-                  }
-                });
-          } else {
-            std::cerr << "reading mh_buff " << ec.message() << "\n";
-            send_status_response("reading mh_buff",
-                                 message::ResponseStatus::FAILED);
-          }
-        });
-  }
+  void read_header();
 
   void read_save_value_request(std::size_t b_size) {
     auto self(shared_from_this());
