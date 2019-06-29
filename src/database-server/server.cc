@@ -58,22 +58,22 @@ class session : public std::enable_shared_from_this<session> {
   void start() { do_read(); }
 
  private:
-  void do_read() {
-    auto self(shared_from_this());
-    decltype(message::MetaHeader{}.ByteSizeLong()) mh_size{0};
-    {
-      auto m{message::MetaHeader{}};
-      m.set_headersize(1);
-      mh_size = m.ByteSizeLong();
-    }
-    std::clog << "mh_size " << mh_size << "\n";
+  void read_header() {
+    auto mh_size_func = []() {
+      auto mh{message::MetaHeader{}};
+      mh.set_headersize(1);
+      return mh.ByteSizeLong();
+    };
+    // FIXME(denisacostaq@gmail.com): verify critical section.
+    static const auto mh_size{mh_size_func()};
     std::shared_ptr<std::uint8_t[]> mh_buff{new std::uint8_t[mh_size]};
+    auto self(shared_from_this());
     ba::async_read(
         socket_, ba::buffer(mh_buff.get(), mh_size),
-        [this, self, mh_size, mh_buff](boost::system::error_code ec,
-                                       std::size_t length) {
+        [this, self, mh_buff](boost::system::error_code ec,
+                              std::size_t length) {
           if (!ec && length == mh_size) {
-            auto mh{message::MetaHeader{}};
+            message::MetaHeader mh{};
             mh.ParseFromArray(mh_buff.get(), static_cast<int>(mh_size));
             std::clog << "mh.headersize() " << mh.headersize() << std::endl;
             std::shared_ptr<std::uint8_t[]> h_buff{
@@ -86,79 +86,126 @@ class session : public std::enable_shared_from_this<session> {
                     message::Header h{};
                     h.ParseFromArray(h_buff.get(), static_cast<int>(h_size));
                     std::clog << "h.bodysize() " << h.bodysize() << std::endl;
-                    std::shared_ptr<std::uint8_t[]> body_buff{
-                        new std::uint8_t[h.bodysize()]};
-                    ba::async_read(
-                        socket_, ba::buffer(body_buff.get(), h.bodysize()),
-                        [this, self, body_buff, body_size = h.bodysize()](
-                            boost::system::error_code ec, size_t length) {
-                          if (!ec && length == body_size) {
-                            message::SaveValue sv{};
-                            sv.ParseFromArray(body_buff.get(),
-                                              static_cast<int>(body_size));
-                            std::clog << "finally"
-                                      << "\n";
-                            std::clog << "name " << sv.variable() << "\n";
-                            std::clog << "value " << sv.value() << "\n\n";
-                            do_write(sv.value());
-                          } else {
-                            std::cerr << "reading body_buf" << ec.message()
-                                      << "\n";
-                          }
-                        });
+                    read_body(h.msg_type(), h.bodysize());
                   } else {
                     std::cerr << "reading h_buff" << ec.message() << "\n";
+                    send_status_response("reading h_buff",
+                                         message::ResponseStatus::FAILED);
                   }
                 });
           } else {
             std::cerr << "reading mh_buff " << ec.message() << "\n";
+            send_status_response("reading mh_buff",
+                                 message::ResponseStatus::FAILED);
           }
         });
   }
 
-  void do_write(double val) {
+  void read_save_value_request(std::size_t b_size) {
     auto self(shared_from_this());
-    message::Failure body;
-    if (val > 50.) {
-      body.set_status(message::ResponseStatus::OK);
-      body.set_msg("all ok");
-    } else {
-      body.set_status(message::ResponseStatus::INVALID_ARGUMENT);
-      body.set_msg("fallo carijo");
-    }
-    message::Header h{};
-    h.set_msg_type(message::RESPONSE_FAILURE);
-    h.set_bodysize(body.ByteSizeLong());
-    std::unique_ptr<std::uint8_t[]> h_data{new std::uint8_t[h.ByteSizeLong()]};
-    h.SerializeToArray(h_data.get(), h.ByteSize());
-    std::unique_ptr<std::uint8_t[]> body_data{
-        new std::uint8_t[body.ByteSizeLong()]};
-    body.SerializeToArray(body_data.get(), body.ByteSize());
-    message::MetaHeader mh{};
-    mh.set_headersize(h.ByteSizeLong());
-    std::unique_ptr<std::uint8_t[]> mh_data{
-        new std::uint8_t[mh.ByteSizeLong()]};
-    mh.SerializeToArray(mh_data.get(), mh.ByteSize());
+    std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
+    ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                   [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                   size_t length) {
+                     if (!ec && length == b_size) {
+                       message::SaveValue sv{};
+                       sv.ParseFromArray(body_buff.get(),
+                                         static_cast<int>(b_size));
+                       std::clog << "finally"
+                                 << "\n";
+                       std::clog << "name " << sv.variable() << "\n";
+                       std::clog << "value " << sv.value() << "\n\n";
+                       send_status_response("Ok", message::ResponseStatus::OK);
+                     } else {
+                       std::cerr << "reading body_buf" << ec.message() << "\n";
+                     }
+                   });
+  }
 
-    std::shared_ptr<std::uint8_t[]> full_buffer{
-        new std::uint8_t[mh.ByteSizeLong() + h.ByteSizeLong() +
-                         body.ByteSizeLong()]};
-    std::memcpy(full_buffer.get(), mh_data.get(), mh.ByteSizeLong());
-    std::memcpy(&full_buffer.get()[mh.ByteSizeLong()], h_data.get(),
-                h.ByteSizeLong());
-    std::memcpy(&full_buffer.get()[mh.ByteSizeLong() + h.ByteSizeLong()],
-                body_data.get(), body.ByteSizeLong());
-    auto full_buffer_size{mh.ByteSizeLong() + h.ByteSizeLong() +
-                          body.ByteSizeLong()};
-    ba::async_write(socket_, ba::buffer(full_buffer.get(), full_buffer_size),
-                    [this, self, full_buffer, full_buffer_size](
-                        boost::system::error_code ec, std::size_t length) {
-                      if (!ec && full_buffer_size == length) {
+  void read_body(message::MessageType msg_type, std::size_t b_size) {
+    switch (msg_type) {
+      case message::MessageType::REQUEST_SAVE_VALUE:
+        read_save_value_request(b_size);
+        break;
+      default:
+        std::cerr << "unknow request " << msg_type << "\n";
+        send_status_response("unknow error", message::ResponseStatus::FAILED);
+        break;
+    }
+  }
+
+  void do_read() { read_header(); }
+
+  void send_msg(std::shared_ptr<std::uint8_t[]> f_buf, std::size_t f_size) {
+    auto self(shared_from_this());
+    ba::async_write(socket_, ba::buffer(f_buf.get(), f_size),
+                    [this, self, f_buf, f_size](boost::system::error_code ec,
+                                                std::size_t length) {
+                      if (!ec && f_size == length) {
                         do_read();
                       } else {
-                        std::cerr << "writing full buffer " << "\n";
+                        std::cerr << "writing full buffer "
+                                  << "\n";
+                        send_status_response("writing response",
+                                             message::ResponseStatus::FAILED);
                       }
                     });
+  }
+
+  std::shared_ptr<std::uint8_t[]> build_f_msg(
+      std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,
+      std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size) {
+    auto f_buffer_size{h_size + b_size};
+    std::shared_ptr<std::uint8_t[]> f_buf{new std::uint8_t[f_buffer_size]};
+    std::memcpy(f_buf.get(), h_buf.get(), h_size);
+    std::memcpy(&f_buf.get()[h_size], b_buf.get(), b_size);
+    return f_buf;
+  }
+
+  std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
+                                              std::size_t* out_fh_size) {
+    message::Header h_msg{};
+    h_msg.set_msg_type(message::RESPONSE_FAILURE);
+    h_msg.set_bodysize(b_size);
+    std::unique_ptr<std::uint8_t[]> h_buf{
+        new std::uint8_t[h_msg.ByteSizeLong()]};
+    h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
+    message::MetaHeader mh_msg{};
+    mh_msg.set_headersize(h_msg.ByteSizeLong());
+    std::unique_ptr<std::uint8_t[]> mh_buf{
+        new std::uint8_t[mh_msg.ByteSizeLong()]};
+    mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSize());
+    const auto fh_size{mh_msg.ByteSizeLong() + h_msg.ByteSizeLong()};
+    std::unique_ptr<std::uint8_t[]> fh_buf{new std::uint8_t[fh_size]};
+    std::memcpy(fh_buf.get(), mh_buf.get(), mh_msg.ByteSizeLong());
+    std::memcpy(&fh_buf.get()[mh_msg.ByteSizeLong()], h_buf.get(),
+                h_msg.ByteSizeLong());
+    *out_fh_size = fh_size;
+    return fh_buf;
+  }
+
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::string& msg, message::ResponseStatus status,
+      std::size_t* out_b_size) {
+    message::Failure b_msg{};
+    b_msg.set_status(status);
+    b_msg.set_msg(msg);
+    std::unique_ptr<std::uint8_t[]> b_buf{
+        new std::uint8_t[b_msg.ByteSizeLong()]};
+    b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
+    *out_b_size = b_msg.ByteSizeLong();
+    return b_buf;
+  }
+
+  void send_status_response(const std::string& msg,
+                            message::ResponseStatus status) {
+    std::size_t b_size{};
+    auto b_buf{build_b_response(msg, status, &b_size)};
+    std::size_t fh_size{};
+    auto fh_buf{build_h_msg(b_size, &fh_size)};
+    auto f_buf{
+        build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
+    send_msg(f_buf, fh_size + b_size);
   }
 
   tcp::socket socket_;
