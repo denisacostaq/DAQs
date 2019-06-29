@@ -81,17 +81,7 @@ class Session : public std::enable_shared_from_this<Session> {
                    });
   }
 
-  void read_body(message::MessageType msg_type, std::size_t b_size) {
-    switch (msg_type) {
-      case message::MessageType::REQUEST_SAVE_VALUE:
-        read_save_value_request(b_size);
-        break;
-      default:
-        std::cerr << "unknow request " << msg_type << "\n";
-        send_status_response("unknow error", message::ResponseStatus::FAILED);
-        break;
-    }
-  }
+  void read_body(message::MessageType msg_type, std::size_t b_size);
 
   void do_read() { read_header(); }
 
