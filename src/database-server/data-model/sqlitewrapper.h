@@ -51,7 +51,7 @@ class SQLiteWrapper : public IDataModel {
    * @param db_path the path to the sqlite3 db file
    * @sa IDataModel
    */
-  SQLiteWrapper(const std::string& db_path);
+  explicit SQLiteWrapper(const std::string& db_path);
 
   /**
    * @brief ~SQLiteWrapper release the sqlite3 connection.

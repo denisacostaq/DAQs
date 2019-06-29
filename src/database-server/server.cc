@@ -46,129 +46,33 @@
 
 #include <boost/asio.hpp>
 
-#include "messages.pb.h"
+#include <messages.pb.h>
+
+#include "src/database-server/data-access/dataaccess.h"
+#include "src/database-server/data-model/sqlitewrapper.h"
+#include "src/database-server/session.h"
 
 namespace ba = boost::asio;
 using ba::ip::tcp;
 
-class session : public std::enable_shared_from_this<session> {
- public:
-  explicit session(tcp::socket socket) : socket_(std::move(socket)) {}
-
-  void start() { do_read(); }
-
- private:
-  void do_read() {
-    auto self(shared_from_this());
-    decltype(message::MetaHeader{}.ByteSizeLong()) mh_size{0};
-    {
-      auto m{message::MetaHeader{}};
-      m.set_headersize(1);
-      mh_size = m.ByteSizeLong();
-    }
-    std::clog << "mh_size " << mh_size << "\n";
-    std::shared_ptr<std::uint8_t[]> mh_buff{new std::uint8_t[mh_size]};
-    ba::async_read(
-        socket_, ba::buffer(mh_buff.get(), mh_size),
-        [this, self, mh_size, mh_buff](boost::system::error_code ec,
-                                       std::size_t length) {
-          if (!ec && length == mh_size) {
-            auto mh{message::MetaHeader{}};
-            mh.ParseFromArray(mh_buff.get(), static_cast<int>(mh_size));
-            std::clog << "mh.headersize() " << mh.headersize() << std::endl;
-            std::shared_ptr<std::uint8_t[]> h_buff{
-                new std::uint8_t[mh.headersize()]};
-            ba::async_read(
-                socket_, ba::buffer(h_buff.get(), mh.headersize()),
-                [this, self, h_size = mh.headersize(), h_buff](
-                    boost::system::error_code ec, std::size_t length) {
-                  if (!ec && length == h_size) {
-                    message::Header h{};
-                    h.ParseFromArray(h_buff.get(), static_cast<int>(h_size));
-                    std::clog << "h.bodysize() " << h.bodysize() << std::endl;
-                    std::shared_ptr<std::uint8_t[]> body_buff{
-                        new std::uint8_t[h.bodysize()]};
-                    ba::async_read(
-                        socket_, ba::buffer(body_buff.get(), h.bodysize()),
-                        [this, self, body_buff, body_size = h.bodysize()](
-                            boost::system::error_code ec, size_t length) {
-                          if (!ec && length == body_size) {
-                            message::SaveValue sv{};
-                            sv.ParseFromArray(body_buff.get(),
-                                              static_cast<int>(body_size));
-                            std::clog << "finally"
-                                      << "\n";
-                            std::clog << "name " << sv.variable() << "\n";
-                            std::clog << "value " << sv.value() << "\n\n";
-                            do_write(sv.value());
-                          } else {
-                            std::cerr << "reading body_buf" << ec.message()
-                                      << "\n";
-                          }
-                        });
-                  } else {
-                    std::cerr << "reading h_buff" << ec.message() << "\n";
-                  }
-                });
-          } else {
-            std::cerr << "reading mh_buff " << ec.message() << "\n";
-          }
-        });
-  }
-
-  void do_write(double val) {
-    auto self(shared_from_this());
-    message::Failure body;
-    if (val > 50.) {
-      body.set_status(message::ResponseStatus::OK);
-      body.set_msg("all ok");
-    } else {
-      body.set_status(message::ResponseStatus::INVALID_ARGUMENT);
-      body.set_msg("fallo carijo");
-    }
-    message::Header h{};
-    h.set_msg_type(message::RESPONSE_FAILURE);
-    h.set_bodysize(body.ByteSizeLong());
-    std::unique_ptr<std::uint8_t[]> h_data{new std::uint8_t[h.ByteSizeLong()]};
-    h.SerializeToArray(h_data.get(), h.ByteSize());
-    std::unique_ptr<std::uint8_t[]> body_data{
-        new std::uint8_t[body.ByteSizeLong()]};
-    body.SerializeToArray(body_data.get(), body.ByteSize());
-    message::MetaHeader mh{};
-    mh.set_headersize(h.ByteSizeLong());
-    std::unique_ptr<std::uint8_t[]> mh_data{
-        new std::uint8_t[mh.ByteSizeLong()]};
-    mh.SerializeToArray(mh_data.get(), mh.ByteSize());
-
-    std::shared_ptr<std::uint8_t[]> full_buffer{
-        new std::uint8_t[mh.ByteSizeLong() + h.ByteSizeLong() +
-                         body.ByteSizeLong()]};
-    std::memcpy(full_buffer.get(), mh_data.get(), mh.ByteSizeLong());
-    std::memcpy(&full_buffer.get()[mh.ByteSizeLong()], h_data.get(),
-                h.ByteSizeLong());
-    std::memcpy(&full_buffer.get()[mh.ByteSizeLong() + h.ByteSizeLong()],
-                body_data.get(), body.ByteSizeLong());
-    auto full_buffer_size{mh.ByteSizeLong() + h.ByteSizeLong() +
-                          body.ByteSizeLong()};
-    ba::async_write(socket_, ba::buffer(full_buffer.get(), full_buffer_size),
-                    [this, self, full_buffer, full_buffer_size](
-                        boost::system::error_code ec, std::size_t length) {
-                      if (!ec && full_buffer_size == length) {
-                        do_read();
-                      } else {
-                        std::cerr << "writing full buffer " << "\n";
-                      }
-                    });
-  }
-
-  tcp::socket socket_;
-};
-
 class server {
  public:
-  server(ba::io_context& io_context, std::uint16_t port)
-      : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
+  server(ba::io_context& io_context, std::uint16_t port,
+         const std::string& db_file)
+      : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
+        dm_{new SQLiteWrapper(db_file)},
+        da_{new DataAccess(dm_)} {
+    if (dm_->create_scheme() == IDataModel::Err::Ok) {
+      da_->add_variable("temp");
+    } else {
+      throw std::string{"Unable to create schema."};
+    }
     do_accept();
+  }
+
+  ~server() {
+    delete da_;
+    delete dm_;
   }
 
  private:
@@ -176,7 +80,7 @@ class server {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
           if (!ec) {
-            std::make_shared<session>(std::move(socket))->start();
+            std::make_shared<Session>(std::move(socket), da_)->start();
           } else {
             std::cerr << "acepting " << ec.message() << "\n";
           }
@@ -185,6 +89,8 @@ class server {
   }
 
   tcp::acceptor acceptor_;
+  IDataModel* dm_;
+  IDataAccess* da_;
 };
 
 int main(int argc, char* argv[]) {
@@ -194,10 +100,14 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     ba::io_context io_context;
-    server s(io_context, std::atoi(argv[1]));
+    server s(io_context, std::atoi(argv[1]), "/tmp/sql.db");
     io_context.run();
+  } catch (const std::string& e) {
+    std::cerr << "Exception: " << e << "\n";
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << "\n";
+  } catch (...) {
+    std::cerr << "Unknow exception\n";
   }
   return 0;
 }

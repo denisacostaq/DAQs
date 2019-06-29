@@ -1,7 +1,7 @@
-/*! @brief This file have the interface for DataAccess class.
-    @file dataaccess.h
+/*! @brief This file have the interface for Session class.
+    @file session.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/22/2019
+    @date 6/29/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,60 +35,61 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATABASESERVER_DATAACCESS_H
-#define DATABASESERVER_DATAACCESS_H
+#ifndef DAQS_DATABASESERVER_SESSION_H
+#define DAQS_DATABASESERVER_SESSION_H
+
+#include <cstdlib>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <utility>
+
+#include <messages.pb.h>
+#include <boost/asio.hpp>
 
 #include "src/database-server/data-access/idataaccess.h"
-#include "src/database-server/data-model/idatamodel.h"
 
-class DataAccess : public IDataAccess {
+class Session : public std::enable_shared_from_this<Session> {
  public:
-  explicit DataAccess(IDataModel* dm) noexcept;
+  Session(boost::asio::ip::tcp::socket socket, IDataAccess* da);
 
-  /**
-   * @brief add_variable add a new variable.
-   * @param name variable name.
-   * @return Ok on success.
-   * @sa IDataAccess::add_variable
-   */
-  Err add_variable(const std::string& name) noexcept override;
-
-  /**
-   * @brief add_variable_value add a new value for a given variable.
-   * @param var_name variable name.
-   * @param var_value variable value.
-   * @return Ok on success.
-   * @sa IDataAccess::add_variable_value
-   */
-  Err add_variable_value(const std::string& var_name,
-                         double var_value) noexcept override;
-
-  /**
-   * @brief fetch_variable_values get values for a given variable.
-   * @param var_name variable name.
-   * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
-   * @return a vector of values if any and an error code.
-   * @sa IDataAccess::fetch_variable_values
-   */
-  std::tuple<std::vector<double>, Err> fetch_variable_values(
-      const std::string& var_name, size_t max_len) noexcept override;
-
-  /**
-   * @brief fetch_variable_values get values for a given variable in a period.
-   * @param var_name variable name.
-   * @param start_date start date.
-   * @param end_date end date
-   * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
-   * @return a vector of values if any and an error code.
-   * @sa IDataAccess::fetch_variable_values
-   */
-  std::tuple<std::vector<double>, Err> fetch_variable_values(
-      const std::string& var_name,
-      const std::chrono::system_clock::time_point& start_date,
-      const std::chrono::system_clock::time_point& end_date,
-      size_t max_len) noexcept override;
+  void start() { do_read(); }
 
  private:
-  IDataModel* dm_;
+  void read_header();
+
+  void read_save_value_request(std::size_t b_size);
+
+  void read_get_values_request(std::size_t b_size);
+
+  void read_body(message::MessageType msg_type, std::size_t b_size);
+
+  void do_read() { read_header(); }
+
+  void send_msg(std::shared_ptr<std::uint8_t[]> f_buf, std::size_t f_size);
+
+  std::shared_ptr<std::uint8_t[]> build_f_msg(
+      std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,
+      std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size);
+
+  std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
+                                              message::MessageType msg_type,
+                                              std::size_t* out_fh_size);
+
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::string& msg, message::ResponseStatus status,
+      std::size_t* out_b_size);
+
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::vector<double>& values, std::size_t* out_b_size);
+
+  void send_status_response(const std::string& msg,
+                            message::ResponseStatus status);
+
+  void send_values_response(const std::vector<double>& values);
+
+  boost::asio::ip::tcp::socket socket_;
+  IDataAccess* da_;
 };
-#endif  // DATABASESERVER_DATAACCESS_H
+
+#endif  // DAQS_DATABASESERVER_SESSION_H
