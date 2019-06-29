@@ -162,3 +162,24 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
       break;
   }
 }
+
+void Session::read_save_value_request(std::size_t b_size) {
+  auto self(shared_from_this());
+  std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::SaveValue sv{};
+                     sv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     std::clog << "finally"
+                               << "\n";
+                     std::clog << "name " << sv.variable() << "\n";
+                     std::clog << "value " << sv.value() << "\n\n";
+                     send_status_response("Ok", message::ResponseStatus::OK);
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
+}
