@@ -39,6 +39,8 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtNetwork/QTcpSocket>
 
@@ -52,6 +54,9 @@ class Client : public QObject {
   void connect();
 
   void send_var_val(const QString &var_name, double value);
+  void request_var_values(const QString &var_name,
+                          const std::chrono::system_clock::time_point &start,
+                          const std::chrono::system_clock::time_point &end);
 
   ~Client() { socket_.close(); }
 

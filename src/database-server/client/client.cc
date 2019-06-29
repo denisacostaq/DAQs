@@ -111,11 +111,11 @@ void Client::onReadyRead() {
       return;
     }
     valsResp.ParseFromArray(respBytes.data(), respBytes.size());
-    ::google::protobuf::RepeatedField<double> const* const pVals =
+    ::google::protobuf::RepeatedField<double> const* const p_vals =
         valsResp.mutable_values();
     std::vector<double> vals;
-    vals.resize(static_cast<decltype(vals)::size_type>(pVals->size()));
-    std::copy(pVals->begin(), pVals->end(), std::back_inserter(vals));
+    vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
+    std::copy(p_vals->cbegin(), p_vals->cend(), std::back_inserter(vals));
     emit valuesReceived(vals);
   }
 }
@@ -137,6 +137,27 @@ void Client::send_var_val(const QString& var_name, double value) {
   sv.SerializeToOstream(&out);
   QByteArray bytes{out.str().c_str(),
                    mh.ByteSize() + hdr.ByteSize() + sv.ByteSize()};
+  socket_.write(bytes);
+}
+
+void Client::request_var_values(
+    const QString& var_name, const std::chrono::system_clock::time_point& start,
+    const std::chrono::system_clock::time_point& end) {
+  message::GetValues gv{};
+  gv.set_variable(var_name.toStdString());
+  gv.set_start(start.time_since_epoch().count());
+  gv.set_end(end.time_since_epoch().count());
+  message::Header hdr{};
+  hdr.set_msg_type(message::REQUEST_GET_VALUES);
+  hdr.set_bodysize(gv.ByteSizeLong());
+  std::ostringstream out{};
+  message::MetaHeader mh{};
+  mh.set_headersize(hdr.ByteSizeLong());
+  mh.SerializeToOstream(&out);
+  hdr.SerializeToOstream(&out);
+  gv.SerializeToOstream(&out);
+  QByteArray bytes{out.str().c_str(),
+                   mh.ByteSize() + hdr.ByteSize() + gv.ByteSize()};
   socket_.write(bytes);
 }
 
