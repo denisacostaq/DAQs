@@ -113,13 +113,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::shared_ptr<std::uint8_t[]> build_f_msg(
       std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,
-      std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size) {
-    auto f_buffer_size{h_size + b_size};
-    std::shared_ptr<std::uint8_t[]> f_buf{new std::uint8_t[f_buffer_size]};
-    std::memcpy(f_buf.get(), h_buf.get(), h_size);
-    std::memcpy(&f_buf.get()[h_size], b_buf.get(), b_size);
-    return f_buf;
-  }
+      std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size);
 
   std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
                                               std::size_t* out_fh_size);
