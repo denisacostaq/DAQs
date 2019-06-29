@@ -15,7 +15,7 @@ ApplicationWindow {
         Page1Form {
         }
         
-        Page2Form {
+        Historic {
         }
     }
     
@@ -27,7 +27,7 @@ ApplicationWindow {
             text: qsTr("Page 1")
         }
         TabButton {
-            text: qsTr("Page 2")
+            text: qsTr("Historic")
         }
     }
 }

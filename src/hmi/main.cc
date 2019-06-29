@@ -1,15 +1,14 @@
-/*! @brief This file have the interface for %{Cpp:License:ClassName} class.
-    @brief This file have the implementation for %{Cpp:License:ClassName} class.
-    @file %{Cpp:License:FileName}
+/*! @brief This file have the startup/seupt for the HMI application.
+    @file main.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/29/2019
-    
+
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
     [<strong>denisacostaq</strong>][denisacostaq-URL].
     All rights reserved.</center></h1>
     @attention This file is part of [<strong>DAQs</strong>][DAQs-URL].
-    
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
     are met:
@@ -21,7 +20,7 @@
     - 3. Neither the name of the University nor the names of its contributors
       may be used to endorse or promote products derived from this software
       without specific prior written permission.
-      
+
     THIS PRODUCT IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -32,23 +31,20 @@
     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-    
+
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#include <QtWidgets/QApplication>
+#include <QtQml/QQmlApplicationEngine>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  
-  QGuiApplication app(argc, argv);
-  
-  QQmlApplicationEngine engine;
-  engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
-  if (engine.rootObjects().isEmpty())
+  QApplication app{argc, argv};
+  QQmlApplicationEngine engine{};
+  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
+  if (engine.rootObjects().isEmpty()) {
     return -1;
-  
+  }
   return app.exec();
 }
