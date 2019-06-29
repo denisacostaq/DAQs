@@ -80,3 +80,13 @@ void Session::read_header() {
         }
       });
 }
+
+void Session::send_status_response(const std::string &msg,
+                                   message::ResponseStatus status) {
+  std::size_t b_size{};
+  auto b_buf{build_b_response(msg, status, &b_size)};
+  std::size_t fh_size{};
+  auto fh_buf{build_h_msg(b_size, &fh_size)};
+  auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
+  send_msg(f_buf, fh_size + b_size);
+}
