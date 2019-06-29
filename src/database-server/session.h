@@ -95,21 +95,7 @@ class Session : public std::enable_shared_from_this<Session> {
 
   void do_read() { read_header(); }
 
-  void send_msg(std::shared_ptr<std::uint8_t[]> f_buf, std::size_t f_size) {
-    auto self(shared_from_this());
-    ba::async_write(socket_, ba::buffer(f_buf.get(), f_size),
-                    [this, self, f_buf, f_size](boost::system::error_code ec,
-                                                std::size_t length) {
-                      if (!ec && f_size == length) {
-                        do_read();
-                      } else {
-                        std::cerr << "writing full buffer "
-                                  << "\n";
-                        send_status_response("writing response",
-                                             message::ResponseStatus::FAILED);
-                      }
-                    });
-  }
+  void send_msg(std::shared_ptr<std::uint8_t[]> f_buf, std::size_t f_size);
 
   std::shared_ptr<std::uint8_t[]> build_f_msg(
       std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,

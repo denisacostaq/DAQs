@@ -133,3 +133,20 @@ std::shared_ptr<std::uint8_t[]> Session::build_f_msg(
   std::memcpy(&f_buf.get()[h_size], b_buf.get(), b_size);
   return f_buf;
 }
+
+void Session::send_msg(std::shared_ptr<std::uint8_t[]> f_buf,
+                       std::size_t f_size) {
+  auto self(shared_from_this());
+  ba::async_write(socket_, ba::buffer(f_buf.get(), f_size),
+                  [this, self, f_buf, f_size](boost::system::error_code ec,
+                                              std::size_t length) {
+                    if (!ec && f_size == length) {
+                      do_read();
+                    } else {
+                      std::cerr << "writing full buffer "
+                                << "\n";
+                      send_status_response("writing response",
+                                           message::ResponseStatus::FAILED);
+                    }
+                  });
+}
