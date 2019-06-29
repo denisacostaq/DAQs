@@ -1,14 +1,13 @@
-/*! \brief This file have the implementation for server.
-    \file server.c
-    \author Alvaro Denis <denisacostaq@gmail.com>
-    \date 6/28/2019
+/*! @brief This file have the implementation for Session class.
+    @file session.cc
+    @author Alvaro Denis <denisacostaq@gmail.com>
+    @date 6/29/2019
 
-    \copyright
-    \attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
+    @copyright
+    @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
     [<strong>denisacostaq</strong>][denisacostaq-URL].
     All rights reserved.</center></h1>
-    \attention This file is part of
-   [<strong>APIRestGenerator</strong>][APIRestGenerator-URL].
+    @attention This file is part of [<strong>DAQs</strong>][DAQs-URL].
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions
@@ -34,59 +33,8 @@
     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
-    [APIRestGenerator-URL]: http://github.com/denisacostaq/apirestgenerator
-   "APIRestGenerator based on golang revel and gorm"
+    [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-
-#include <cstdlib>
-#include <functional>
-#include <iostream>
-#include <memory>
-#include <utility>
-
-#include <boost/asio.hpp>
-
-#include "messages.pb.h"
-
 #include "src/database-server/session.h"
 
-namespace ba = boost::asio;
-using ba::ip::tcp;
-
-class server {
- public:
-  server(ba::io_context& io_context, std::uint16_t port)
-      : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
-    do_accept();
-  }
-
- private:
-  void do_accept() {
-    acceptor_.async_accept(
-        [this](boost::system::error_code ec, tcp::socket socket) {
-          if (!ec) {
-            std::make_shared<Session>(std::move(socket))->start();
-          } else {
-            std::cerr << "acepting " << ec.message() << "\n";
-          }
-          do_accept();
-        });
-  }
-
-  tcp::acceptor acceptor_;
-};
-
-int main(int argc, char* argv[]) {
-  try {
-    if (argc != 2) {
-      std::cerr << "Usage: async_tcp_echo_server <port>\n";
-      return 1;
-    }
-    ba::io_context io_context;
-    server s(io_context, std::atoi(argv[1]));
-    io_context.run();
-  } catch (std::exception& e) {
-    std::cerr << "Exception: " << e.what() << "\n";
-  }
-  return 0;
-}
+Session::Session(tcp::socket socket) : socket_(std::move(socket)) {}
