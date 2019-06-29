@@ -12,8 +12,7 @@ endif(NOT GCC_EXE)
 ExternalProject_Add(sqlite3_project
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite3
-    #https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
-    URL http://localhost:8000/sqlite/sqlite-snapshot-201906171413.tar.gz
+    URL https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
     CONFIGURE_COMMAND ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3/configure --enable-threadsafe=true CC=${GCC_EXE}
     BUILD_COMMAND ${MAKE_EXE} -C ${CMAKE_CURRENT_BINARY_DIR}/sqlite3 -j${N_PROC}
     INSTALL_COMMAND echo "Skipping install sqlite3"
