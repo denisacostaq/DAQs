@@ -37,7 +37,11 @@
  */
 #include "src/database-server/session.h"
 
-Session::Session(tcp::socket socket) : socket_(std::move(socket)) {}
+namespace ba = boost::asio;
+using ba::ip::tcp;
+
+Session::Session(tcp::socket socket, IDataAccess *da)
+    : socket_(std::move(socket)), da_{da} {}
 
 void Session::read_header() {
   auto mh_size_func = []() {
@@ -166,20 +170,27 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
 void Session::read_save_value_request(std::size_t b_size) {
   auto self(shared_from_this());
   std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
-  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
-                 [this, self, body_buff, b_size](boost::system::error_code ec,
-                                                 size_t length) {
-                   if (!ec && length == b_size) {
-                     message::SaveValue sv{};
-                     sv.ParseFromArray(body_buff.get(),
-                                       static_cast<int>(b_size));
-                     std::clog << "finally"
-                               << "\n";
-                     std::clog << "name " << sv.variable() << "\n";
-                     std::clog << "value " << sv.value() << "\n\n";
-                     send_status_response("Ok", message::ResponseStatus::OK);
-                   } else {
-                     std::cerr << "reading body_buf" << ec.message() << "\n";
-                   }
-                 });
+  ba::async_read(
+      socket_, ba::buffer(body_buff.get(), b_size),
+      [this, self, body_buff, b_size](boost::system::error_code ec,
+                                      size_t length) {
+        if (!ec && length == b_size) {
+          message::SaveValue sv{};
+          sv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
+          std::clog << "finally"
+                    << "\n";
+          std::clog << "name " << sv.variable() << "\n";
+          std::clog << "value " << sv.value() << "\n\n";
+          auto err{da_->add_variable_value(sv.variable(), sv.value())};
+          if (IDataAccess::Err::Ok == err) {
+            send_status_response("Ok", message::ResponseStatus::OK);
+          } else {
+            std::cerr << "database error\n";
+            send_status_response("Failed to save value",
+                                 message::ResponseStatus::FAILED);
+          }
+        } else {
+          std::cerr << "reading body_buf" << ec.message() << "\n";
+        }
+      });
 }

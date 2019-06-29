@@ -45,15 +45,13 @@
 #include <utility>
 
 #include <boost/asio.hpp>
+#include <messages.pb.h>
 
-#include "messages.pb.h"
-
-namespace ba = boost::asio;
-using ba::ip::tcp;
+#include "src/database-server/data-access/idataaccess.h"
 
 class Session : public std::enable_shared_from_this<Session> {
  public:
-  explicit Session(tcp::socket socket);
+  explicit Session(boost::asio::ip::tcp::socket socket, IDataAccess *da);
 
   void start() { do_read(); }
 
@@ -82,7 +80,8 @@ class Session : public std::enable_shared_from_this<Session> {
   void send_status_response(const std::string& msg,
                             message::ResponseStatus status);
 
-  tcp::socket socket_;
+  boost::asio::ip::tcp::socket socket_;
+  IDataAccess *da_;
 };
 
 #endif  // DAQS_DATABASESERVER_SESSION_H

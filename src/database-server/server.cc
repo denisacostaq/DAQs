@@ -46,8 +46,10 @@
 
 #include <boost/asio.hpp>
 
-#include "messages.pb.h"
+#include <messages.pb.h>
 
+#include "src/database-server/data-access/dataaccess.h"
+#include "src/database-server/data-model/sqlitewrapper.h"
 #include "src/database-server/session.h"
 
 namespace ba = boost::asio;
@@ -55,9 +57,22 @@ using ba::ip::tcp;
 
 class server {
  public:
-  server(ba::io_context& io_context, std::uint16_t port)
-      : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)) {
+  server(ba::io_context& io_context, std::uint16_t port,
+         const std::string& db_file)
+      : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
+        dm_{new SQLiteWrapper(db_file)},
+        da_{new DataAccess(dm_)} {
+    if (dm_->create_scheme() == IDataModel::Err::Ok) {
+      da_->add_variable("temp");
+    } else {
+      throw std::string{"Unable to create schema."};
+    }
     do_accept();
+  }
+
+  ~server() {
+    delete da_;
+    delete dm_;
   }
 
  private:
@@ -65,7 +80,7 @@ class server {
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
           if (!ec) {
-            std::make_shared<Session>(std::move(socket))->start();
+            std::make_shared<Session>(std::move(socket), da_)->start();
           } else {
             std::cerr << "acepting " << ec.message() << "\n";
           }
@@ -74,6 +89,8 @@ class server {
   }
 
   tcp::acceptor acceptor_;
+  IDataModel* dm_;
+  IDataAccess* da_;
 };
 
 int main(int argc, char* argv[]) {
@@ -83,10 +100,14 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     ba::io_context io_context;
-    server s(io_context, std::atoi(argv[1]));
+    server s(io_context, std::atoi(argv[1]), "/tmp/sql.db");
     io_context.run();
+  } catch (const std::string& e) {
+    std::cerr << "Exception: " << e << "\n";
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << "\n";
+  } catch (...) {
+    std::cerr << "Unknow exception\n";
   }
   return 0;
 }
