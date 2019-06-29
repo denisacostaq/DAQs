@@ -43,7 +43,7 @@
 
 class DataAccess : public IDataAccess {
  public:
-  DataAccess(IDataModel* dm) noexcept;
+  explicit DataAccess(IDataModel* dm) noexcept;
 
   /**
    * @brief add_variable add a new variable.

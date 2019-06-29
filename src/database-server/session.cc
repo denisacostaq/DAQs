@@ -90,7 +90,18 @@ void Session::send_status_response(const std::string &msg,
   std::size_t b_size{};
   auto b_buf{build_b_response(msg, status, &b_size)};
   std::size_t fh_size{};
-  auto fh_buf{build_h_msg(b_size, &fh_size)};
+  auto fh_buf{
+      build_h_msg(b_size, message::MessageType::RESPONSE_FAILURE, &fh_size)};
+  auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
+  send_msg(f_buf, fh_size + b_size);
+}
+
+void Session::send_values_response(const std::vector<double> &values) {
+  std::size_t b_size{};
+  auto b_buf{build_b_response(values, &b_size)};
+  std::size_t fh_size{};
+  auto fh_buf{
+      build_h_msg(b_size, message::MessageType::RESPONSE_VALUES, &fh_size)};
   auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
   send_msg(f_buf, fh_size + b_size);
 }
@@ -107,10 +118,21 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
   return b_buf;
 }
 
-std::unique_ptr<std::uint8_t[]> Session::build_h_msg(std::size_t b_size,
-                                                     std::size_t *out_fh_size) {
+std::unique_ptr<std::uint8_t[]> Session::build_b_response(
+    const std::vector<double> &vals, std::size_t *out_b_size) {
+  message::ValuesResponse b_msg{};
+  *b_msg.mutable_values() = {vals.begin(), vals.end()};
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
+  *out_b_size = b_msg.ByteSizeLong();
+  return b_buf;
+}
+
+std::unique_ptr<std::uint8_t[]> Session::build_h_msg(
+    std::size_t b_size, message::MessageType msg_type,
+    std::size_t *out_fh_size) {
   message::Header h_msg{};
-  h_msg.set_msg_type(message::RESPONSE_FAILURE);
+  h_msg.set_msg_type(msg_type);
   h_msg.set_bodysize(b_size);
   std::unique_ptr<std::uint8_t[]> h_buf{new std::uint8_t[h_msg.ByteSizeLong()]};
   h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
@@ -160,6 +182,9 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
     case message::MessageType::REQUEST_SAVE_VALUE:
       read_save_value_request(b_size);
       break;
+    case message::MessageType::REQUEST_GET_VALUES:
+      read_get_values_request(b_size);
+      break;
     default:
       std::cerr << "unknow request " << msg_type << "\n";
       send_status_response("unknow error", message::ResponseStatus::FAILED);
@@ -193,4 +218,28 @@ void Session::read_save_value_request(std::size_t b_size) {
           std::cerr << "reading body_buf" << ec.message() << "\n";
         }
       });
+}
+
+void Session::read_get_values_request(std::size_t b_size) {
+  auto self(shared_from_this());
+  std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::GetValues gv{};
+                     gv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     auto res{da_->fetch_variable_values(gv.variable())};
+                     if (std::get<1>(res) == IDataAccess::Err::Ok) {
+                       send_values_response(std::get<0>(res));
+                     } else {
+                       std::cerr << "database error\n";
+                       send_status_response("Failed to get values",
+                                            message::ResponseStatus::FAILED);
+                     }
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
 }

@@ -44,14 +44,14 @@
 #include <memory>
 #include <utility>
 
-#include <boost/asio.hpp>
 #include <messages.pb.h>
+#include <boost/asio.hpp>
 
 #include "src/database-server/data-access/idataaccess.h"
 
 class Session : public std::enable_shared_from_this<Session> {
  public:
-  explicit Session(boost::asio::ip::tcp::socket socket, IDataAccess *da);
+  Session(boost::asio::ip::tcp::socket socket, IDataAccess* da);
 
   void start() { do_read(); }
 
@@ -59,6 +59,8 @@ class Session : public std::enable_shared_from_this<Session> {
   void read_header();
 
   void read_save_value_request(std::size_t b_size);
+
+  void read_get_values_request(std::size_t b_size);
 
   void read_body(message::MessageType msg_type, std::size_t b_size);
 
@@ -71,17 +73,23 @@ class Session : public std::enable_shared_from_this<Session> {
       std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size);
 
   std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
+                                              message::MessageType msg_type,
                                               std::size_t* out_fh_size);
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       const std::string& msg, message::ResponseStatus status,
       std::size_t* out_b_size);
 
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::vector<double>& values, std::size_t* out_b_size);
+
   void send_status_response(const std::string& msg,
                             message::ResponseStatus status);
 
+  void send_values_response(const std::vector<double>& values);
+
   boost::asio::ip::tcp::socket socket_;
-  IDataAccess *da_;
+  IDataAccess* da_;
 };
 
 #endif  // DAQS_DATABASESERVER_SESSION_H
