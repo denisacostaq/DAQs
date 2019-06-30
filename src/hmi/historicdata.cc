@@ -43,18 +43,26 @@
 #include <QtCore/QTimer>
 
 HistoricData::HistoricData(QObject *parent)
-    : QObject{parent}, m_vals{}, m_emulated{} {
+    : QObject{parent}, m_vals{}, m_dates{}, m_emulated{} {
   QTimer *m_wTimer{new QTimer{this}};
-  m_wTimer->setInterval(4000);
+  m_wTimer->setInterval(6000);
   QObject::connect(m_wTimer, &QTimer::timeout, this, [this]() {
     m_vals.clear();
     m_emulated.clear();
+    m_dates.clear();
+    auto now{std::chrono::system_clock::now().time_since_epoch()};
+    auto mseconds{std::chrono::duration_cast<std::chrono::milliseconds>(now)};
+    mseconds -= std::chrono::seconds(50); // some seconds ago
+    QDateTime dt{};
     std::random_device rd;
     std::mt19937 g{rd()};
     std::uniform_real_distribution<double> dist(-30.0, 30.0);
-    for (int i{0}; i < 10; ++i) {
+    for (int i{0}; i < 500; ++i) {
       m_vals.append(i);
       m_emulated.append(dist(g));
+      dt.setMSecsSinceEpoch(mseconds.count());
+      mseconds += std::chrono::milliseconds(100);
+      m_dates.append(dt);
     }
     emit valsChanged();
   });

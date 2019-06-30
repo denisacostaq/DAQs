@@ -7,6 +7,7 @@ Page {
     height: 400
     
     header: Label {
+        id: headerLabel
         text: qsTr("Historic")
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
@@ -19,6 +20,7 @@ Page {
             lineSeries.clear();
             var max = 0;
             var min = 0;
+            xTime.min = dataLayer.getEmulatedDateTime(0);
             for (var i = 0; i < vals.length; ++i) {
                 var emulated = dataLayer.getEmulatedValue(vals[i]);
                 if (max < emulated) {
@@ -27,10 +29,12 @@ Page {
                 if (min > emulated) {
                     min = emulated;
                 }
-                lineSeries.append(vals[i], emulated);
+                lineSeries.append(dataLayer.getEmulatedDateTime(i), emulated);
             }
-            line.axisY().max = max;
-            line.axisY().min = min;
+            xTime.max = dataLayer.getEmulatedDateTime(vals.length - 1);
+            yAxis.max = max;
+            yAxis.min = min;
+            headerLabel.text = qsTr("Historic data from ") + xTime.min + qsTr(" to ") + xTime.max
         }
     }
     
@@ -46,30 +50,19 @@ Page {
             max: 10
             tickCount: 20
         }
+
+        DateTimeAxis {
+            id: xTime
+            format: "mm:ss:MM"
+            tickCount: 10
+        }
         
         LineSeries {
             id: lineSeries
-            name: "LineSeries"
+            name: "temperature"
             axisY: yAxis
-            XYPoint {
-                x: 0
-                y: 2
-            }
-            
-            XYPoint {
-                x: 1
-                y: 1.2
-            }
-            
-            XYPoint {
-                x: 2
-                y: 3.3
-            }
-            
-            XYPoint {
-                x: 5
-                y: 2.1
-            }
+            axisX: xTime
+            useOpenGL: true
         }
         
         MouseArea {

@@ -38,9 +38,13 @@
 #ifndef HISTORICDATA_H
 #define HISTORICDATA_H
 
+#include <chrono>
+#include <thread>
+
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
+#include <QtCore/QDateTime>
 #include <QQmlListProperty>
 
 class HistoricData : public QObject {
@@ -53,12 +57,16 @@ class HistoricData : public QObject {
   Q_INVOKABLE double getEmulatedValue(int i) {
     return m_emulated[i];
   }
+  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) {
+    return m_dates[i];
+  }
 
  signals:
   void valsChanged();
 
  private:
   QVector<int> m_vals;
+  QVector<QDateTime> m_dates;
   QVector<double> m_emulated;
 };
 
