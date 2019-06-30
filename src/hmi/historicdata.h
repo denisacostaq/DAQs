@@ -1,5 +1,5 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for HistoricData class.
+    @file historicdata.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/29/2019
 
@@ -35,20 +35,31 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
+#ifndef HISTORICDATA_H
+#define HISTORICDATA_H
 
-#include "src/hmi/historicdata.h"
+#include <QtCore/QObject>
+#include <QtCore/QPointF>
+#include <QtCore/QVector>
+#include <QQmlListProperty>
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
+class HistoricData : public QObject {
+  Q_OBJECT
+ public:
+  Q_PROPERTY(QVector<int> m_vals READ getVals NOTIFY valsChanged)
+  HistoricData(QObject *parent = nullptr);
+
+  QVector<int> getVals() { return m_vals; }
+  Q_INVOKABLE double getEmulatedValue(int i) {
+    return m_emulated[i];
   }
-  return app.exec();
-}
+
+ signals:
+  void valsChanged();
+
+ private:
+  QVector<int> m_vals;
+  QVector<double> m_emulated;
+};
+
+#endif  // HISTORICDATA_H

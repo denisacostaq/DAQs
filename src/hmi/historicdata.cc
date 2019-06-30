@@ -1,5 +1,5 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the implementation for HistoricData class.
+    @file historicdata.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/29/2019
 
@@ -35,20 +35,28 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtWidgets/QApplication>
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-
 #include "src/hmi/historicdata.h"
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
-  }
-  return app.exec();
+#include <algorithm>
+#include <random>
+
+#include <QtCore/QTimer>
+
+HistoricData::HistoricData(QObject *parent)
+    : QObject{parent}, m_vals{}, m_emulated{} {
+  QTimer *m_wTimer{new QTimer{this}};
+  m_wTimer->setInterval(4000);
+  QObject::connect(m_wTimer, &QTimer::timeout, this, [this]() {
+    m_vals.clear();
+    m_emulated.clear();
+    std::random_device rd;
+    std::mt19937 g{rd()};
+    std::uniform_real_distribution<double> dist(-30.0, 30.0);
+    for (int i{0}; i < 10; ++i) {
+      m_vals.append(i);
+      m_emulated.append(dist(g));
+    }
+    emit valsChanged();
+  });
+  m_wTimer->start();
 }

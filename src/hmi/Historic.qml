@@ -12,9 +12,33 @@ Page {
         padding: 10
     }
     
+    Connections {
+        target: dataLayer
+        onValsChanged: {
+            var vals = dataLayer.m_vals;
+            lineSeries.clear();
+            var max = 0;
+            var min = 0;
+            for (var i = 0; i < vals.length; ++i) {
+                var emulated = dataLayer.getEmulatedValue(vals[i]);
+                if (max < emulated) {
+                    max = emulated;
+                }
+                if (min > emulated) {
+                    min = emulated;
+                }
+                lineSeries.append(vals[i], emulated);
+            }
+            line.axisY().max = max;
+            line.axisY().min = min;
+        }
+    }
+    
     ChartView {
         id: line
         anchors.fill: parent
+        animationOptions: ChartView.AllAnimations
+        antialiasing: true
         
         ValueAxis {
             id: yAxis
@@ -45,6 +69,29 @@ Page {
             XYPoint {
                 x: 5
                 y: 2.1
+            }
+        }
+        
+        MouseArea {
+            id: charMouseArea
+            anchors.fill: parent
+            onPositionChanged: {
+                console.log('onPositionChanged', mouse.x, mouse.y)
+            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: {
+                console.log('onClicked', mouse.button, mouse.x, mouse.y)
+                if(mouse.button & Qt.RightButton) {
+                    line.zoomIn()
+                } else {
+                    line.zoomOut()
+                }
+            }
+            onPressed: {
+                console.log("onPressed", mouse.button, mouse.x, mouse.y)
+            }
+            onReleased: {
+                console.log("onReleased", mouse.button, mouse.x, mouse.y)
             }
         }
     }
