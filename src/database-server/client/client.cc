@@ -115,7 +115,7 @@ void Client::onReadyRead() {
         valsResp.mutable_values();
     std::vector<double> vals;
     vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::copy(p_vals->cbegin(), p_vals->cend(), std::back_inserter(vals));
+    std::copy(p_vals->begin(), p_vals->end(), std::back_inserter(vals));
     emit valuesReceived(vals);
   }
 }
