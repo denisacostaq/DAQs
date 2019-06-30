@@ -109,7 +109,7 @@ class IDataModel {
    */
   virtual Err fetch_variable_values(
       const std::string& var_name,
-      const std::function<void(const VarValue &val)>& send_vale) noexcept = 0;
+      const std::function<void(const VarValue& val)>& send_vale) noexcept = 0;
 
   /**
    * @brief fetch_variable_values  get all values of a given variables in a date
@@ -124,7 +124,7 @@ class IDataModel {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(const VarValue &val)>& send_vale) noexcept = 0;
+      const std::function<void(const VarValue& val)>& send_vale) noexcept = 0;
 };
 
 #endif  //  DATABASE_SERVER_IDATAMODEL_H

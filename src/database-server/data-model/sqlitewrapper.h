@@ -92,9 +92,9 @@ class SQLiteWrapper : public IDataModel {
    * @return Err::Ok on success.
    * @sa IDataModel::fetch_variable_values
    */
-  Err fetch_variable_values(
-      const std::string& var_name,
-      const std::function<void(const VarValue &val)>& send_vale) noexcept override;
+  Err fetch_variable_values(const std::string& var_name,
+                            const std::function<void(const VarValue& val)>&
+                                send_vale) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable in a date
@@ -109,7 +109,8 @@ class SQLiteWrapper : public IDataModel {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(const VarValue &val)>& send_vale) noexcept override;
+      const std::function<void(const VarValue& val)>&
+          send_vale) noexcept override;
 
  private:
   sqlite3* db_;

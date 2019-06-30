@@ -125,7 +125,7 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   std::vector<IDataModel::VarValue> var1Values, varNoneValues;
   IDataModel::VarValue varCopy{};
   auto callback = [varCopy](std::vector<IDataModel::VarValue>* container,
-                     const IDataModel::VarValue& val) mutable {
+                            const IDataModel::VarValue& val) mutable {
     container->push_back(val);
   };
   auto var1ValuesCallback =
@@ -137,9 +137,9 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   EXPECT_EQ(var1OrgValues.size(), var1Values.size());
   for (auto v : var1OrgValues) {
     EXPECT_NE(std::find_if(var1Values.cbegin(), var1Values.cend(),
-                        [v](const IDataModel::VarValue& var1Val) {
-                          return var1Val.val == v;
-                        }),
+                           [v](const IDataModel::VarValue& var1Val) {
+                             return var1Val.val == v;
+                           }),
               var1Values.end());
   }
   EXPECT_EQ(IDataModel::Err::Ok,
@@ -147,9 +147,9 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   EXPECT_EQ(varNoneOrgValues.size(), varNoneValues.size());
   for (auto v : varNoneOrgValues) {
     EXPECT_NE(std::find_if(varNoneValues.cbegin(), varNoneValues.cend(),
-                        [v](const IDataModel::VarValue& var1Val) {
-                          return var1Val.val == v;
-                        }),
+                           [v](const IDataModel::VarValue& var1Val) {
+                             return var1Val.val == v;
+                           }),
               varNoneValues.end());
   }
 }

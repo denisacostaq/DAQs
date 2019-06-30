@@ -147,7 +147,8 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
                   std::cerr << e.what();
                   return -1;
                 }
-                (*static_cast<std::function<void(const VarValue &)> *>(callback))(val);
+                (*static_cast<std::function<void(const VarValue &)> *>(
+                    callback))(val);
                 return 0;
               }
             }
@@ -196,7 +197,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
             }
             return -1;
           },
-          const_cast<std::function<void(const VarValue&)> *>(&send_vale),
+          const_cast<std::function<void(const VarValue &)> *>(&send_vale),
           &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
