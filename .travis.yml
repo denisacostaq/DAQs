@@ -23,6 +23,7 @@ matrix:
             - libprotobuf-dev
             - protobuf-compiler
             - qt512-meta-minimal
+            - qt512charts-no-lgpl
             - libgl-dev #required by qtquick
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
@@ -43,6 +44,7 @@ matrix:
             - libprotobuf-dev
             - protobuf-compiler
             - qt512-meta-minimal
+            - qt512charts-no-lgpl
             - libgl-dev #required by qtquick
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
