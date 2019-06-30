@@ -52,7 +52,7 @@ HistoricData::HistoricData(QObject *parent)
     m_dates.clear();
     auto now{std::chrono::system_clock::now().time_since_epoch()};
     auto mseconds{std::chrono::duration_cast<std::chrono::milliseconds>(now)};
-    mseconds -= std::chrono::seconds(50); // some seconds ago
+    mseconds -= std::chrono::seconds(50);  // some seconds ago
     QDateTime dt{};
     std::random_device rd;
     std::mt19937 g{rd()};

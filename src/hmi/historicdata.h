@@ -41,11 +41,11 @@
 #include <chrono>
 #include <thread>
 
+#include <QQmlListProperty>
+#include <QtCore/QDateTime>
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
-#include <QtCore/QDateTime>
-#include <QQmlListProperty>
 
 class HistoricData : public QObject {
   Q_OBJECT
@@ -54,12 +54,8 @@ class HistoricData : public QObject {
   HistoricData(QObject *parent = nullptr);
 
   QVector<int> getVals() { return m_vals; }
-  Q_INVOKABLE double getEmulatedValue(int i) {
-    return m_emulated[i];
-  }
-  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) {
-    return m_dates[i];
-  }
+  Q_INVOKABLE double getEmulatedValue(int i) { return m_emulated[i]; }
+  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) { return m_dates[i]; }
 
  signals:
   void valsChanged();
