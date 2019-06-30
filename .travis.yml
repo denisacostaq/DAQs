@@ -49,6 +49,7 @@ matrix:
       env:
         - MATRIX_EVAL="brew install protobuf && CC=clang && CXX=clang++"
 
+  allow_failures:
     - os: osx
       osx_image: xcode10.1
       env:
