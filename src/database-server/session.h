@@ -66,9 +66,9 @@ class Session : public std::enable_shared_from_this<Session> {
 
   void do_read() { read_header(); }
 
-  void send_msg(std::shared_ptr<std::uint8_t[]> f_buf, std::size_t f_size);
+  void send_msg(std::shared_ptr<uint8_t> f_buf, std::size_t f_size);
 
-  std::shared_ptr<std::uint8_t[]> build_f_msg(
+  std::shared_ptr<std::uint8_t> build_f_msg(
       std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,
       std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size);
 

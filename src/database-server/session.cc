@@ -47,11 +47,12 @@ void Session::read_header() {
   auto mh_size_func = []() {
     auto mh{message::MetaHeader{}};
     mh.set_headersize(1);
-    return mh.ByteSize();
+    return static_cast<size_t>(mh.ByteSize());
   };
   // FIXME(denisacostaq@gmail.com): verify critical section.
   static const auto mh_size{mh_size_func()};
-  std::shared_ptr<std::uint8_t[]> mh_buff{new std::uint8_t[mh_size]};
+  auto mh_buff{std::shared_ptr<std::uint8_t>(
+      new std::uint8_t[mh_size], std::default_delete<std::uint8_t[]>())};
   auto self(shared_from_this());
   ba::async_read(
       socket_, ba::buffer(mh_buff.get(), mh_size),
@@ -60,8 +61,9 @@ void Session::read_header() {
           message::MetaHeader mh{};
           mh.ParseFromArray(mh_buff.get(), static_cast<int>(mh_size));
           std::clog << "mh.headersize() " << mh.headersize() << std::endl;
-          std::shared_ptr<std::uint8_t[]> h_buff{
-              new std::uint8_t[mh.headersize()]};
+          auto h_buff{std::shared_ptr<std::uint8_t>{
+              new std::uint8_t[mh.headersize()],
+              std::default_delete<std::uint8_t[]>()}};
           ba::async_read(
               socket_, ba::buffer(h_buff.get(), mh.headersize()),
               [this, self, h_size = mh.headersize(), h_buff](
@@ -134,33 +136,34 @@ std::unique_ptr<std::uint8_t[]> Session::build_h_msg(
   message::Header h_msg{};
   h_msg.set_msg_type(msg_type);
   h_msg.set_bodysize(b_size);
-  std::unique_ptr<std::uint8_t[]> h_buf{new std::uint8_t[h_msg.ByteSize()]};
+  auto h_buf{std::make_unique<std::uint8_t[]>(h_msg.ByteSize())};
   h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
   message::MetaHeader mh_msg{};
   mh_msg.set_headersize(h_msg.ByteSize());
-  std::unique_ptr<std::uint8_t[]> mh_buf{
-      new std::uint8_t[mh_msg.ByteSize()]};
+  auto mh_buf{std::make_unique<std::uint8_t[]>(mh_msg.ByteSize())};
   mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSize());
   const auto fh_size{mh_msg.ByteSize() + h_msg.ByteSize()};
-  std::unique_ptr<std::uint8_t[]> fh_buf{new std::uint8_t[fh_size]};
-  std::memcpy(fh_buf.get(), mh_buf.get(), mh_msg.ByteSize());
-  std::memcpy(&fh_buf.get()[mh_msg.ByteSize()], h_buf.get(),
-              h_msg.ByteSize());
+  auto f_buf_addr{new std::uint8_t[fh_size]};
+  auto fh_buf{std::unique_ptr<std::uint8_t[]>(f_buf_addr)};
+  std::memcpy(f_buf_addr, mh_buf.get(), mh_msg.ByteSize());
+  std::memcpy(&f_buf_addr[mh_msg.ByteSize()], h_buf.get(), h_msg.ByteSize());
   *out_fh_size = fh_size;
   return fh_buf;
 }
 
-std::shared_ptr<std::uint8_t[]> Session::build_f_msg(
+std::shared_ptr<std::uint8_t> Session::build_f_msg(
     std::unique_ptr<std::uint8_t[]> &&h_buf, std::size_t h_size,
     std::unique_ptr<std::uint8_t[]> &&b_buf, std::size_t b_size) {
   auto f_buffer_size{h_size + b_size};
-  std::shared_ptr<std::uint8_t[]> f_buf{new std::uint8_t[f_buffer_size]};
-  std::memcpy(f_buf.get(), h_buf.get(), h_size);
-  std::memcpy(&f_buf.get()[h_size], b_buf.get(), b_size);
+  auto f_buf_addr{new std::uint8_t[f_buffer_size]};
+  auto f_buf{std::shared_ptr<std::uint8_t>{
+      f_buf_addr, std::default_delete<std::uint8_t[]>()}};
+  std::memcpy(f_buf_addr, h_buf.get(), h_size);
+  std::memcpy(&f_buf_addr[h_size], b_buf.get(), b_size);
   return f_buf;
 }
 
-void Session::send_msg(std::shared_ptr<std::uint8_t[]> f_buf,
+void Session::send_msg(std::shared_ptr<std::uint8_t> f_buf,
                        std::size_t f_size) {
   auto self(shared_from_this());
   ba::async_write(socket_, ba::buffer(f_buf.get(), f_size),
@@ -194,7 +197,8 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
 
 void Session::read_save_value_request(std::size_t b_size) {
   auto self(shared_from_this());
-  std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
+  auto body_buff{std::shared_ptr<std::uint8_t>(
+      new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>())};
   ba::async_read(
       socket_, ba::buffer(body_buff.get(), b_size),
       [this, self, body_buff, b_size](boost::system::error_code ec,
@@ -222,7 +226,8 @@ void Session::read_save_value_request(std::size_t b_size) {
 
 void Session::read_get_values_request(std::size_t b_size) {
   auto self(shared_from_this());
-  std::shared_ptr<std::uint8_t[]> body_buff{new std::uint8_t[b_size]};
+  auto body_buff{std::shared_ptr<std::uint8_t>{
+      new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>()}};
   ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
                  [this, self, body_buff, b_size](boost::system::error_code ec,
                                                  size_t length) {
