@@ -5,6 +5,8 @@ ApplicationWindow {
     visible: true
     width: 640
     height: 480
+    flags: Qt.FramelessWindowHint | Qt.Window
+    visibility: Qt.WindowFullScreen
     title: qsTr("Tabs")
     
     SwipeView {
