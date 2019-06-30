@@ -15,14 +15,17 @@ matrix:
           update: true
           sources:
             - sourceline: 'ppa:mhier/libboost-latest'
+            - sourceline: 'ppa:beineri/opt-qt-5.12.2-xenial'
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
             - boost1.67
             - libprotobuf-dev
             - protobuf-compiler
+            - qt512-meta-minimal
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
 
     - os: linux
       addons:
@@ -30,6 +33,7 @@ matrix:
           update: true
           sources:
             - sourceline: 'ppa:mhier/libboost-latest'
+            - sourceline: 'ppa:beineri/opt-qt-5.12.2-xenial'
             - llvm-toolchain-xenial-7
           packages:
             - clang-7
@@ -37,8 +41,10 @@ matrix:
             - boost1.67
             - libprotobuf-dev
             - protobuf-compiler
+            - qt512-meta-minimal
       env:
         - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+        - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
 
     #On macOS, the version of clang is controlled by the choice of osx_image. You can find here the list of available osx_image
     #https://docs.travis-ci.com/user/languages/c/#clang-on-macos
@@ -47,15 +53,18 @@ matrix:
     - os: osx
       osx_image: xcode10.1 #clang-10, boost 1.67
       env:
-        - MATRIX_EVAL="brew install protobuf && CC=clang && CXX=clang++"
+        - MATRIX_EVAL="brew update && brew install protobuf qt5 && CC=clang && CXX=clang++"
+        - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
 
   allow_failures:
     - os: osx
       osx_image: xcode10.1
       env:
-        - MATRIX_EVAL="brew install protobuf gcc@7 && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="brew update && brew install protobuf gcc@7 qt5 && CC=gcc-7 && CXX=g++-7"
+        - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
 
 before_install:
+  - eval "${MATRIX_EVAL}"
   - mkdir -p 3rdparty/fakeroot;
   - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
@@ -63,18 +72,13 @@ before_install:
     fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
-      brew update;
+      QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
     fi
-  - eval "${MATRIX_EVAL}"
 
 script:
   - mkdir 3rdparty/build
   - pushd 3rdparty/build
-  - if [[ ( $TRAVIS_OS_NAME == 'osx' ) && ( $CXX == 'g++-7' ) ]];then
-      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DSQLITEDATAMODEL_TEST_ENABLED=OFF ../../;
-    else
-      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON ../../;
-    fi
+  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
   - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
   - make
   - make test
