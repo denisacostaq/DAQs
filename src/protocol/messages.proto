@@ -70,10 +70,19 @@ message GetValues {
 }
 
 /**
+ * A repeated file for ValuesResponse
+ */
+message VarValue {
+  required string name = 1;
+  required double value = 2;
+  required uint64 timestamp = 3;
+}
+
+/**
  * Response: Return values.
  * @prev GetValues packaged as body.
  FIXME(denisacostaq@gmail.com): add required for values
  */
 message ValuesResponse {
-  repeated double values = 1;
+  repeated VarValue values = 1;
 }
