@@ -1,2 +1,7 @@
 3rdparty/
 *.user
+*.orig
+*_LOCAL_*
+*_BACKUP_*
+*_BASE_*
+

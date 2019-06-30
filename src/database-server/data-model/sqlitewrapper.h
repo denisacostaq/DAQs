@@ -35,12 +35,12 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATAMODEL_SQLITEWRAPPER_H
-#define DATAMODEL_SQLITEWRAPPER_H
+#ifndef DATABASESERVER_DATAMODEL_SQLITEWRAPPER_H
+#define DATABASESERVER_DATAMODEL_SQLITEWRAPPER_H
 
 #include <string>
 
-#include "src/data-model/idatamodel.h"
+#include "src/database-server/data-model/idatamodel.h"
 
 class sqlite3;
 class SQLiteWrapper : public IDataModel {
@@ -51,7 +51,7 @@ class SQLiteWrapper : public IDataModel {
    * @param db_path the path to the sqlite3 db file
    * @sa IDataModel
    */
-  SQLiteWrapper(const std::string& db_path);
+  explicit SQLiteWrapper(const std::string& db_path);
 
   /**
    * @brief ~SQLiteWrapper release the sqlite3 connection.
@@ -117,4 +117,4 @@ class SQLiteWrapper : public IDataModel {
   sqlite3* db_;
 };
 
-#endif  //  DATAMODEL_SQLITEWRAPPER_H
+#endif  // DATABASESERVER_DATAMODEL_SQLITEWRAPPER_H

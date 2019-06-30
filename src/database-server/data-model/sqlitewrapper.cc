@@ -35,7 +35,7 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include "src/data-model/sqlitewrapper.h"
+#include "src/database-server/data-model/sqlitewrapper.h"
 
 #include <cerrno>
 #include <cstring>
@@ -52,7 +52,7 @@ SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
   if (err != SQLITE_OK) {
     std::cerr << sqlite3_errmsg(db_) << "\n";
     std::cerr << std::strerror(sqlite3_system_errno(db_)) << "\n";
-    throw std::string("Can't open database " + db_path);
+    throw std::string{"Can't open database " + db_path};
   } else {
     std::clog << "Opened database successfully\n";
   }

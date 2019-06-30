@@ -7,9 +7,42 @@ enum ResponseStatus {
   INVALID_ARGUMENT = 2;
 }
 
+enum MessageType {
+  REQUEST_SAVE_VALUE = 1;
+  REQUEST_GET_VALUES = 2;
+  RESPONSE_FAILURE = 3;
+  RESPONSE_VALUES = 4;
+}
+
+// Package format
+// ------------------------------
+// | MetaHeader | Header | Body |
+// ------------------------------
+// To know more details about the specific messages checkout the documentation
+// in the definitions.
+
+/**
+ * Request/Response: It's a prefix for header, contains the size of a Header.
+ * @next Header
+ */
+message MetaHeader {
+  required fixed64 headerSize = 1;
+}
+
+/**
+ * Request/Response: It's a prefix for any msg, contains info about the body
+ * type and the body size..
+ * @previous MetaHeader
+ * @next Any, a body.
+ */
+message Header {
+  required MessageType msg_type = 1;
+  required fixed64 bodySize = 2;
+}
+
 /**
  * Request: Save a variable value.
- * @next Failure
+ * @next Failure packaged as body.
  */
 message SaveValue {
   required string variable = 1;
@@ -18,7 +51,7 @@ message SaveValue {
 
 /**
  * Rsponse: Return information about a failure if any or just ok.
- * @prev Any
+ * @prev Any packaged as body.
  */
 message Failure {
   required ResponseStatus status = 1;
@@ -27,16 +60,18 @@ message Failure {
 
 /**
  * Request: Get variable values.
- * @next Failure
- * @next ValuesResponse
+ * @next Failure packaged as body.
+ * @next ValuesResponse packaged as body.
  */
 message GetValues {
   required string variable = 1;
+  optional int64 start = 2;
+  optional int64 end = 3;
 }
 
 /**
  * Response: Return values.
- * @prev GetValues
+ * @prev GetValues packaged as body.
  FIXME(denisacostaq@gmail.com): add required for values
  */
 message ValuesResponse {

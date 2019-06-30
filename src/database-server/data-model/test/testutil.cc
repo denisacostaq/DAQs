@@ -1,5 +1,5 @@
-/*! @brief This file have the interface for DataAccess class.
-    @file dataaccess.h
+/*! @brief This file have the implementation for test utils.
+    @file testutil.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/22/2019
 
@@ -35,61 +35,16 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATAACCESS_H
-#define DATAACCESS_H
 
-#include "src/data-access/idataaccess.h"
+#include "src/database-server/data-model/test/testutil.h"
 
-#include "src/data-model/idatamodel.h"
+#include <boost/filesystem.hpp>
 
-class DataAccess : public IDataAccess {
- public:
-  DataAccess(IDataModel* dm) noexcept;
-
-  /**
-   * @brief add_variable add a new variable.
-   * @param name variable name.
-   * @return Ok on success.
-   * @sa IDataAccess::add_variable
-   */
-  Err add_variable(const std::string& name) noexcept override;
-
-  /**
-   * @brief add_variable_value add a new value for a given variable.
-   * @param var_name variable name.
-   * @param var_value variable value.
-   * @return Ok on success.
-   * @sa IDataAccess::add_variable_value
-   */
-  Err add_variable_value(const std::string& var_name,
-                         double var_value) noexcept override;
-
-  /**
-   * @brief fetch_variable_values get values for a given variable.
-   * @param var_name variable name.
-   * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
-   * @return a vector of values if any and an error code.
-   * @sa IDataAccess::fetch_variable_values
-   */
-  std::tuple<std::vector<double>, Err> fetch_variable_values(
-      const std::string& var_name, size_t max_len) noexcept override;
-
-  /**
-   * @brief fetch_variable_values get values for a given variable in a period.
-   * @param var_name variable name.
-   * @param start_date start date.
-   * @param end_date end date
-   * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
-   * @return a vector of values if any and an error code.
-   * @sa IDataAccess::fetch_variable_values
-   */
-  std::tuple<std::vector<double>, Err> fetch_variable_values(
-      const std::string& var_name,
-      const std::chrono::system_clock::time_point& start_date,
-      const std::chrono::system_clock::time_point& end_date,
-      size_t max_len) noexcept override;
-
- private:
-  IDataModel* dm_;
-};
-#endif  // DATAACCESS_H
+std::string get_random_sqlite_file_path() noexcept {
+  const auto &fileRel =
+      boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.db");
+  const auto &dirAbs = boost::filesystem::temp_directory_path() / "DAQs";
+  boost::filesystem::create_directories(dirAbs);
+  const auto &fileAbs = dirAbs / fileRel;
+  return fileAbs.string();
+}

@@ -1,7 +1,7 @@
-/*! @brief This file have the interface for test utils.
-    @file testutil.h
+/*! @brief This file have the interface for Session class.
+    @file session.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/22/2019
+    @date 6/29/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,11 +35,61 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DAQ_TESTUTIL_H
-#define DAQ_TESTUTIL_H
+#ifndef DAQS_DATABASESERVER_SESSION_H
+#define DAQS_DATABASESERVER_SESSION_H
 
-#include <string>
+#include <cstdlib>
+#include <functional>
+#include <iostream>
+#include <memory>
+#include <utility>
 
-std::string get_random_sqlite_file_path() noexcept;
+#include <messages.pb.h>
+#include <boost/asio.hpp>
 
-#endif  //  DAQ_TESTUTIL_H
+#include "src/database-server/data-access/idataaccess.h"
+
+class Session : public std::enable_shared_from_this<Session> {
+ public:
+  Session(boost::asio::ip::tcp::socket socket, IDataAccess* da);
+
+  void start() { do_read(); }
+
+ private:
+  void read_header();
+
+  void read_save_value_request(std::size_t b_size);
+
+  void read_get_values_request(std::size_t b_size);
+
+  void read_body(message::MessageType msg_type, std::size_t b_size);
+
+  void do_read() { read_header(); }
+
+  void send_msg(std::shared_ptr<uint8_t> f_buf, std::size_t f_size);
+
+  std::shared_ptr<std::uint8_t> build_f_msg(
+      std::unique_ptr<std::uint8_t[]>&& h_buf, std::size_t h_size,
+      std::unique_ptr<std::uint8_t[]>&& b_buf, std::size_t b_size);
+
+  std::unique_ptr<std::uint8_t[]> build_h_msg(std::size_t b_size,
+                                              message::MessageType msg_type,
+                                              std::size_t* out_fh_size);
+
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::string& msg, message::ResponseStatus status,
+      std::size_t* out_b_size);
+
+  std::unique_ptr<std::uint8_t[]> build_b_response(
+      const std::vector<double>& values, std::size_t* out_b_size);
+
+  void send_status_response(const std::string& msg,
+                            message::ResponseStatus status);
+
+  void send_values_response(const std::vector<double>& values);
+
+  boost::asio::ip::tcp::socket socket_;
+  IDataAccess* da_;
+};
+
+#endif  // DAQS_DATABASESERVER_SESSION_H

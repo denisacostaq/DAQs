@@ -1,5 +1,5 @@
-/*! @brief This file have the implementation for test utils.
-    @file testutil.cc
+/*! @brief This file have the interface for test utils.
+    @file testutil.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/22/2019
 
@@ -35,16 +35,11 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
+#ifndef DATABASESERVER_TESTUTIL_H
+#define DATABASESERVER_TESTUTIL_H
 
-#include "src/data-model/test/testutil.h"
+#include <string>
 
-#include <boost/filesystem.hpp>
+std::string get_random_sqlite_file_path() noexcept;
 
-std::string get_random_sqlite_file_path() noexcept {
-  const auto &fileRel =
-      boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.db");
-  const auto &dirAbs = boost::filesystem::temp_directory_path() / "DAQs";
-  boost::filesystem::create_directories(dirAbs);
-  const auto &fileAbs = dirAbs / fileRel;
-  return fileAbs.string();
-}
+#endif  // DATABASESERVER_TESTUTIL_H
