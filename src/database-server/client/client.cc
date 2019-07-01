@@ -115,10 +115,12 @@ void Client::onReadyRead() {
         p_vals{valsResp.mutable_values()};
     std::vector<IDataModel::VarValue> vals{};
     vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::for_each(p_vals->cbegin(), p_vals->cend(), [&vals](const ::message::VarValue &val) {
-      IDataModel::VarValue v{val.name(), val.value(), val.timestamp()};
-      vals.push_back(v);
-    });
+    std::for_each(
+        p_vals->cbegin(), p_vals->cend(),
+        [&vals](const ::message::VarValue& val) {
+          IDataModel::VarValue v{val.name(), val.value(), val.timestamp()};
+          vals.push_back(v);
+        });
     emit valuesReceived(vals);
   }
 }
