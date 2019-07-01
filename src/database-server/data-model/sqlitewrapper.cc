@@ -107,13 +107,14 @@ IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
 
 IDataModel::Err SQLiteWrapper::add_variable_value(
     const IDataModel::VarValue &var) noexcept {
+  auto now{std::chrono::system_clock::now()};
+  auto timestamp{std::chrono::duration_cast<std::chrono::milliseconds>(
+      now.time_since_epoch())};
   char *err_msg = nullptr;
   std::string sql = sqlite3_mprintf(
       "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
-      "(SELECT ID FROM "
-      "VARIABLE WHERE NAME = '%q'))",
-      var.val, std::chrono::system_clock::now().time_since_epoch().count(),
-      var.name.c_str());
+      "(SELECT ID FROM VARIABLE WHERE NAME = '%q'))",
+      var.val, timestamp.count(), var.name.c_str());
   if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
