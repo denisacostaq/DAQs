@@ -51,6 +51,23 @@
  */
 class IDataModel {
  public:
+  /**
+   * @brief The VarValue struct represent dumy data for a variable value.
+   */
+  struct VarValue {
+    /**
+     * @brief name of the variable.
+     */
+    std::string name;
+    /**
+     * @brief val value of the variable instance.
+     */
+    double val;
+    /**
+     * @brief timestamp at the moment of saving the value.
+     */
+    std::uint64_t timestamp;
+  };
   enum class Err { Ok, Failed };
 
   IDataModel() = default;
@@ -78,13 +95,11 @@ class IDataModel {
 
   /**
    * @brief add_variable_value add a new value for the variable.
-   * @param var_name variable in which this value will be added.
-   * @param var_value value of the variable.
+   * @param var variable infor with tha variable name and value.
    * @return Err::Ok on succes
    * @sa add_variable
    */
-  virtual Err add_variable_value(const std::string& var_name,
-                                 double var_value) noexcept = 0;
+  virtual Err add_variable_value(const VarValue& var) noexcept = 0;
 
   /**
    * @brief fetch_variable_values get all values of a given variables
@@ -94,7 +109,7 @@ class IDataModel {
    */
   virtual Err fetch_variable_values(
       const std::string& var_name,
-      const std::function<void(double value)>& send_vale) noexcept = 0;
+      const std::function<void(const VarValue& val)>& send_vale) noexcept = 0;
 
   /**
    * @brief fetch_variable_values  get all values of a given variables in a date
@@ -109,7 +124,7 @@ class IDataModel {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(double value)>& send_vale) noexcept = 0;
+      const std::function<void(const VarValue& val)>& send_vale) noexcept = 0;
 };
 
 #endif  //  DATABASE_SERVER_IDATAMODEL_H

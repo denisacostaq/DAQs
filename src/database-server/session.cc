@@ -98,7 +98,8 @@ void Session::send_status_response(const std::string &msg,
   send_msg(f_buf, fh_size + b_size);
 }
 
-void Session::send_values_response(const std::vector<double> &values) {
+void Session::send_values_response(
+    const std::vector<IDataModel::VarValue> &values) {
   std::size_t b_size{};
   auto b_buf{build_b_response(values, &b_size)};
   std::size_t fh_size{};
@@ -121,9 +122,15 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
 }
 
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
-    const std::vector<double> &vals, std::size_t *out_b_size) {
+    const std::vector<IDataModel::VarValue> &vals, std::size_t *out_b_size) {
   message::ValuesResponse b_msg{};
-  *b_msg.mutable_values() = {vals.begin(), vals.end()};
+  std::for_each(vals.cbegin(), vals.cend(),
+                [&b_msg](const IDataModel::VarValue &val) {
+                  auto v{b_msg.mutable_values()->Add()};
+                  v->set_name(val.name);
+                  v->set_value(val.val);
+                  v->set_timestamp(val.timestamp);
+                });
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSize()]};
   b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
   *out_b_size = b_msg.ByteSize();
@@ -199,29 +206,30 @@ void Session::read_save_value_request(std::size_t b_size) {
   auto self(shared_from_this());
   auto body_buff{std::shared_ptr<std::uint8_t>(
       new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>())};
-  ba::async_read(
-      socket_, ba::buffer(body_buff.get(), b_size),
-      [this, self, body_buff, b_size](boost::system::error_code ec,
-                                      size_t length) {
-        if (!ec && length == b_size) {
-          message::SaveValue sv{};
-          sv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
-          std::clog << "finally"
-                    << "\n";
-          std::clog << "name " << sv.variable() << "\n";
-          std::clog << "value " << sv.value() << "\n\n";
-          auto err{da_->add_variable_value(sv.variable(), sv.value())};
-          if (IDataAccess::Err::Ok == err) {
-            send_status_response("Ok", message::ResponseStatus::OK);
-          } else {
-            std::cerr << "database error\n";
-            send_status_response("Failed to save value",
-                                 message::ResponseStatus::FAILED);
-          }
-        } else {
-          std::cerr << "reading body_buf" << ec.message() << "\n";
-        }
-      });
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::SaveValue sv{};
+                     sv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     std::clog << "finally"
+                               << "\n";
+                     std::clog << "name " << sv.variable() << "\n";
+                     std::clog << "value " << sv.value() << "\n\n";
+                     auto err{da_->add_variable_value(
+                         IDataModel::VarValue{sv.variable(), sv.value()})};
+                     if (IDataAccess::Err::Ok == err) {
+                       send_status_response("Ok", message::ResponseStatus::OK);
+                     } else {
+                       std::cerr << "database error\n";
+                       send_status_response("Failed to save value",
+                                            message::ResponseStatus::FAILED);
+                     }
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
 }
 
 void Session::read_get_values_request(std::size_t b_size) {

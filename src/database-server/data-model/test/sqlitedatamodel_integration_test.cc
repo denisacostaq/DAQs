@@ -98,55 +98,68 @@ TEST_F(SQLiteWrapperTest, AddVariable) {
 }
 
 TEST_F(SQLiteWrapperTest, AddVariableValue) {
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable("var1"));
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value("var1", 23.1));
-  EXPECT_NE(IDataModel::Err::Ok, dm_->add_variable_value("varNone", 13.1));
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value("var1", 21.1));
+  IDataModel::VarValue var{"var1", 23.1};
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var.name));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(var));
+  EXPECT_NE(IDataModel::Err::Ok,
+            dm_->add_variable_value(IDataModel::VarValue{"varNone", 13.1}));
+  EXPECT_EQ(IDataModel::Err::Ok,
+            dm_->add_variable_value(IDataModel::VarValue{"var1", 21.1}));
 }
 
 TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
-  std::string var1 = "var1";
-  std::string varNone = "varNone";
+  IDataModel::VarValue var1{"var1"};
+  IDataModel::VarValue varNone{"varNone"};
   std::vector<double> var1OrgValues{23.1, 21.1};
   std::vector<double> varNoneOrgValues{13.1, 13.2, 3.32};
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var1));
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(varNone));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var1.name));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(varNone.name));
   for (auto v : var1OrgValues) {
-    EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(var1, v));
+    var1.val = v;
+    EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(var1));
   }
   for (auto v : varNoneOrgValues) {
-    EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(varNone, v));
+    varNone.val = v;
+    EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(varNone));
   }
-  std::vector<double> var1Values, varNoneValues;
-  auto callback = [](std::vector<double>* container, double value) {
-    container->push_back(value);
+  std::vector<IDataModel::VarValue> var1Values, varNoneValues;
+  IDataModel::VarValue varCopy{};
+  auto callback = [varCopy](std::vector<IDataModel::VarValue>* container,
+                            const IDataModel::VarValue& val) mutable {
+    container->push_back(val);
   };
   auto var1ValuesCallback =
       std::bind(callback, &var1Values, std::placeholders::_1);
   auto varNoneValuesCallback =
       std::bind(callback, &varNoneValues, std::placeholders::_1);
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(var1, var1ValuesCallback));
+            dm_->fetch_variable_values(var1.name, var1ValuesCallback));
   EXPECT_EQ(var1OrgValues.size(), var1Values.size());
   for (auto v : var1OrgValues) {
-    EXPECT_NE(std::find(var1Values.begin(), var1Values.end(), v),
+    EXPECT_NE(std::find_if(var1Values.cbegin(), var1Values.cend(),
+                           [v](const IDataModel::VarValue& var1Val) {
+                             return var1Val.val == v;
+                           }),
               var1Values.end());
   }
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(varNone, varNoneValuesCallback));
+            dm_->fetch_variable_values(varNone.name, varNoneValuesCallback));
   EXPECT_EQ(varNoneOrgValues.size(), varNoneValues.size());
   for (auto v : varNoneOrgValues) {
-    EXPECT_NE(std::find(varNoneValues.begin(), varNoneValues.end(), v),
+    EXPECT_NE(std::find_if(varNoneValues.cbegin(), varNoneValues.cend(),
+                           [v](const IDataModel::VarValue& var1Val) {
+                             return var1Val.val == v;
+                           }),
               varNoneValues.end());
   }
 }
 
 TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
-  std::string var1 = "var1";
+  IDataModel::VarValue var1{"var1"};
   const int ammount = 100;
   std::vector<double> var1OrgValues;
   var1OrgValues.reserve(100);
-  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var1));
+  EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable(var1.name));
   for (int i = 0; i < ammount; ++i) {
     var1OrgValues.push_back(i);
   }
@@ -154,8 +167,8 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   laps.push_back(std::chrono::system_clock::now());
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
   for (size_t i = 0; i < var1OrgValues.size(); ++i) {
-    EXPECT_EQ(IDataModel::Err::Ok,
-              dm_->add_variable_value(var1, var1OrgValues[i]));
+    var1.val = var1OrgValues[i];
+    EXPECT_EQ(IDataModel::Err::Ok, dm_->add_variable_value(var1));
     if (i == 30 || i == 60 || i == 90) {
       laps.push_back(std::chrono::system_clock::now());
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -164,22 +177,26 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   laps.push_back(std::chrono::system_clock::now());
   int count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(var1, laps[0], laps[1],
-                                       [&count](double) { ++count; }));
+            dm_->fetch_variable_values(
+                var1.name, laps[0], laps[1],
+                [&count](const IDataModel::VarValue&) { ++count; }));
   EXPECT_EQ(31, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(var1, laps[1], laps[2],
-                                       [&count](double) { ++count; }));
+            dm_->fetch_variable_values(
+                var1.name, laps[1], laps[2],
+                [&count](const IDataModel::VarValue&) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(var1, laps[2], laps[3],
-                                       [&count](double) { ++count; }));
+            dm_->fetch_variable_values(
+                var1.name, laps[2], laps[3],
+                [&count](const IDataModel::VarValue&) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataModel::Err::Ok,
-            dm_->fetch_variable_values(var1, laps[3], laps[4],
-                                       [&count](double) { ++count; }));
+            dm_->fetch_variable_values(
+                var1.name, laps[3], laps[4],
+                [&count](const IDataModel::VarValue&) { ++count; }));
   EXPECT_EQ(9, count);
 }

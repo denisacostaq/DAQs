@@ -45,54 +45,56 @@ IDataAccess::Err DataAccess::add_variable(const std::string& name) noexcept {
   return dm_->add_variable(name) == IDataModel::Err::Ok ? Err::Ok : Err::Failed;
 }
 
-IDataAccess::Err DataAccess::add_variable_value(const std::string& var_name,
-                                                double var_value) noexcept {
-  return dm_->add_variable_value(var_name, var_value) == IDataModel::Err::Ok
-             ? Err::Ok
-             : Err::Failed;
+IDataAccess::Err DataAccess::add_variable_value(
+    const IDataModel::VarValue& var) noexcept {
+  return dm_->add_variable_value(var) == IDataModel::Err::Ok ? Err::Ok
+                                                             : Err::Failed;
 }
 
-std::tuple<std::vector<double>, IDataAccess::Err>
+std::tuple<std::vector<IDataModel::VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(const std::string& var_name,
                                   size_t max_len) noexcept {
-  std::vector<double> values;
+  std::vector<IDataModel::VarValue> values{};
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
     try {
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<double>{}, Err::InvalidArgument);
+      return std::make_tuple(std::vector<IDataModel::VarValue>{},
+                             Err::InvalidArgument);
     }
   }
-  if (dm_->fetch_variable_values(var_name, [&values](double val) {
-        values.push_back(val);
-      }) != IDataModel::Err::Ok) {
-    return std::make_tuple(std::vector<double>{}, Err::Failed);
+  if (dm_->fetch_variable_values(var_name,
+                                 [&values](const IDataModel::VarValue& val) {
+                                   values.push_back(val);
+                                 }) != IDataModel::Err::Ok) {
+    return std::make_tuple(std::vector<IDataModel::VarValue>{}, Err::Failed);
   }
   values.shrink_to_fit();
   return std::make_tuple(values, Err::Ok);
 }
 
-std::tuple<std::vector<double>, IDataAccess::Err>
+std::tuple<std::vector<IDataModel::VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(
     const std::string& var_name,
     const std::chrono::system_clock::time_point& start_date,
     const std::chrono::system_clock::time_point& end_date,
     size_t max_len) noexcept {
-  std::vector<double> values;
+  std::vector<IDataModel::VarValue> values{};
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
     try {
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<double>{}, Err::InvalidArgument);
+      return std::make_tuple(std::vector<IDataModel::VarValue>{},
+                             Err::InvalidArgument);
     }
   }
   if (dm_->fetch_variable_values(var_name, start_date, end_date,
-                                 [&values](double val) {
+                                 [&values](const IDataModel::VarValue& val) {
                                    values.push_back(val);
                                  }) != IDataModel::Err::Ok) {
-    return std::make_tuple(std::vector<double>{}, Err::Failed);
+    return std::make_tuple(std::vector<IDataModel::VarValue>{}, Err::Failed);
   }
   values.shrink_to_fit();
   return std::make_tuple(values, Err::Ok);

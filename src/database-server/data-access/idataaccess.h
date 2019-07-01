@@ -45,6 +45,8 @@
 #include <tuple>
 #include <vector>
 
+#include "src/database-server/data-model/idatamodel.h"
+
 /**
  * @brief The IDataAccess interface is like a proxy for the data layer
  * @details This class can filter request or data, for example check for
@@ -71,13 +73,11 @@ class IDataAccess {
 
   /**
    * @brief add_variable_value add a new variable value related to a variable.
-   * @param var_name variable name.
-   * @param var_value variable value.
+   * @param var add a variable value.
    * @return Ok on success.
    * @sa IDataModel::add_variable_value
    */
-  virtual Err add_variable_value(const std::string& var_name,
-                                 double var_value) noexcept = 0;
+  virtual Err add_variable_value(const IDataModel::VarValue& var) noexcept = 0;
 
   /**
    * @brief fetch_variable_values get values for a variable.
@@ -86,7 +86,8 @@ class IDataAccess {
    * @return a vector with the variable values.
    * @sa IDataModel::fetch_variable_values
    */
-  virtual std::tuple<std::vector<double>, Err> fetch_variable_values(
+  virtual std::tuple<std::vector<IDataModel::VarValue>, Err>
+  fetch_variable_values(
       const std::string& var_name,
       size_t max_len = std::numeric_limits<size_t>::infinity()) noexcept = 0;
 
@@ -99,7 +100,8 @@ class IDataAccess {
    * @return a vector with the variable values.
    * @sa IDataModel::fetch_variable_values
    */
-  virtual std::tuple<std::vector<double>, Err> fetch_variable_values(
+  virtual std::tuple<std::vector<IDataModel::VarValue>, Err>
+  fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,

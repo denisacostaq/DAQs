@@ -111,11 +111,16 @@ void Client::onReadyRead() {
       return;
     }
     valsResp.ParseFromArray(respBytes.data(), respBytes.size());
-    ::google::protobuf::RepeatedField<double> const* const p_vals =
-        valsResp.mutable_values();
-    std::vector<double> vals;
+    ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
+        p_vals{valsResp.mutable_values()};
+    std::vector<IDataModel::VarValue> vals{};
     vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::copy(p_vals->begin(), p_vals->end(), std::back_inserter(vals));
+    std::for_each(
+        p_vals->begin(), p_vals->end(),
+        [&vals](const ::message::VarValue& val) {
+          IDataModel::VarValue v{val.name(), val.value(), val.timestamp()};
+          vals.push_back(v);
+        });
     emit valuesReceived(vals);
   }
 }

@@ -44,7 +44,9 @@
 #include <QtCore/QObject>
 #include <QtNetwork/QTcpSocket>
 
-#include "messages.pb.h"
+#include <messages.pb.h>
+
+#include "src/database-server/data-model/idatamodel.h"
 
 class Client : public QObject {
   Q_OBJECT
@@ -62,7 +64,7 @@ class Client : public QObject {
 
  signals:
   // FIXME(denisacostaq@gmail.com): expensive copy
-  void valuesReceived(const std::vector<double> &vals);
+  void valuesReceived(const std::vector<IDataModel::VarValue> &vals);
   void responseReceived(message::ResponseStatus status, QString response);
   void connected();
 

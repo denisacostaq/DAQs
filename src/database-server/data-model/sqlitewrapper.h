@@ -79,13 +79,11 @@ class SQLiteWrapper : public IDataModel {
   /**
    * @brief add_variable_value add an entry ti the vriable value table, related
    * to an entry in the variable table.
-   * @param var_name related entry in the variable table.
-   * @param var_value value of the variable for the variable value table.
+   * @param var variable value info to be inserted.
    * @return Err::Ok on success.
    * @sa IDataModel::add_variable_value
    */
-  Err add_variable_value(const std::string& var_name,
-                         double var_value) noexcept override;
+  Err add_variable_value(const VarValue& var) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable.
@@ -94,9 +92,9 @@ class SQLiteWrapper : public IDataModel {
    * @return Err::Ok on success.
    * @sa IDataModel::fetch_variable_values
    */
-  Err fetch_variable_values(
-      const std::string& var_name,
-      const std::function<void(double value)>& send_vale) noexcept override;
+  Err fetch_variable_values(const std::string& var_name,
+                            const std::function<void(const VarValue& val)>&
+                                send_vale) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable in a date
@@ -111,7 +109,8 @@ class SQLiteWrapper : public IDataModel {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(double value)>& send_vale) noexcept override;
+      const std::function<void(const VarValue& val)>&
+          send_vale) noexcept override;
 
  private:
   sqlite3* db_;
