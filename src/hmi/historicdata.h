@@ -47,6 +47,8 @@
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
 
+#include "src/database-server/client/client.h"
+
 class HistoricData : public QObject {
   Q_OBJECT
  public:
@@ -64,6 +66,8 @@ class HistoricData : public QObject {
   QVector<int> m_vals;
   QVector<QDateTime> m_dates;
   QVector<double> m_emulated;
+  Client *m_cl; // FIXME(denisacostaq@gmail.com): RAII even delete.
+  std::chrono::system_clock::time_point m_now;
 };
 
 #endif  // HISTORICDATA_H
