@@ -51,21 +51,22 @@ HistoricData::HistoricData(QObject *parent)
       m_now{std::chrono::system_clock::now()} {
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
-  QObject::connect(m_cl, &Client::valuesReceived,
-                   [this](const std::vector<IDataModel::VarValue> &vals) {
-                     m_vals.clear();
-                     m_emulated.clear();
-                     m_dates.clear();
-                     for (const auto &val : vals) {
-                       m_vals.append(m_vals.size());
-                       m_emulated.append(val.val);
-                       auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp, Qt::UTC)};
-                       m_dates.append(dt.toLocalTime());
-                     }
-                     if (!m_vals.empty()) {
-                       emit valsChanged();
-                     }
-                   });
+  QObject::connect(
+      m_cl, &Client::valuesReceived,
+      [this](const std::vector<IDataModel::VarValue> &vals) {
+        m_vals.clear();
+        m_emulated.clear();
+        m_dates.clear();
+        for (const auto &val : vals) {
+          m_vals.append(m_vals.size());
+          m_emulated.append(val.val);
+          auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp, Qt::UTC)};
+          m_dates.append(dt.toLocalTime());
+        }
+        if (!m_vals.empty()) {
+          emit valsChanged();
+        }
+      });
   m_cl->connect();
   QTimer *m_wTimer{new QTimer{this}};
   m_wTimer->setInterval(6000);
