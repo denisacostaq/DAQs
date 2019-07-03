@@ -74,6 +74,16 @@ before_install:
   - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
     fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then wget --show-progress https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -O $(pwd)/3rdparty/fakeroot/sdk-tools-linux-4333796.zip; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then unzip -q $(pwd)/3rdparty/fakeroot/sdk-tools-linux-4333796.zip -d $(pwd)/3rdparty/fakeroot/andoid-sdk; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then ls $(pwd)/3rdparty/fakeroot/andoid-sdk; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then export ANDROID_SDK_HOME=$(pwd)/3rdparty/fakeroot/andoid-sdk; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then wget --show-progress https://dl.google.com/android/repository/android-ndk-r18b-linux-x86_64.zip -O $(pwd)/3rdparty/fakeroot/android-ndk-r18b-linux-x86_64.zip; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then unzip -q $(pwd)/3rdparty/fakeroot/android-ndk-r18b-linux-x86_64.zip -d $(pwd)/3rdparty/fakeroot/andoid-ndk; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then ls $(pwd)/3rdparty/fakeroot/andoid-ndk; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then export ANDROID_NDK_HOME=$(pwd)/3rdparty/fakeroot/andoid-ndk/android-ndk-r18b; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then ${ANDROID_NDK_HOME}/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/bin/arm-linux-androideabi-g++ --version; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then ${ANDROID_SDK_HOME}/tools/bin/sdkmanager "platforms;android-21"; fi
   - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
       export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
       QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
