@@ -107,13 +107,14 @@ IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
 
 IDataModel::Err SQLiteWrapper::add_variable_value(
     const IDataModel::VarValue &var) noexcept {
+  auto now{std::chrono::system_clock::now()};
+  auto timestamp{std::chrono::duration_cast<std::chrono::milliseconds>(
+      now.time_since_epoch())};
   char *err_msg = nullptr;
   std::string sql = sqlite3_mprintf(
       "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
-      "(SELECT ID FROM "
-      "VARIABLE WHERE NAME = '%q'))",
-      var.val, std::chrono::system_clock::now().time_since_epoch().count(),
-      var.name.c_str());
+      "(SELECT ID FROM VARIABLE WHERE NAME = '%q'))",
+      var.val, timestamp.count(), var.name.c_str());
   if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
@@ -179,8 +180,12 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
     const std::chrono::system_clock::time_point &end_date,
     const std::function<void(const VarValue &val)> &send_vale) noexcept {
   char *err_msg = nullptr;
-  const std::int64_t sd = start_date.time_since_epoch().count();
-  const std::int64_t ed = end_date.time_since_epoch().count();
+  const std::int64_t sd{std::chrono::duration_cast<std::chrono::milliseconds>(
+                            start_date.time_since_epoch())
+                            .count()};
+  const std::int64_t ed{std::chrono::duration_cast<std::chrono::milliseconds>(
+                            end_date.time_since_epoch())
+                            .count()};
   std::string query = sqlite3_mprintf(
       "SELECT VAL FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
       "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
