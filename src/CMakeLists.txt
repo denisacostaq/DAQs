@@ -23,5 +23,7 @@ if(BUILD_TESTING)
 endif(BUILD_TESTING)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)
+if(NOT ANDROID)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)
+endif(NOT ANDROID)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hmi)

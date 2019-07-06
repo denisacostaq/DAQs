@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 set(VERION_MAJOR CACHE 0 INTERNAL)
@@ -9,8 +9,8 @@ set(VERION_PATCH CACHE 0 INTERNAL)
 #VERSION ${VERION_MAJOR}.${VERION_MINOR}.${VERION_PATCH}
 # new policy CMP0048
 project(DAQ
-    DESCRIPTION "Data Acquisition System (basic demo)"
-    HOMEPAGE_URL "https://github.com/denisacostaq/DAQs"
+#    DESCRIPTION "Data Acquisition System (basic demo)"
+#    HOMEPAGE_URL "https://github.com/denisacostaq/DAQs"
     LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
 include(ProcessorCount)

@@ -1,6 +1,15 @@
-find_package(Protobuf 2.6 REQUIRED)
 set(PROTO_SRC
   ${CMAKE_CURRENT_SOURCE_DIR}/messages.proto)
+
+
+if(ANDROID)
+    find_package(Protobuf 3.4 REQUIRED NO_CMAKE_SYSTEM_PATH
+        PATHS /tmp/kk/protobufinstalled)
+    #deprecated macros
+    include(/tmp/kk/protobufinstalled/lib/cmake/protobuf/protobuf-module.cmake)
+else(ANDROID)
+    find_package(Protobuf 3.4 REQUIRED)
+endif(ANDROID)
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
 add_library(proto-messages ${PROTO_SRCS} ${PROTO_HDRS})
 target_include_directories(proto-messages SYSTEM PUBLIC ${Protobuf_INCLUDE_DIRS})
