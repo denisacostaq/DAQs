@@ -71,22 +71,18 @@ matrix:
         - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
 
 before_install:
-#mov to a matrix entry
-  #- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then
-  - docker pull denisacostaq/qt:latest;
-  - docker run -v $(pwd):/usr/src/daqs --name qt513-android -itd denisacostaq/qt:latest;
-  - docker exec qt513-android ls /usr/src/;
-  - docker exec qt513-android sudo mkdir -p /usr/src/daqs/build;
-  - docker exec qt513-android sudo chmod -R 777 /usr/src/daqs/build;
-  - docker exec qt513-android bash -c 'echo "QT_ANDROID ${QT_ANDROID}"';
-  - docker exec qt513-android bash -c 'ls ${QT_ANDROID}/*';
-  - docker exec qt513-android bash -c 'ls ${QT_ANDROID}/lib/cmake/*';
-  - docker exec qt513-android bash -c 'ls ${QT_ANDROID}/lib/*';
-  - docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT} -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake/protobuf -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B /usr/src/daqs/build /usr/src/daqs';
-  - docker exec qt513-android make -C /usr/src/daqs/build;
-  - docker exec qt513-android ls /usr/src/daqs/build/*;
-  - docker rmi -f denisacostaq/qt:latest;
-    #fi
+#move to a matrix entry
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then
+      docker pull denisacostaq/qt:latest;
+      docker run -v $(pwd):/usr/src/daqs --name qt513-android -itd denisacostaq/qt:latest;
+      docker exec qt513-android ls /usr/src/;
+      docker exec qt513-android sudo mkdir -p /usr/src/daqs/build;
+      docker exec qt513-android sudo chmod -R 777 /usr/src/daqs/build;
+      docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT} -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake/protobuf -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B /usr/src/daqs/build /usr/src/daqs';
+      docker exec qt513-android make -C /usr/src/daqs/build;
+      docker exec qt513-android ls /usr/src/daqs/build/*;
+      docker rmi -f denisacostaq/qt:latest;
+    fi
   - eval "${MATRIX_EVAL}"
   - mkdir -p 3rdparty/fakeroot;
   - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
