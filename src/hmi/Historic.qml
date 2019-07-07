@@ -53,7 +53,7 @@ Page {
 
         DateTimeAxis {
             id: xTime
-            format: "mm:ss:MM"
+            format: "hh:mm:ss:MM"
             tickCount: 10
         }
         

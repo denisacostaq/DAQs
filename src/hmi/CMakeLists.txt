@@ -14,4 +14,4 @@ else(ANDROID)
 endif(ANDROID)
 target_compile_definitions(
   hmi PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-target_link_libraries(hmi PRIVATE Qt5::Core Qt5::Quick Qt5::Charts)
+target_link_libraries(hmi PRIVATE database-client Qt5::Core Qt5::Quick Qt5::Charts)
