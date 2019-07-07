@@ -78,7 +78,11 @@ before_install:
   - docker exec qt513-android ls /usr/src/;
   - docker exec qt513-android sudo mkdir -p /usr/src/daqs/build;
   - docker exec qt513-android sudo chmod -R 777 /usr/src/daqs/build;
-  - docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT} -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B /usr/src/daqs/build /usr/src/daqs';
+  - docker exec qt513-android ls /opt/daqs/;
+  - docker exec qt513-android ls /opt/daqs/protobuf/;
+  - docker exec qt513-android ls /opt/daqs/protobuf/lib/;
+  - docker exec qt513-android ls /opt/daqs/protobuf/lib/cmake;
+  - docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT} -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake/protobuf -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B /usr/src/daqs/build /usr/src/daqs';
   - docker exec qt513-android make -C /usr/src/daqs/build;
   - docker exec qt513-android ls /usr/src/daqs/build/*;
   - docker rmi -f denisacostaq/qt:latest;

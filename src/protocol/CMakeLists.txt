@@ -6,7 +6,7 @@ if(ANDROID)
     find_package(Protobuf 3.4 REQUIRED NO_CMAKE_SYSTEM_PATH
         PATHS ${Protobuf_DIR})
     #deprecated macros
-    include(/tmp/kk/protobufinstalled/lib/cmake/protobuf/protobuf-module.cmake)
+    include(${Protobuf_DIR}/protobuf-module.cmake)
 else(ANDROID)
     find_package(Protobuf 3.4 REQUIRED)
 endif(ANDROID)
