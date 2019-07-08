@@ -69,7 +69,7 @@ void Client::onReadyRead() {
   {
     message::MetaHeader mh{};
     mh.set_headersize(1);
-    mh_size = mh.ByteSize();
+    mh_size = mh.ByteSizeLong();
   }
   message::MetaHeader mh{};
   std::unique_ptr<char[]> mh_data{new char[mh_size]};
@@ -133,10 +133,10 @@ void Client::send_var_val(const QString& var_name, double value) {
   sv.set_value(value);
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_SAVE_VALUE);
-  hdr.set_bodysize(sv.ByteSize());
+  hdr.set_bodysize(sv.ByteSizeLong());
   std::ostringstream out{};
   message::MetaHeader mh{};
-  mh.set_headersize(hdr.ByteSize());
+  mh.set_headersize(hdr.ByteSizeLong());
   mh.SerializeToOstream(&out);
   hdr.SerializeToOstream(&out);
   sv.SerializeToOstream(&out);
@@ -154,10 +154,10 @@ void Client::request_var_values(
   gv.set_end(end.time_since_epoch().count());
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_GET_VALUES);
-  hdr.set_bodysize(gv.ByteSize());
+  hdr.set_bodysize(gv.ByteSizeLong());
   std::ostringstream out{};
   message::MetaHeader mh{};
-  mh.set_headersize(hdr.ByteSize());
+  mh.set_headersize(hdr.ByteSizeLong());
   mh.SerializeToOstream(&out);
   hdr.SerializeToOstream(&out);
   gv.SerializeToOstream(&out);
