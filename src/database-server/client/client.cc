@@ -141,7 +141,8 @@ void Client::send_var_val(const QString& var_name, double value) {
   hdr.SerializeToOstream(&out);
   sv.SerializeToOstream(&out);
   QByteArray bytes{out.str().c_str(),
-                   mh.ByteSize() + hdr.ByteSize() + sv.ByteSize()};
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    sv.ByteSizeLong())};
   socket_.write(bytes);
 }
 
@@ -162,7 +163,8 @@ void Client::request_var_values(
   hdr.SerializeToOstream(&out);
   gv.SerializeToOstream(&out);
   QByteArray bytes{out.str().c_str(),
-                   mh.ByteSize() + hdr.ByteSize() + gv.ByteSize()};
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    gv.ByteSizeLong())};
   socket_.write(bytes);
 }
 
