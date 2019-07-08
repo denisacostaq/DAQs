@@ -57,4 +57,20 @@ if(ANDROID)
       ${CMAKE_CURRENT_BINARY_DIR}/configAndroid.json @ONLY)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/android/AndroidManifest.xml.in
       ${CMAKE_CURRENT_BINARY_DIR}/android-build/AndroidManifest.xml @ONLY)
+    # check if the apk must be installed to the device
+    if(ARG_INSTALL)
+        set(INSTALL_OPTIONS --reinstall)
+    endif(ARG_INSTALL)
+    add_custom_target(apk_debug
+        COMMENT "Building android apk"
+        DEPENDS hmi
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/libs/${ANDROID_ABI} # it seems that recompiled libraries are not copied if we don't remove them first
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/hmi/libhmi.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/protocol/libproto-messages.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/database-server/client/libdatabase-client.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${Protobuf_DIR}/../../libprotobuf.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${Qt5SDK_DIR}/bin/androiddeployqt --verbose --output ${CMAKE_CURRENT_BINARY_DIR}/android-build --input ${CMAKE_CURRENT_BINARY_DIR}/configAndroid.json --android-platform android-21 --gradle ${INSTALL_OPTIONS}
+     )
+ #./gradlew build --debug
 endif(ANDROID)
