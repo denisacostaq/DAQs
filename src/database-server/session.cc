@@ -124,8 +124,15 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     const std::vector<IDataModel::VarValue> &vals, std::size_t *out_b_size) {
   message::ValuesResponse b_msg{};
+  std::for_each(vals.cbegin(), vals.cend(),
+                [&b_msg](const IDataModel::VarValue &val) {
+                  auto v{b_msg.mutable_values()->Add()};
+                  v->set_name(val.name);
+                  v->set_value(val.val);
+                  v->set_timestamp(val.timestamp);
+                });
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
-  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSizeLong());
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
   *out_b_size = b_msg.ByteSizeLong();
   return b_buf;
 }
