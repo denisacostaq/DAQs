@@ -146,7 +146,8 @@ std::unique_ptr<std::uint8_t[]> Session::build_h_msg(
   auto f_buf_addr{new std::uint8_t[fh_size]};
   auto fh_buf{std::unique_ptr<std::uint8_t[]>(f_buf_addr)};
   std::memcpy(f_buf_addr, mh_buf.get(), mh_msg.ByteSizeLong());
-  std::memcpy(&f_buf_addr[mh_msg.ByteSizeLong()], h_buf.get(), h_msg.ByteSizeLong());
+  std::memcpy(&f_buf_addr[mh_msg.ByteSizeLong()], h_buf.get(),
+              h_msg.ByteSizeLong());
   *out_fh_size = fh_size;
   return fh_buf;
 }
