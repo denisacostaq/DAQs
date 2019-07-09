@@ -111,7 +111,7 @@ script:
   - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format; fi
   - make
   - make test
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make doc; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
   - popd
 
 notifications:
