@@ -29,6 +29,9 @@ matrix:
             - qt512-meta-minimal
             - qt512charts-no-lgpl
             - libgl-dev #required by qtquick
+            - doxygen
+            - graphviz
+            - mscgen
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
         - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
