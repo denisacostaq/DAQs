@@ -102,10 +102,16 @@ before_install:
 script:
   - mkdir 3rdparty/build
   - pushd 3rdparty/build
-  - cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make check-format; fi
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DBUILD_DOC=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
+    else
+      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
+    fi
+# Set up cmake arguments in matrix
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format; fi
   - make
   - make test
+  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then make doc; fi
   - popd
 
 notifications:
