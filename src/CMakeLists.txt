@@ -25,3 +25,8 @@ endif(BUILD_TESTING)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hmi)
+
+
+if(BUILD_DOC)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc)
+endif(BUILD_DOC)
