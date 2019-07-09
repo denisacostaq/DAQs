@@ -36,7 +36,6 @@
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
 
-
 /*! \mainpage DAQs Source documentation.
 
 <h1>Index:</h1>
@@ -46,15 +45,15 @@
 
 //-----------------------------------------------------------
 
-  /*! \page protocol <center>Protocol definition</center>
+/*! \page protocol <center>Protocol definition</center>
 
 This is the message sequence chart.
-TODO(denisacostaq@gmail.com): This come from the examples http://www.mcternan.me.uk/mscgen/
+TODO(denisacostaq@gmail.com): This come from the examples
+http://www.mcternan.me.uk/mscgen/
 
- \mscfile protocol
+\mscfile protocol
 
-  */
-
+*/
 
 //-----------------------------------------------------------
 
