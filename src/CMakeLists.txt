@@ -29,3 +29,8 @@ else(ANDROID)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)
 endif(ANDROID)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/hmi)
+
+
+if(BUILD_DOC)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/doc)
+endif(BUILD_DOC)
