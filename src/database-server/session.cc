@@ -47,7 +47,7 @@ void Session::read_header() {
   auto mh_size_func = []() {
     auto mh{message::MetaHeader{}};
     mh.set_headersize(1);
-    return static_cast<size_t>(mh.ByteSize());
+    return mh.ByteSizeLong();
   };
   // FIXME(denisacostaq@gmail.com): verify critical section.
   static const auto mh_size{mh_size_func()};
@@ -115,9 +115,9 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
   message::Failure b_msg{};
   b_msg.set_status(status);
   b_msg.set_msg(msg);
-  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSize()]};
-  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
-  *out_b_size = b_msg.ByteSize();
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSizeLong());
+  *out_b_size = b_msg.ByteSizeLong();
   return b_buf;
 }
 
@@ -131,9 +131,9 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
                   v->set_value(val.val);
                   v->set_timestamp(val.timestamp);
                 });
-  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSize()]};
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
   b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
-  *out_b_size = b_msg.ByteSize();
+  *out_b_size = b_msg.ByteSizeLong();
   return b_buf;
 }
 
@@ -143,17 +143,18 @@ std::unique_ptr<std::uint8_t[]> Session::build_h_msg(
   message::Header h_msg{};
   h_msg.set_msg_type(msg_type);
   h_msg.set_bodysize(b_size);
-  auto h_buf{std::make_unique<std::uint8_t[]>(h_msg.ByteSize())};
-  h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
+  auto h_buf{std::make_unique<std::uint8_t[]>(h_msg.ByteSizeLong())};
+  h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSizeLong());
   message::MetaHeader mh_msg{};
-  mh_msg.set_headersize(h_msg.ByteSize());
-  auto mh_buf{std::make_unique<std::uint8_t[]>(mh_msg.ByteSize())};
-  mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSize());
-  const auto fh_size{mh_msg.ByteSize() + h_msg.ByteSize()};
+  mh_msg.set_headersize(h_msg.ByteSizeLong());
+  auto mh_buf{std::make_unique<std::uint8_t[]>(mh_msg.ByteSizeLong())};
+  mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSizeLong());
+  const auto fh_size{mh_msg.ByteSizeLong() + h_msg.ByteSizeLong()};
   auto f_buf_addr{new std::uint8_t[fh_size]};
   auto fh_buf{std::unique_ptr<std::uint8_t[]>(f_buf_addr)};
-  std::memcpy(f_buf_addr, mh_buf.get(), mh_msg.ByteSize());
-  std::memcpy(&f_buf_addr[mh_msg.ByteSize()], h_buf.get(), h_msg.ByteSize());
+  std::memcpy(f_buf_addr, mh_buf.get(), mh_msg.ByteSizeLong());
+  std::memcpy(&f_buf_addr[mh_msg.ByteSizeLong()], h_buf.get(),
+              h_msg.ByteSizeLong());
   *out_fh_size = fh_size;
   return fh_buf;
 }
