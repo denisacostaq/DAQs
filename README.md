@@ -1,5 +1,5 @@
-[![Build Status (master)](https://api.travis-ci.com/denisacostaq/DAQs.svg?branch=master)](https://api.travis-ci.com/denisacostaq/DAQs)
-[![Build Status (last)](https://api.travis-ci.com/denisacostaq/DAQs.svg)](https://api.travis-ci.com/denisacostaq/DAQs)
+[![Build Status (master)](https://img.shields.io/travis/com/denisacostaq/DAQs/master.svg?label=Build%20Status%20%28master%29)](https://api.travis-ci.com/denisacostaq/DAQs)
+[![Build Status (last)](https://img.shields.io/travis/com/denisacostaq/DAQs.svg?label=Build%20Status%20%28last%29)](https://api.travis-ci.com/denisacostaq/DAQs)
 
 ## Table of contents
 
