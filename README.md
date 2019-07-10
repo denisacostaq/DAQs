@@ -8,6 +8,8 @@
 - [DAQs](#daqs)
 - [Build instructions](#build-instructions)
   - [Build for android](#build-for-android)
+    - [Build android for arm](#build-android-for-arm)
+    - [Build android for x86_64](#build-android-for-x86_64)
   - [Build for your host](#build-for-your-host)
 
 <!-- /MarkdownTOC -->
@@ -36,11 +38,24 @@ At the moment of calling cmake you need to set the following variables:
 
 Example:
 
- - `cmake -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..`
- - `cmake --build . --target apk_debug -j $(nproc)`
+### Build android for arm.
+
+```bash
+> cmake -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..
+> cmake --build . --target apk_debug -j $(nproc)
+```
+
+### Build android for x86_64.
+
+```bash
+> cmake -DANDROID_ABI=x86_64 -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..
+> cmake --build . --target apk_debug -j $(nproc)
+```
+
 
 ## Build for your host.
 
-`cmake -DQt5_DIR=<your_path>/lib/cmake/Qt5 ..`
-
-`cmake --build . --target all -j $(nproc)`
+```bash
+> cmake -DQt5_DIR=<your_path>/lib/cmake/Qt5 ..
+> cmake --build . --target all -j $(nproc)
+```
