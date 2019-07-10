@@ -1,119 +1,106 @@
 dist: xenial
-
 language: cpp
-
 services:
-  - docker
-
+- docker
 env:
   global:
-    - CMAKE_VERSION=3.14.5
-
+  - CMAKE_VERSION=3.14.5
 matrix:
   fast_finish: true
   include:
-    - os: linux
-      addons:
-        apt:
-          update: true
-          sources:
-            - sourceline: 'ppa:mhier/libboost-latest'
-            - sourceline: 'ppa:beineri/opt-qt-5.12.2-xenial'
-            - sourceline: 'ppa:onedata/protobuf3'
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-            - boost1.67
-            - libprotobuf-dev
-            - protobuf-compiler
-            - qt512-meta-minimal
-            - qt512charts-no-lgpl
-            - libgl-dev #required by qtquick
-            - doxygen
-            - graphviz
-            - mscgen
-      env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
-        - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
-
-    - os: linux
-      addons:
-        apt:
-          update: true
-          sources:
-            - sourceline: 'ppa:mhier/libboost-latest'
-            - sourceline: 'ppa:beineri/opt-qt-5.12.2-xenial'
-            - sourceline: 'ppa:onedata/protobuf3'
-            - llvm-toolchain-xenial-7
-          packages:
-            - clang-7
-            - clang-format-7
-            - boost1.67
-            - libprotobuf-dev
-            - protobuf-compiler
-            - qt512-meta-minimal
-            - qt512charts-no-lgpl
-            - libgl-dev #required by qtquick
-      env:
-        - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
-        - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
-
+  - os: linux
+    addons:
+      apt:
+        update: true
+        sources:
+        - sourceline: ppa:mhier/libboost-latest
+        - sourceline: ppa:beineri/opt-qt-5.12.2-xenial
+        - sourceline: ppa:onedata/protobuf3
+        - ubuntu-toolchain-r-test
+        packages:
+        - g++-7
+        - boost1.67
+        - libprotobuf-dev
+        - protobuf-compiler
+        - qt512-meta-minimal
+        - qt512charts-no-lgpl
+        - libgl-dev #required by qtquick
+        - doxygen
+        - graphviz
+        - mscgen
+    env:
+    - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+    - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
+  - os: linux
+    addons:
+      apt:
+        update: true
+        sources:
+        - sourceline: ppa:mhier/libboost-latest
+        - sourceline: ppa:beineri/opt-qt-5.12.2-xenial
+        - sourceline: ppa:onedata/protobuf3
+        - llvm-toolchain-xenial-7
+        packages:
+        - clang-7
+        - clang-format-7
+        - boost1.67
+        - libprotobuf-dev
+        - protobuf-compiler
+        - qt512-meta-minimal
+        - qt512charts-no-lgpl
+        - libgl-dev #required by qtquick
+    env:
+    - MATRIX_EVAL="CC=clang-7 && CXX=clang++-7"
+    - QT5_CMAKE_MODULES_PATH="/opt/qt512/lib/cmake/Qt5"
     #On macOS, the version of clang is controlled by the choice of osx_image. You can find here the list of available osx_image
     #https://docs.travis-ci.com/user/languages/c/#clang-on-macos
     #https://docs.travis-ci.com/user/reference/osx/#macos-version
     #https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L160-L164
-    - os: osx
-      osx_image: xcode10.1 #clang-10, boost 1.67
-      env:
-        - MATRIX_EVAL="brew update && brew install protobuf qt5 && CC=clang && CXX=clang++"
-        - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
-
+  - os: osx
+    osx_image: xcode10.1
+    env:
+    - MATRIX_EVAL="brew update && brew install protobuf qt5 && CC=clang && CXX=clang++"
+    - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
   allow_failures:
-    - os: osx
-      osx_image: xcode10.1
-      env:
-        - MATRIX_EVAL="brew update && brew install protobuf gcc@7 qt5 && CC=gcc-7 && CXX=g++-7"
-        - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
-
+  - os: osx
+    osx_image: xcode10.1
+    env:
+    - MATRIX_EVAL="brew update && brew install protobuf gcc@7 qt5 && CC=gcc-7 && CXX=g++-7"
+    - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
 before_install:
-#move to a matrix entry
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then
-      docker pull denisacostaq/qt:latest;
-      docker run -v $(pwd):/usr/src/daqs --name qt513-android -itd denisacostaq/qt:latest;
-      docker exec qt513-android ls /usr/src/;
-      docker exec qt513-android sudo mkdir -p /usr/src/daqs/build;
-      docker exec qt513-android sudo chmod -R 777 /usr/src/daqs/build;
-      docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT} -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake/protobuf -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B /usr/src/daqs/build /usr/src/daqs';
-      docker exec qt513-android make -C /usr/src/daqs/build;
-      docker exec qt513-android ls /usr/src/daqs/build/*;
-      docker rmi -f denisacostaq/qt:latest;
-    fi
-  - eval "${MATRIX_EVAL}"
-  - mkdir -p 3rdparty/fakeroot;
-  - wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
-  - if [[ $TRAVIS_OS_NAME == 'linux' ]]; then
-      export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
-    fi
-  - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-      export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
-      QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
-    fi
-
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'clang++-7' ) ]]; then docker
+  pull denisacostaq/qt:latest; docker run -v $(pwd):/usr/src/daqs --name qt513-android
+  -itd denisacostaq/qt:latest; docker exec qt513-android ls /usr/src/; docker exec
+  qt513-android sudo mkdir -p /usr/src/daqs/build; docker exec qt513-android sudo
+  chmod -R 777 /usr/src/daqs/build; docker exec qt513-android bash -c 'cmake -DANDROID_SDK_DIR=${ANDROID_SDK_ROOT}
+  -DQt5SDK_DIR=${QT_ANDROID} -DProtobuf_DIR=/opt/daqs/protobuf/lib/cmake/protobuf
+  -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_ROOT}/build/cmake/android.toolchain.cmake -B
+  /usr/src/daqs/build /usr/src/daqs'; docker exec qt513-android make -C /usr/src/daqs/build;
+  docker exec qt513-android ls /usr/src/daqs/build/*; docker rmi -f denisacostaq/qt:latest;
+  fi
+- eval "${MATRIX_EVAL}"
+- mkdir -p 3rdparty/fakeroot;
+- wget --show-progress -qO- https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-$(uname
+  -s)-x86_64.tar.gz | tar xzf - -C 3rdparty/fakeroot;
+- if [[ $TRAVIS_OS_NAME == 'linux' ]]; then export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname
+  -s)-x86_64/bin:$PATH; fi
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname
+  -s)-x86_64/CMake.app/Contents/bin:$PATH; QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
+  fi
 script:
-  - mkdir 3rdparty/build
-  - pushd 3rdparty/build
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then
-      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DBUILD_DOC=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
-    else
-      cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
-    fi
+- mkdir 3rdparty/build
+- pushd 3rdparty/build
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then cmake -DCMAKE_CXX_COMPILER=${CXX}
+  -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DBUILD_DOC=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH}
+  ../../; else cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON
+  -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../; fi
 # Set up cmake arguments in matrix
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format; fi
-  - make
-  - make test
-  - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
-  - popd
-
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format;
+  fi
+- make
+- make test
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
+- popd
 notifications:
   email:
-    - denisacostaq@gmail.com
+  - denisacostaq@gmail.com
