@@ -3,6 +3,11 @@
 
 [![Build history](https://buildstats.info/travisci/chart/denisacostaq/DAQs?showStats=true)](https://travis-ci.com/denisacostaq/DAQs/builds)
 
+[![Issues](https://img.shields.io/github/issues/denisacostaq/DAQs.svg)](https://github.com/denisacostaq/DAQs/issues)
+[![Bugs](https://img.shields.io/github/issues/denisacostaq/DAQs/bug.svg)](https://github.com/denisacostaq/DAQs/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+[![Pulls](https://img.shields.io/github/issues-pr/denisacostaq/DAQs.svg)](https://github.com/denisacostaq/DAQs/pulls)
+
+
 ## Table of contents
 
 <!-- MarkdownTOC levels="1,2,3" autolink="true" bracket="round" -->
