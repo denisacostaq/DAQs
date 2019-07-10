@@ -13,6 +13,7 @@ project(DAQ
     HOMEPAGE_URL "https://github.com/denisacostaq/DAQs"
     LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(ANDROID)
     if(NOT DEFINED Qt5SDK_DIR)
         message(FATAL_ERROR "Qt5SDK_DIR is required.")

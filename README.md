@@ -1,5 +1,12 @@
-[![Build Status (master)](https://api.travis-ci.com/denisacostaq/DAQs.svg?branch=master)](https://api.travis-ci.com/denisacostaq/DAQs)
-[![Build Status (last)](https://api.travis-ci.com/denisacostaq/DAQs.svg)](https://api.travis-ci.com/denisacostaq/DAQs)
+[![Build Status (master)](https://img.shields.io/travis/com/denisacostaq/DAQs/master.svg?label=Build%20Status%20%28master%29)](https://api.travis-ci.com/denisacostaq/DAQs)
+[![Build Status (last)](https://img.shields.io/travis/com/denisacostaq/DAQs.svg?label=Build%20Status%20%28last%29)](https://travis-ci.com/denisacostaq/DAQs/pull_requests)
+
+[![Build history](https://buildstats.info/travisci/chart/denisacostaq/DAQs?showStats=true)](https://travis-ci.com/denisacostaq/DAQs/builds)
+
+[![Issues](https://img.shields.io/github/issues/denisacostaq/DAQs.svg)](https://github.com/denisacostaq/DAQs/issues)
+[![Bugs](https://img.shields.io/github/issues/denisacostaq/DAQs/bug.svg)](https://github.com/denisacostaq/DAQs/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+[![Pulls](https://img.shields.io/github/issues-pr/denisacostaq/DAQs.svg)](https://github.com/denisacostaq/DAQs/pulls)
+
 
 ## Table of contents
 
@@ -8,6 +15,8 @@
 - [DAQs](#daqs)
 - [Build instructions](#build-instructions)
   - [Build for android](#build-for-android)
+    - [Build android for arm](#build-android-for-arm)
+    - [Build android for x86_64](#build-android-for-x86_64)
   - [Build for your host](#build-for-your-host)
 
 <!-- /MarkdownTOC -->
@@ -36,11 +45,24 @@ At the moment of calling cmake you need to set the following variables:
 
 Example:
 
- - `cmake -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..`
- - `cmake --build . --target apk_debug -j $(nproc)`
+### Build android for arm.
+
+```bash
+> cmake -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..
+> cmake --build . --target apk_debug -j $(nproc)
+```
+
+### Build android for x86_64.
+
+```bash
+> cmake -DANDROID_ABI=x86_64 -DCMAKE_TOOLCHAIN_FILE=<ndk_path>/build/cmake/android.toolchain.cmake -DProtobuf_DIR=<protobuf_install_dir>/lib/cmake/protobuf -DQt5SDK_DIR=<your_path> -DANDROID_SDK_DIR=<your_path> ..
+> cmake --build . --target apk_debug -j $(nproc)
+```
+
 
 ## Build for your host.
 
-`cmake -DQt5_DIR=<your_path>/lib/cmake/Qt5 ..`
-
-`cmake --build . --target all -j $(nproc)`
+```bash
+> cmake -DQt5_DIR=<your_path>/lib/cmake/Qt5 ..
+> cmake --build . --target all -j $(nproc)
+```

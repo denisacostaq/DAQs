@@ -10,7 +10,7 @@
   "ndk-host": "@ANDROID_NDK_HOST_SYSTEM_NAME@",
   "target-architecture": "@ANDROID_ABI@",
   "qml-root-path": "@CMAKE_SOURCE_DIR@/src/hmi",
-  "stdcpp-path": "@ANDROID_STL_PATH@/libs/armeabi-v7a/libc++_shared.so",
+  "stdcpp-path": "@ANDROID_STL_PATH@/libs/@ANDROID_ABI@/libc++_shared.so",
   "useLLVM": true,
   "application-binary": "@CMAKE_BINARY_DIR@/src/hmi/libhmi.so"
 }
