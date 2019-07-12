@@ -1,19 +1,20 @@
 get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} PATH)
 string(REGEX REPLACE "\\..*" "" COMPILER_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
-#        hint COMPILER_PATH
+    message(WARNING "COMPILER_PATH ${COMPILER_PATH}")
     find_program(COV_EXE
         NAMES llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov
-        PATHS /Library/Developer/CommandLineTools/usr/bin)
+        HINTS ${COMPILER_PATH})
     find_program(LLVM_PROFDATA_EXE
         NAMES llvm-profdata-${COMPILER_MAJOR_VERSION} llvm-profdata
-        PATHS /Library/Developer/CommandLineTools/usr/bin)
+        HINTS ${COMPILER_PATH})
     if(NOT LLVM_PROFDATA_EXE)
         message(SEND_ERROR "llvm profdata tool is missing.")
     endif(NOT LLVM_PROFDATA_EXE)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-#        hint COMPILER_PATH
-    find_program(COV_EXE gcov-${COMPILER_MAJOR_VERSION})
+    message(WARNING "COMPILER_PATH ${COMPILER_PATH}")
+    find_program(COV_EXE gcov-${COMPILER_MAJOR_VERSION}
+        HINTS ${COMPILER_PATH})
     find_program(LCOV_EXE lcov)
     if(NOT LCOV_EXE)
         message(SEND_ERROR "Code coverage frontend tool is missing.")
