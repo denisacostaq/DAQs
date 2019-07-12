@@ -89,7 +89,6 @@ before_install:
     export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
   fi
 - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    ls /Library/Developer/CommandLineTools/usr/bin/;
     export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
     QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
   fi
@@ -108,12 +107,16 @@ script:
 - make test
 - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
 - make coverage
-- lcov --list coverage/coverage.info # Show test report in travis log.
-# Install coverals gem for uploading coverage to coveralls.
-- gem install coveralls-lcov
-- coveralls-lcov coverage/coverage.info # uploads to coveralls
-- bash <(curl -s https://codecov.io/bash) -f coverage_out.info.cleaned || echo "Codecov did not collect coverage reports"
 - popd
+after_success:
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then
+    # Show test report in travis log.
+    lcov --list ${TRAVIS_BUILD_DIR}/3rdparty/build/coverage/coverage.info;
+    # Install coverals gem for uploading coverage to coveralls.
+    gem install coveralls-lcov;
+    # uploads to coveralls
+    coveralls-lcov ${TRAVIS_BUILD_DIR}/3rdparty/build/coverage/coverage.info;
+  fi
 notifications:
   email:
   - denisacostaq@gmail.com

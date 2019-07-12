@@ -64,8 +64,10 @@ if(ENABLE_CODE_CEVERAGE_REPORT)
     string(REGEX REPLACE "\\..*" "" COMPILER_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
 #        hint COMPILER_PATH
-        find_program(COV_EXE llvm-cov-${COMPILER_MAJOR_VERSION})
-        find_program(LLVM_PROFDATA_EXE llvm-profdata-${COMPILER_MAJOR_VERSION})
+        find_program(COV_EXE
+            NAMES llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov)
+        find_program(LLVM_PROFDATA_EXE
+            NAMES llvm-profdata-${COMPILER_MAJOR_VERSION} llvm-profdata)
         if(NOT LLVM_PROFDATA_EXE)
             message(SEND_ERROR "llvm profdata tool is missing.")
         endif(NOT LLVM_PROFDATA_EXE)
