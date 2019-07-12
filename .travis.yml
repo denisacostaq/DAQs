@@ -110,11 +110,8 @@ script:
 - popd
 after_success:
 - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then
-    # Show test report in travis log.
     lcov --list ${TRAVIS_BUILD_DIR}/3rdparty/build/coverage/coverage.info;
-    # Install coverals gem for uploading coverage to coveralls.
     gem install coveralls-lcov;
-    # uploads to coveralls
     coveralls-lcov ${TRAVIS_BUILD_DIR}/3rdparty/build/coverage/coverage.info;
   fi
 notifications:
