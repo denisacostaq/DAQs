@@ -61,8 +61,13 @@ matrix:
     #https://gist.github.com/yamaya/2924292#file-xcode-clang-vers-L160-L164
   - os: osx
     osx_image: xcode10.1
+    addons:
+      homebrew:
+        packages:
+          protobuf
+          qt5
     env:
-    - MATRIX_EVAL="brew update && brew install protobuf qt5 llvm@7 && CC=clang && CXX=clang++"
+    - MATRIX_EVAL="CC=clang && CXX=clang++"
     - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
   allow_failures:
   - os: osx
@@ -101,8 +106,7 @@ script:
     cmake -DCMAKE_CXX_COMPILER=${CXX} -DCMAKE_C_COMPILER=${CC} -DBUILD_TESTING=ON -DENABLE_CODE_CEVERAGE_REPORT=ON -DQt5_DIR=${QT5_CMAKE_MODULES_PATH} ../../;
   fi
 # Set up cmake arguments in matrix
-- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format;
-  fi
+- if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make check-format; fi
 - make
 - make test
 - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
