@@ -31,36 +31,41 @@ file(GLOB_RECURSE
   ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
   ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cc)
 add_custom_target(coverage
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     COMMAND mkdir -p coverage
     COMMAND ${CMAKE_MAKE_PROGRAM} test
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 if(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage")
     SET(CMAKE_C_FLAGS "-g -O0 -W -fprofile-arcs -ftest-coverage")
     SET(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
     add_custom_command(TARGET coverage
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
         COMMENT "Generating coverage files"
         COMMAND ${COV_EXE} -b ${ALL_SOURCES} -o ${CMAKE_BINARY_DIR} | > CoverageSummary.tmp
         COMMAND cat CoverageSummary.tmp
         BYPRODUCTS CoverageSummary.tmp
         COMMAND echo "Coverage files have been output to ${CMAKE_BINARY_DIR}/coverage"
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
     )
     add_custom_command(TARGET coverage
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
         COMMENT "Generating coverage info"
-        COMMAND lcov -c -d ${CMAKE_BINARY_DIR}/src/database-server/data-model/ -o coverage.info --ignore-errors source
-        COMMAND echo "Coverage info have been output to a.info"
+        COMMAND ${LCOV_EXE} -c -d ${CMAKE_BINARY_DIR}/src/ -o coverage.info
+        COMMAND ${LCOV_EXE} --remove coverage.info --output-file coverage.info
+          '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-model/test/*'
+          '/usr/*'
+          '*gtest/*'
+        COMMAND echo "Coverage info have been output to ${CMAKE_BINARY_DIR}/coverage/coverage.info"
         BYPRODUCTS coverage.info
         MAIN_DEPENDENCY CoverageSummary.tmp
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
     )
     add_custom_command(TARGET coverage
-        COMMENT "Generating html coverage"
-        COMMAND genhtml --title "Code coverage report for DAQs." coverage.info --output-directory html
-        COMMAND echo "Coverage info have been output to d"
-        MAIN_DEPENDENCY a.info
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
+        COMMENT "Generating html coverage"
+        COMMAND ${GENHTML_EXE} --title "Code coverage report for DAQs." coverage.info --output-directory html
+        COMMAND echo "Coverage info have been output to ${CMAKE_BINARY_DIR}/coverage/html/index.html"
+        COMMAND ${LCOV_EXE} --list coverage.info
+        MAIN_DEPENDENCY coverage.info
     )
     #FIXME(denisacostaq@gmail.com): Make sure to clean up the coverage folder
     # fix for clang too
