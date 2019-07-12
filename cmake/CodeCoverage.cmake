@@ -3,15 +3,23 @@ string(REGEX REPLACE "\\..*" "" COMPILER_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VER
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
 #        hint COMPILER_PATH
     find_program(COV_EXE
-        NAMES "llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov")
+        NAMES llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov)
     find_program(LLVM_PROFDATA_EXE
-        NAMES "llvm-profdata-${COMPILER_MAJOR_VERSION} llvm-profdata")
+        NAMES llvm-profdata-${COMPILER_MAJOR_VERSION} llvm-profdata)
     if(NOT LLVM_PROFDATA_EXE)
         message(SEND_ERROR "llvm profdata tool is missing.")
     endif(NOT LLVM_PROFDATA_EXE)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
 #        hint COMPILER_PATH
     find_program(COV_EXE gcov-${COMPILER_MAJOR_VERSION})
+    find_program(LCOV_EXE lcov)
+    if(NOT LCOV_EXE)
+        message(SEND_ERROR "Code coverage frontend tool is missing.")
+    endif(NOT LCOV_EXE)
+    find_program(GENHTML_EXE genhtml)
+    if(NOT GENHTML_EXE)
+        message(SEND_ERROR "Code coverage gen html tool is missing.")
+    endif(NOT GENHTML_EXE)
 else()
     message(SEND_ERROR "Code coverage is supported for clang and gcc only in this project.")
 endif()
