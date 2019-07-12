@@ -95,7 +95,6 @@ before_install:
     export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/bin:$PATH;
   fi
 - if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    ls /Library/Developer/CommandLineTools/usr/bin/;
     export PATH=$(pwd)/3rdparty/fakeroot/cmake-${CMAKE_VERSION}-$(uname -s)-x86_64/CMake.app/Contents/bin:$PATH;
     QT5_CMAKE_MODULES_PATH=$(eval "${QT5_CMAKE_MODULES_PATH}")/lib/cmake/Qt5;
   fi
