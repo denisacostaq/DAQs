@@ -3,10 +3,12 @@ string(REGEX REPLACE "\\..*" "" COMPILER_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VER
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
     find_program(COV_EXE
         NAMES llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov
-        HINTS ${COMPILER_PATH})
+        HINTS ${COMPILER_PATH}
+        PATHS /Library/Developer/CommandLineTools/usr/bin)
     find_program(LLVM_PROFDATA_EXE
         NAMES llvm-profdata-${COMPILER_MAJOR_VERSION} llvm-profdata
-        HINTS ${COMPILER_PATH})
+        HINTS ${COMPILER_PATH}
+        PATHS /Library/Developer/CommandLineTools/usr/bin)
     if(NOT LLVM_PROFDATA_EXE)
         message(SEND_ERROR "llvm profdata tool is missing.")
     endif(NOT LLVM_PROFDATA_EXE)
