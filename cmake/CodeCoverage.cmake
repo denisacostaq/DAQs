@@ -1,7 +1,6 @@
 get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} PATH)
 string(REGEX REPLACE "\\..*" "" COMPILER_MAJOR_VERSION "${CMAKE_CXX_COMPILER_VERSION}")
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
-    message(WARNING "COMPILER_PATH ${COMPILER_PATH}")
     find_program(COV_EXE
         NAMES llvm-cov-${COMPILER_MAJOR_VERSION} llvm-cov
         HINTS ${COMPILER_PATH})
@@ -12,7 +11,6 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
         message(SEND_ERROR "llvm profdata tool is missing.")
     endif(NOT LLVM_PROFDATA_EXE)
 elseif(CMAKE_COMPILER_IS_GNUCXX)
-    message(WARNING "COMPILER_PATH ${COMPILER_PATH}")
     find_program(COV_EXE gcov-${COMPILER_MAJOR_VERSION}
         HINTS ${COMPILER_PATH})
     find_program(LCOV_EXE lcov)
