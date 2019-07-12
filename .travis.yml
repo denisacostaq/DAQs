@@ -108,6 +108,11 @@ script:
 - make test
 - if [[ ( $TRAVIS_OS_NAME == 'linux' ) && ( $CXX == 'g++-7' ) ]]; then make doc; fi
 - make coverage
+- lcov --list coverage/coverage.info # Show test report in travis log.
+# Install coverals gem for uploading coverage to coveralls.
+- gem install coveralls-lcov
+- coveralls-lcov coverage/coverage.info # uploads to coveralls
+- bash <(curl -s https://codecov.io/bash) -f coverage_out.info.cleaned || echo "Codecov did not collect coverage reports"
 - popd
 notifications:
   email:
