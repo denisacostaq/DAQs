@@ -1,5 +1,6 @@
 [![Build Status (master)](https://img.shields.io/travis/com/denisacostaq/DAQs/master.svg?label=Build%20Status%20%28master%29)](https://api.travis-ci.com/denisacostaq/DAQs)
 [![Build Status (last)](https://img.shields.io/travis/com/denisacostaq/DAQs.svg?label=Build%20Status%20%28last%29)](https://travis-ci.com/denisacostaq/DAQs/pull_requests)
+[![Coverage Status](https://coveralls.io/repos/github/denisacostaq/DAQs/badge.svg?branch=master)](https://coveralls.io/github/denisacostaq/DAQs)
 
 [![Build history](https://buildstats.info/travisci/chart/denisacostaq/DAQs?showStats=true)](https://travis-ci.com/denisacostaq/DAQs/builds)
 

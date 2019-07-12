@@ -55,6 +55,13 @@ option(SQLITEDATAMODEL_TEST_ENABLED ON)
 if(BUILD_TESTING)
     include(CTest)
 endif(BUILD_TESTING)
+
+cmake_dependent_option(ENABLE_CODE_CEVERAGE_REPORT
+    "Enable code coverage report." OFF
+    "BUILD_TESTING" ON)
+if(ENABLE_CODE_CEVERAGE_REPORT)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CodeCoverage.cmake)
+endif(ENABLE_CODE_CEVERAGE_REPORT)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 if(ANDROID)

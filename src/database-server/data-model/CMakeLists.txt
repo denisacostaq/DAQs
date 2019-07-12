@@ -48,3 +48,7 @@ if(BUILD_TESTING AND SQLITEDATAMODEL_TEST_ENABLED)
   target_link_libraries(sqlitedatamodel_test PRIVATE ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} sqlitedatamodel test_util)
   gtest_add_tests(sqlitedatamodel_test "" AUTO)
 endif(BUILD_TESTING AND SQLITEDATAMODEL_TEST_ENABLED)
+
+if(ENABLE_CODE_CEVERAGE_REPORT)
+    add_dependencies(coverage sqlitedatamodel_test)
+endif(ENABLE_CODE_CEVERAGE_REPORT)
