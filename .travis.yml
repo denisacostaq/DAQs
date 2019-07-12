@@ -65,9 +65,9 @@ matrix:
       homebrew:
         update: true
         packages:
-          protobuf
-          qt5
-          llvm@7
+          - protobuf
+          - qt5
+          - llvm@7
     env:
     - MATRIX_EVAL="CC=clang && CXX=clang++"
     - QT5_CMAKE_MODULES_PATH="brew --prefix qt5"
