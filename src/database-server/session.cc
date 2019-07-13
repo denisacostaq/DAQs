@@ -99,7 +99,7 @@ void Session::send_status_response(const std::string &msg,
 }
 
 void Session::send_values_response(
-    const std::vector<IDataModel::VarValue> &values) {
+    const std::vector<IDataSource::VarValue> &values) {
   std::size_t b_size{};
   auto b_buf{build_b_response(values, &b_size)};
   std::size_t fh_size{};
@@ -122,10 +122,10 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
 }
 
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
-    const std::vector<IDataModel::VarValue> &vals, std::size_t *out_b_size) {
+    const std::vector<IDataSource::VarValue> &vals, std::size_t *out_b_size) {
   message::ValuesResponse b_msg{};
   std::for_each(vals.cbegin(), vals.cend(),
-                [&b_msg](const IDataModel::VarValue &val) {
+                [&b_msg](const IDataSource::VarValue &val) {
                   auto v{b_msg.mutable_values()->Add()};
                   v->set_name(val.name);
                   v->set_value(val.val);
@@ -219,7 +219,7 @@ void Session::read_save_value_request(std::size_t b_size) {
                      std::clog << "name " << sv.variable() << "\n";
                      std::clog << "value " << sv.value() << "\n\n";
                      auto err{da_->add_variable_value(
-                         IDataModel::VarValue{sv.variable(), sv.value()})};
+                         IDataSource::VarValue{sv.variable(), sv.value()})};
                      if (IDataAccess::Err::Ok == err) {
                        send_status_response("Ok", message::ResponseStatus::OK);
                      } else {

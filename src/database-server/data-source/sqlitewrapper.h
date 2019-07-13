@@ -40,16 +40,16 @@
 
 #include <string>
 
-#include "src/database-server/data-source/idatamodel.h"
+#include "src/database-server/data-source/idatasource.h"
 
 class sqlite3;
-class SQLiteWrapper : public IDataModel {
+class SQLiteWrapper : public IDataSource {
  public:
   /**
    * @brief SQLiteWrapper create a sqlite3 connection.
    * @throw exception if any error happen.
    * @param db_path the path to the sqlite3 db file
-   * @sa IDataModel
+   * @sa IDataSource
    */
   explicit SQLiteWrapper(const std::string& db_path);
 
@@ -64,7 +64,7 @@ class SQLiteWrapper : public IDataModel {
    * @details a table with posible variables, a table with variable values and a
    * relation betwen the two (a variable have many variable values).
    * @return Err::Ok on success.
-   * @sa IDataModel::create_scheme
+   * @sa IDataSource::create_scheme
    */
   Err create_scheme() noexcept override;
 
@@ -72,7 +72,7 @@ class SQLiteWrapper : public IDataModel {
    * @brief add_variable add an entry to the variable table.
    * @param name of the variable.
    * @return Err::Ok on success.
-   * @sa IDataModel::add_variable
+   * @sa IDataSource::add_variable
    */
   Err add_variable(const std::string& name) noexcept override;
 
@@ -81,7 +81,7 @@ class SQLiteWrapper : public IDataModel {
    * to an entry in the variable table.
    * @param var variable value info to be inserted.
    * @return Err::Ok on success.
-   * @sa IDataModel::add_variable_value
+   * @sa IDataSource::add_variable_value
    */
   Err add_variable_value(const VarValue& var) noexcept override;
 
@@ -90,7 +90,7 @@ class SQLiteWrapper : public IDataModel {
    * @param var_name variable to get related values from.
    * @param send_vale get values one at a time from this callback.
    * @return Err::Ok on success.
-   * @sa IDataModel::fetch_variable_values
+   * @sa IDataSource::fetch_variable_values
    */
   Err fetch_variable_values(const std::string& var_name,
                             const std::function<void(const VarValue& val)>&
