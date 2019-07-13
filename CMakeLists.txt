@@ -47,8 +47,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 option(BUILD_TESTING "Build tests" OFF)
 include(CMakeDependentOption)
-cmake_dependent_option(SQLITEDATAMODEL_TEST_ENABLED
-	"Build sqlite datamodel integration tests" ON
+cmake_dependent_option(SQLITEDATASOURCE_TEST_ENABLED
+	"Build sqlite data source integration tests" ON
 	"BUILD_TESTING" OFF)
 if(BUILD_TESTING)
     include(CTest)

@@ -32,22 +32,22 @@ if(NOT CMAKE_USE_PTHREADS_INIT)
      message(FATAL_ERROR "pthread it's required")
 endif(NOT CMAKE_USE_PTHREADS_INIT)
 
-add_library(sqlitedatamodel
+add_library(sqlitedatasource
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
-target_include_directories(sqlitedatamodel SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
-target_link_libraries(sqlitedatamodel PUBLIC ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
+target_include_directories(sqlitedatasource SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
+target_link_libraries(sqlitedatasource PUBLIC ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
 
-if(SQLITEDATAMODEL_TEST_ENABLED)
+if(SQLITEDATASOURCE_TEST_ENABLED)
   find_package(Boost 1.67 REQUIRED filesystem)
   add_library(test_util ${CMAKE_CURRENT_SOURCE_DIR}/test/testutil.cc)
   target_include_directories(test_util SYSTEM PUBLIC ${Boost_INCLUDE_DIR})
   target_link_libraries(test_util PUBLIC ${Boost_LIBRARIES})
-  add_executable(sqlitedatamodel_test
-    ${CMAKE_CURRENT_SOURCE_DIR}/test/sqlitedatamodel_integration_test.cc)
-  target_include_directories(sqlitedatamodel_test SYSTEM PRIVATE ${GTEST_INCLUDE_DIR})
-  target_link_libraries(sqlitedatamodel_test PRIVATE ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} sqlitedatamodel test_util)
-  gtest_add_tests(sqlitedatamodel_test "" AUTO)
+  add_executable(sqlitedatasource_test
+    ${CMAKE_CURRENT_SOURCE_DIR}/test/sqlitedatasource_integration_test.cc)
+  target_include_directories(sqlitedatasource_test SYSTEM PRIVATE ${GTEST_INCLUDE_DIR})
+  target_link_libraries(sqlitedatasource_test PRIVATE ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} sqlitedatasource test_util)
+  gtest_add_tests(sqlitedatasource_test "" AUTO)
   if(ENABLE_CODE_CEVERAGE_REPORT)
-    add_dependencies(coverage sqlitedatamodel_test)
+    add_dependencies(coverage sqlitedatasource_test)
   endif(ENABLE_CODE_CEVERAGE_REPORT)
-endif(SQLITEDATAMODEL_TEST_ENABLED)
+endif(SQLITEDATASOURCE_TEST_ENABLED)
