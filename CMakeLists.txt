@@ -49,16 +49,14 @@ option(BUILD_TESTING "Build tests" OFF)
 include(CMakeDependentOption)
 cmake_dependent_option(SQLITEDATAMODEL_TEST_ENABLED
 	"Build sqlite datamodel integration tests" ON
-	"BUILD_TESTING" ON)
-
-option(SQLITEDATAMODEL_TEST_ENABLED ON)
+	"BUILD_TESTING" OFF)
 if(BUILD_TESTING)
     include(CTest)
 endif(BUILD_TESTING)
 
 cmake_dependent_option(ENABLE_CODE_CEVERAGE_REPORT
-    "Enable code coverage report." OFF
-    "BUILD_TESTING" ON)
+    "Enable code coverage report." ON
+    "BUILD_TESTING" OFF)
 if(ENABLE_CODE_CEVERAGE_REPORT)
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CodeCoverage.cmake)
 endif(ENABLE_CODE_CEVERAGE_REPORT)
