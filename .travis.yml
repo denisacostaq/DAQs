@@ -131,3 +131,4 @@ deploy:
   verbose: true
   on:
     branch: master
+    condition: "$CC = gcc-7"
