@@ -122,3 +122,11 @@ after_success:
 notifications:
   email:
   - denisacostaq@gmail.com
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: false
+  local_dir: ${TRAVIS_BUILD_DIR}/3rdparty/build/src/doc
+  on:
+    branch: master
