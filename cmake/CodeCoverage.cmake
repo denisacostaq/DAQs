@@ -53,7 +53,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_custom_command(TARGET coverage
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
         COMMENT "Generating coverage info"
-        COMMAND ${LCOV_EXE} -c -d ${CMAKE_BINARY_DIR}/src/ -o coverage.info
+        COMMAND ${LCOV_EXE} --capture --directory ${CMAKE_BINARY_DIR}/src/ -o coverage.info
         COMMAND ${LCOV_EXE} --remove coverage.info --output-file coverage.info
           '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-model/test/*'
           '/usr/*'
