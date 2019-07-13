@@ -39,7 +39,7 @@
 #define DATABASESERVER_DATAACCESS_H
 
 #include "src/database-server/data-access/idataaccess.h"
-#include "src/database-server/data-model/idatamodel.h"
+#include "src/database-server/data-source/idatamodel.h"
 
 class DataAccess : public IDataAccess {
  public:

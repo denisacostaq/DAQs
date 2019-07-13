@@ -35,7 +35,7 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include "src/database-server/data-model/sqlitewrapper.h"
+#include "src/database-server/data-source/sqlitewrapper.h"
 
 #include <cerrno>
 #include <cstring>

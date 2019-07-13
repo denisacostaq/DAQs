@@ -49,7 +49,7 @@
 #include <messages.pb.h>
 
 #include "src/database-server/data-access/dataaccess.h"
-#include "src/database-server/data-model/sqlitewrapper.h"
+#include "src/database-server/data-source/sqlitewrapper.h"
 #include "src/database-server/session.h"
 
 namespace ba = boost::asio;

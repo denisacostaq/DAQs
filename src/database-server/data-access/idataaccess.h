@@ -45,7 +45,7 @@
 #include <tuple>
 #include <vector>
 
-#include "src/database-server/data-model/idatamodel.h"
+#include "src/database-server/data-source/idatamodel.h"
 
 /**
  * @brief The IDataAccess interface is like a proxy for the data layer
