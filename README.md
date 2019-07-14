@@ -20,6 +20,7 @@
     - [Build android for arm](#build-android-for-arm)
     - [Build android for x86_64](#build-android-for-x86_64)
   - [Build for your host](#build-for-your-host)
+- [API documentation](#api-documentation)
 
 <!-- /MarkdownTOC -->
 
@@ -68,3 +69,7 @@ Example:
 > cmake -DQt5_DIR=<your_path>/lib/cmake/Qt5 ..
 > cmake --build . --target all -j $(nproc)
 ```
+
+# API documentation.
+
+A detailed API documentation can be found on [github pages](https://denisacostaq.github.io/DAQs/index.html).

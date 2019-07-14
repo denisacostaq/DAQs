@@ -98,10 +98,9 @@ void Session::send_status_response(const std::string &msg,
   send_msg(f_buf, fh_size + b_size);
 }
 
-void Session::send_values_response(
-    const std::vector<IDataModel::VarValue> &values) {
+void Session::send_values_response(std::vector<VarValue> &&values) {
   std::size_t b_size{};
-  auto b_buf{build_b_response(values, &b_size)};
+  auto b_buf{build_b_response(std::move(values), &b_size)};
   std::size_t fh_size{};
   auto fh_buf{
       build_h_msg(b_size, message::MessageType::RESPONSE_VALUES, &fh_size)};
@@ -116,21 +115,20 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
   b_msg.set_status(status);
   b_msg.set_msg(msg);
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
-  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSizeLong());
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
   *out_b_size = b_msg.ByteSizeLong();
   return b_buf;
 }
 
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
-    const std::vector<IDataModel::VarValue> &vals, std::size_t *out_b_size) {
+    std::vector<VarValue> &&vals, std::size_t *out_b_size) {
   message::ValuesResponse b_msg{};
-  std::for_each(vals.cbegin(), vals.cend(),
-                [&b_msg](const IDataModel::VarValue &val) {
-                  auto v{b_msg.mutable_values()->Add()};
-                  v->set_name(val.name);
-                  v->set_value(val.val);
-                  v->set_timestamp(val.timestamp);
-                });
+  std::for_each(vals.cbegin(), vals.cend(), [&b_msg](const VarValue &val) {
+    auto v{b_msg.mutable_values()->Add()};
+    v->set_name(val.name());
+    v->set_value(val.val());
+    v->set_timestamp(val.timestamp());
+  });
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
   b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
   *out_b_size = b_msg.ByteSizeLong();
@@ -218,8 +216,10 @@ void Session::read_save_value_request(std::size_t b_size) {
                                << "\n";
                      std::clog << "name " << sv.variable() << "\n";
                      std::clog << "value " << sv.value() << "\n\n";
-                     auto err{da_->add_variable_value(
-                         IDataModel::VarValue{sv.variable(), sv.value()})};
+                     // FIXME(denisacostaq@gmail.com)" color
+                     Variable var{sv.variable(), "color"};
+                     auto vv{VarValue{var, sv.value(), 0}};
+                     auto err{da_->add_variable_value(std::move(vv))};
                      if (IDataAccess::Err::Ok == err) {
                        send_status_response("Ok", message::ResponseStatus::OK);
                      } else {
@@ -246,7 +246,7 @@ void Session::read_get_values_request(std::size_t b_size) {
                                        static_cast<int>(b_size));
                      auto res{da_->fetch_variable_values(gv.variable())};
                      if (std::get<1>(res) == IDataAccess::Err::Ok) {
-                       send_values_response(std::get<0>(res));
+                       send_values_response(std::move(std::get<0>(res)));
                      } else {
                        std::cerr << "database error\n";
                        send_status_response("Failed to get values",

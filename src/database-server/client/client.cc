@@ -113,14 +113,15 @@ void Client::onReadyRead() {
     valsResp.ParseFromArray(respBytes.data(), respBytes.size());
     ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
         p_vals{valsResp.mutable_values()};
-    std::vector<IDataModel::VarValue> vals{};
+    std::vector<VarValue> vals{};
     vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::for_each(
-        p_vals->begin(), p_vals->end(),
-        [&vals](const ::message::VarValue& val) {
-          IDataModel::VarValue v{val.name(), val.value(), val.timestamp()};
-          vals.push_back(v);
-        });
+    std::for_each(p_vals->begin(), p_vals->end(),
+                  [&vals](const ::message::VarValue& val) {
+                    // FIXME(denisacostaq@gmail.com)" color
+                    Variable variable(val.name(), "color");
+                    VarValue v{variable, val.value(), val.timestamp()};
+                    vals.push_back(std::move(v));
+                  });
     emit valuesReceived(vals);
   }
 }
