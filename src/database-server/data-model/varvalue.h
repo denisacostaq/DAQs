@@ -101,7 +101,7 @@ class VarValue {
     v.val_ = this->val_;
     v.variable_ = this->variable_;
     v.timestamp_ = this->timestamp_;
-    return std::move(v);
+    return v;
   }
 
  private:

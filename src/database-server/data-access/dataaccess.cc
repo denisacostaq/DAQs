@@ -63,7 +63,7 @@ DataAccess::fetch_variable_values(const std::string& var_name,
       std::cerr << e.what() << "\n";
       auto v{std::vector<VarValue>{}};
       auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
-      return std::move(ret);
+      return ret;
     }
   }
   if (ds_->fetch_variable_values(var_name, [&values](VarValue&& val) {
@@ -71,11 +71,11 @@ DataAccess::fetch_variable_values(const std::string& var_name,
       }) != IDataSource::Err::Ok) {
     auto v{std::vector<VarValue>{}};
     auto ret{std::make_tuple(std::move(v), Err::Failed)};
-    return std::move(ret);
+    return ret;
   }
   values.shrink_to_fit();
   auto ret{std::make_tuple(std::move(values), Err::Ok)};
-  return std::move(ret);
+  return ret;
 }
 
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
@@ -92,7 +92,7 @@ DataAccess::fetch_variable_values(
       std::cerr << e.what() << "\n";
       auto v{std::vector<VarValue>{}};
       auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
-      return std::move(ret);
+      return ret;
     }
   }
   if (ds_->fetch_variable_values(var_name, start_date, end_date,
@@ -101,9 +101,9 @@ DataAccess::fetch_variable_values(
                                  }) != IDataSource::Err::Ok) {
     auto v{std::vector<VarValue>{}};
     auto ret{std::make_tuple(std::move(v), Err::Failed)};
-    return std::move(ret);
+    return ret;
   }
   values.shrink_to_fit();
   auto ret{std::make_tuple(std::move(values), Err::Ok)};
-  return std::move(ret);
+  return ret;
 }
