@@ -35,11 +35,52 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef VARVALUE_H
-#define VARVALUE_H
+#ifndef DATAMODEL_VARVALUE_H
+#define DATAMODEL_VARVALUE_H
 
 #include "src/database-server/data-model/variable.h"
 
+/**
+ * @brief The VarValue class define a readed value.
+ * @details A read value is always related to a variable, for a better
+ * understanding check out the following MER diagram.
+ * \dot
+    digraph {
+        graph [layout = dot, rankdir = LR]
+
+        // Box for entities
+        node [shape=none, margin=0]
+
+        // One-to-many relation (from one, to many)
+        edge [arrowhead=crow, arrowtail=dot, dir=both]
+
+        label = "MER variable"
+
+        // Entities
+        Variable [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="darkseagreen">Variable</td></tr>
+                <tr><td port="id" align="left">id: integer</td></tr>
+                <tr><td align="left">name: char(50)</td></tr>
+                <tr><td align="left">color: char(50)</td></tr>
+            </table>
+        >]
+
+        VariableValue [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="darkseagreen">VariableValue</td></tr>
+                <tr><td align="left">id: integer</td></tr>
+                <tr><td align="left">value: double</td></tr>
+                <tr><td align="left">timestamp: integer</td></tr>
+                <tr><td port="fk" align="left">variable_id: integer</td></tr>
+            </table>
+        >]
+
+        // Relationships
+        Variable:id->VariableValue:fk [label="1:*",len=1.00];
+    }
+ * \enddot
+ */
 class VarValue {
  public:
   VarValue() = default;
@@ -69,4 +110,4 @@ class VarValue {
   std::uint64_t timestamp_;
 };
 
-#endif  // VARVALUE_H
+#endif  // DATAMODEL_VARVALUE_H

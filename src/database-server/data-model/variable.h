@@ -35,8 +35,8 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef VARIABLE_H
-#define VARIABLE_H
+#ifndef DATAMODEL_VARIABLE_H
+#define DATAMODEL_VARIABLE_H
 
 #include <iostream>
 #include <string>
@@ -60,4 +60,4 @@ class Variable {
   std::string color_;
 };
 
-#endif  // VARIABLE_H
+#endif  // DATAMODEL_VARIABLE_H
