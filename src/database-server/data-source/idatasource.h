@@ -35,8 +35,8 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef DATABASE_SERVER_IDataSource_H
-#define DATABASE_SERVER_IDataSource_H
+#ifndef DATABASE_SERVER_IDATASOURCE_H
+#define DATABASE_SERVER_IDATASOURCE_H
 
 #include <chrono>
 #include <functional>
@@ -113,4 +113,4 @@ class IDataSource {
       const std::function<void(VarValue&& val)>& send_vale) noexcept = 0;
 };
 
-#endif  //  DATABASE_SERVER_IDataSource_H
+#endif  //  DATABASE_SERVER_IDATASOURCE_H
