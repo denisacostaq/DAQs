@@ -66,6 +66,7 @@ IDataSource::Err SQLiteWrapper::create_scheme() noexcept {
   std::string sql =
       "CREATE TABLE VARIABLE("
       "ID   INTEGER  PRIMARY KEY AUTOINCREMENT,"
+      "COLOR CHAR(50),"
       "NAME CHAR(50) NOT NULL UNIQUE);";
   stataments.push_back(sql);
   sql =
