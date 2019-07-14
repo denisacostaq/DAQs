@@ -1,7 +1,7 @@
-/*! @brief This file have the implementation for HistoricData class.
-    @file historicdata.cc
+/*! @brief This file have the implementation for VarValue class.
+    @file varvalue.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/13/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,42 +35,33 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include "src/hmi/historicdata.h"
+#include "src/database-server/data-model/varvalue.h"
 
-#include <algorithm>
-#include <random>
+#include <utility>
 
-#include <QtCore/QTimer>
+VarValue::VarValue(const Variable &variable, double val, std::uint64_t ts)
+    : variable_{variable}, val_{val}, timestamp_{ts} {}
 
-HistoricData::HistoricData(QObject *parent)
-    : QObject{parent},
-      m_vals{},
-      m_dates{},
-      m_emulated{},
-      m_cl{new Client{"127.0.0.1", 4444}},
-      m_now{std::chrono::system_clock::now()} {
-  QObject::connect(m_cl, &Client::connected,
-                   []() { qDebug() << "connected recived"; });
-  QObject::connect(
-      m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
-        m_vals.clear();
-        m_emulated.clear();
-        m_dates.clear();
-        for (const auto &val : vals) {
-          m_vals.append(m_vals.size());
-          m_emulated.append(val.val());
-          auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp(), Qt::UTC)};
-          m_dates.append(dt.toLocalTime());
-        }
-        if (!m_vals.empty()) {
-          emit valsChanged();
-        }
-      });
-  m_cl->connect();
-  QTimer *m_wTimer{new QTimer{this}};
-  m_wTimer->setInterval(6000);
-  QObject::connect(m_wTimer, &QTimer::timeout, this, [this]() {
-    m_cl->request_var_values("temp", m_now, std::chrono::system_clock::now());
-  });
-  m_wTimer->start();
+VarValue::VarValue(Variable &&variable, double &&val, std::uint64_t &&ts)
+    : variable_{variable}, val_{val}, timestamp_{ts} {}
+
+VarValue::VarValue(VarValue &&var) noexcept
+    : variable_{var.variable_},
+      val_{std::move(var.val_)},
+      timestamp_{std::move(var.timestamp_)} {}
+
+const Variable &VarValue::variable() const noexcept { return variable_; }
+
+void VarValue::set_vaiable(Variable &&var) noexcept {
+  variable_ = std::move(var);
 }
+
+double VarValue::val() const noexcept { return val_; }
+
+void VarValue::set_val(double val) noexcept { val_ = val; }
+
+std::uint64_t VarValue::timestamp() const noexcept { return timestamp_; }
+
+void VarValue::set_timestamp(std::uint64_t ts) noexcept { timestamp_ = ts; }
+
+const std::string &VarValue::name() const noexcept { return variable_.name(); }

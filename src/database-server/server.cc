@@ -49,7 +49,7 @@
 #include <messages.pb.h>
 
 #include "src/database-server/data-access/dataaccess.h"
-#include "src/database-server/data-model/sqlitewrapper.h"
+#include "src/database-server/data-source/sqlitewrapper.h"
 #include "src/database-server/session.h"
 
 namespace ba = boost::asio;
@@ -60,9 +60,9 @@ class server {
   server(ba::io_context& io_context, std::uint16_t port,
          const std::string& db_file)
       : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)),
-        dm_{new SQLiteWrapper(db_file)},
-        da_{new DataAccess(dm_)} {
-    if (dm_->create_scheme() == IDataModel::Err::Ok) {
+        ds_{new SQLiteWrapper(db_file)},
+        da_{new DataAccess(ds_)} {
+    if (ds_->create_scheme() == IDataSource::Err::Ok) {
       da_->add_variable("temp");
     } else {
       throw std::string{"Unable to create schema."};
@@ -72,7 +72,7 @@ class server {
 
   ~server() {
     delete da_;
-    delete dm_;
+    delete ds_;
   }
 
  private:
@@ -89,7 +89,7 @@ class server {
   }
 
   tcp::acceptor acceptor_;
-  IDataModel* dm_;
+  IDataSource* ds_;
   IDataAccess* da_;
 };
 

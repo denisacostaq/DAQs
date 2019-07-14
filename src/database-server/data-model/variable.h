@@ -1,7 +1,7 @@
-/*! @brief This file have the implementation for test utils.
-    @file testutil.cc
+/*! @brief This file have the interface for Variable class.
+    @file variable.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/22/2019
+    @date 7/13/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,16 +35,29 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
+#ifndef DATAMODEL_VARIABLE_H
+#define DATAMODEL_VARIABLE_H
 
-#include "src/database-server/data-model/test/testutil.h"
+#include <iostream>
+#include <string>
 
-#include <boost/filesystem.hpp>
+class Variable {
+ public:
+  Variable() = default;
+  Variable(const std::string &name, const std::string &color);
+  Variable(const Variable &var) = default;
+  Variable(Variable &&var) noexcept = default;
+  Variable &operator=(Variable &&var) = default;
+  Variable &operator=(const Variable &var) = default;
 
-std::string get_random_sqlite_file_path() noexcept {
-  const auto &fileRel =
-      boost::filesystem::unique_path("%%%%_%%%%_%%%%_%%%%.db");
-  const auto &dirAbs = boost::filesystem::temp_directory_path() / "DAQs";
-  boost::filesystem::create_directories(dirAbs);
-  const auto &fileAbs = dirAbs / fileRel;
-  return fileAbs.string();
-}
+  void set_name(const std::string &name) noexcept;
+  void set_color(const std::string &color) noexcept;
+  const std::string &name() const noexcept;
+  const std::string &color() const noexcept;
+
+ private:
+  std::string name_;
+  std::string color_;
+};
+
+#endif  // DATAMODEL_VARIABLE_H

@@ -46,7 +46,7 @@
 
 #include <messages.pb.h>
 
-#include "src/database-server/data-model/idatamodel.h"
+#include "src/database-server/data-source/idatasource.h"
 
 class Client : public QObject {
   Q_OBJECT
@@ -64,7 +64,7 @@ class Client : public QObject {
 
  signals:
   // FIXME(denisacostaq@gmail.com): expensive copy
-  void valuesReceived(const std::vector<IDataModel::VarValue> &vals);
+  void valuesReceived(const std::vector<VarValue> &vals);
   void responseReceived(message::ResponseStatus status, QString response);
   void connected();
 

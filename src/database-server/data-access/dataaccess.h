@@ -39,11 +39,11 @@
 #define DATABASESERVER_DATAACCESS_H
 
 #include "src/database-server/data-access/idataaccess.h"
-#include "src/database-server/data-model/idatamodel.h"
+#include "src/database-server/data-source/idatasource.h"
 
 class DataAccess : public IDataAccess {
  public:
-  explicit DataAccess(IDataModel* dm) noexcept;
+  explicit DataAccess(IDataSource* ds) noexcept;
 
   /**
    * @brief add_variable add a new variable.
@@ -59,7 +59,7 @@ class DataAccess : public IDataAccess {
    * @return Ok on success.
    * @sa IDataAccess::add_variable_value
    */
-  Err add_variable_value(const IDataModel::VarValue& var) noexcept override;
+  Err add_variable_value(VarValue&& var) noexcept override;
 
   /**
    * @brief fetch_variable_values get values for a given variable.
@@ -68,7 +68,7 @@ class DataAccess : public IDataAccess {
    * @return a vector of values if any and an error code.
    * @sa IDataAccess::fetch_variable_values
    */
-  std::tuple<std::vector<IDataModel::VarValue>, Err> fetch_variable_values(
+  std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name, size_t max_len) noexcept override;
 
   /**
@@ -80,13 +80,13 @@ class DataAccess : public IDataAccess {
    * @return a vector of values if any and an error code.
    * @sa IDataAccess::fetch_variable_values
    */
-  std::tuple<std::vector<IDataModel::VarValue>, Err> fetch_variable_values(
+  std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
       size_t max_len) noexcept override;
 
  private:
-  IDataModel* dm_;
+  IDataSource* ds_;
 };
 #endif  // DATABASESERVER_DATAACCESS_H

@@ -1,5 +1,4 @@
-/*! @brief This file have the interface for %{Cpp:License:ClassName} class.
-    @brief This file have the implementation for %{Cpp:License:ClassName} class.
+/*! @brief This file have the interface for IDataAccess class.
     @file idataaccess.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/23/2019
@@ -45,7 +44,7 @@
 #include <tuple>
 #include <vector>
 
-#include "src/database-server/data-model/idatamodel.h"
+#include "src/database-server/data-source/idatasource.h"
 
 /**
  * @brief The IDataAccess interface is like a proxy for the data layer
@@ -67,7 +66,7 @@ class IDataAccess {
    * @brief add_variable add a new variable.
    * @param name variable name.
    * @return Ok on success.
-   * @sa IDataModel::add_variable
+   * @sa IDataSource::add_variable
    */
   virtual Err add_variable(const std::string& name) noexcept = 0;
 
@@ -75,19 +74,18 @@ class IDataAccess {
    * @brief add_variable_value add a new variable value related to a variable.
    * @param var add a variable value.
    * @return Ok on success.
-   * @sa IDataModel::add_variable_value
+   * @sa IDataSource::add_variable_value
    */
-  virtual Err add_variable_value(const IDataModel::VarValue& var) noexcept = 0;
+  virtual Err add_variable_value(VarValue&& var) noexcept = 0;
 
   /**
    * @brief fetch_variable_values get values for a variable.
    * @param var_name variable name.
    * @param max_len max result len (for data compression for example).
    * @return a vector with the variable values.
-   * @sa IDataModel::fetch_variable_values
+   * @sa IDataSource::fetch_variable_values
    */
-  virtual std::tuple<std::vector<IDataModel::VarValue>, Err>
-  fetch_variable_values(
+  virtual std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name,
       size_t max_len = std::numeric_limits<size_t>::infinity()) noexcept = 0;
 
@@ -98,10 +96,9 @@ class IDataAccess {
    * @param end_date end date of the period.
    * @param max_len max result len (for data compression for example).
    * @return a vector with the variable values.
-   * @sa IDataModel::fetch_variable_values
+   * @sa IDataSource::fetch_variable_values
    */
-  virtual std::tuple<std::vector<IDataModel::VarValue>, Err>
-  fetch_variable_values(
+  virtual std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,

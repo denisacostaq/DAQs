@@ -35,7 +35,7 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include "src/database-server/data-model/sqlitewrapper.h"
+#include "src/database-server/data-source/sqlitewrapper.h"
 
 #include <cerrno>
 #include <cstring>
@@ -47,7 +47,7 @@
 
 #include <sqlite3.h>
 
-SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
+SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataSource() {
   int err = sqlite3_open(db_path.c_str(), &db_);
   if (err != SQLITE_OK) {
     std::cerr << sqlite3_errmsg(db_) << "\n";
@@ -60,12 +60,13 @@ SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataModel() {
 
 SQLiteWrapper::~SQLiteWrapper() { sqlite3_close(db_); }
 
-IDataModel::Err SQLiteWrapper::create_scheme() noexcept {
+IDataSource::Err SQLiteWrapper::create_scheme() noexcept {
   std::vector<std::string> stataments;
   stataments.reserve(2);
   std::string sql =
       "CREATE TABLE VARIABLE("
       "ID   INTEGER  PRIMARY KEY AUTOINCREMENT,"
+      "COLOR CHAR(50),"
       "NAME CHAR(50) NOT NULL UNIQUE);";
   stataments.push_back(sql);
   sql =
@@ -91,7 +92,7 @@ IDataModel::Err SQLiteWrapper::create_scheme() noexcept {
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
+IDataSource::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
   std::string sql =
       sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')", name.c_str());
   char *err = nullptr;
@@ -105,8 +106,7 @@ IDataModel::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::add_variable_value(
-    const IDataModel::VarValue &var) noexcept {
+IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
   auto now{std::chrono::system_clock::now()};
   auto timestamp{std::chrono::duration_cast<std::chrono::milliseconds>(
       now.time_since_epoch())};
@@ -114,7 +114,7 @@ IDataModel::Err SQLiteWrapper::add_variable_value(
   std::string sql = sqlite3_mprintf(
       "INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, "
       "(SELECT ID FROM VARIABLE WHERE NAME = '%q'))",
-      var.val, timestamp.count(), var.name.c_str());
+      var.val(), timestamp.count(), var.name().c_str());
   if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
@@ -123,10 +123,9 @@ IDataModel::Err SQLiteWrapper::add_variable_value(
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::fetch_variable_values(
+IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
-    const std::function<void(const IDataModel::VarValue &val)>
-        &send_vale) noexcept {
+    const std::function<void(VarValue &&val)> &send_vale) noexcept {
   char *err_msg = nullptr;
   std::string query = sqlite3_mprintf(
       "SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
@@ -135,12 +134,12 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
   if (sqlite3_exec(
           db_, query.c_str(),
           +[](void *callback, int argc, char **argv, char **azColName) {
-            IDataModel::VarValue val{};
+            VarValue val{};
             for (int i = 0; i < argc; i++) {
               if (strcmp("VAL", azColName[i]) == 0) {
                 try {
                   size_t processed = 0;
-                  val.val = std::stod(argv[i], &processed);
+                  val.set_val(std::stod(argv[i], &processed));
                 } catch (std::invalid_argument e) {
                   std::cerr << e.what();
                   return -1;
@@ -151,7 +150,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
               } else if (strcmp("TIMESTAMP", azColName[i]) == 0) {
                 try {
                   size_t processed = 0;
-                  val.timestamp = std::stoull(argv[i], &processed);
+                  val.set_timestamp(std::stoull(argv[i], &processed));
                 } catch (std::invalid_argument e) {
                   std::cerr << e.what();
                   return -1;
@@ -165,7 +164,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
                 val);
             return 0;
           },
-          const_cast<std::function<void(const VarValue &)> *>(&send_vale),
+          const_cast<std::function<void(VarValue &&)> *>(&send_vale),
           &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
@@ -174,11 +173,11 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
   return Err::Ok;
 }
 
-IDataModel::Err SQLiteWrapper::fetch_variable_values(
+IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,
-    const std::function<void(const VarValue &val)> &send_vale) noexcept {
+    const std::function<void(VarValue &&val)> &send_vale) noexcept {
   char *err_msg = nullptr;
   const std::int64_t sd{std::chrono::duration_cast<std::chrono::milliseconds>(
                             start_date.time_since_epoch())
@@ -212,7 +211,7 @@ IDataModel::Err SQLiteWrapper::fetch_variable_values(
             }
             return -1;
           },
-          const_cast<std::function<void(const VarValue &)> *>(&send_vale),
+          const_cast<std::function<void(VarValue &&)> *>(&send_vale),
           &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
