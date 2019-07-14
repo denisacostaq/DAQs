@@ -47,7 +47,7 @@ class Variable {
   Variable(const std::string &name, const std::string &color);
   Variable(const Variable &var) = default;
   Variable(Variable &&var) noexcept = default;
-  Variable &operator=(Variable &&var) noexcept = default;
+  Variable &operator=(Variable &&var) = default;
   Variable &operator=(const Variable &var) = default;
 
   void set_name(const std::string &name) noexcept;

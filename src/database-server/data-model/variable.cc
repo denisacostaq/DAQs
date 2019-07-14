@@ -39,10 +39,7 @@
 
 Variable::Variable(const std::string &name, const std::string &color)
     : name_{name}, color_{color} {}
-
 void Variable::set_name(const std::string &name) noexcept { name_ = name; }
-
 void Variable::set_color(const std::string &color) noexcept { color_ = color; }
-
 const std::string &Variable::name() const noexcept { return name_; }
 const std::string &Variable::color() const noexcept { return color_; }
