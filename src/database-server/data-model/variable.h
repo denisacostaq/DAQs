@@ -38,19 +38,23 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 
+#include <iostream>
 #include <string>
 
 class Variable {
  public:
+  Variable() = default;
   Variable(const std::string &name, const std::string &color);
   Variable(const Variable &var) = default;
   Variable(Variable &&var) noexcept = default;
-  Variable& operator=(Variable &&var) noexcept = default;
+  Variable &operator=(Variable &&var) noexcept = default;
+  Variable &operator=(const Variable &var) = default;
 
   void set_name(const std::string &name) noexcept;
   void set_color(const std::string &color) noexcept;
-  const std::string& name() const noexcept;
-  const std::string& color() const noexcept;
+  const std::string &name() const noexcept;
+  const std::string &color() const noexcept;
+
  private:
   std::string name_;
   std::string color_;

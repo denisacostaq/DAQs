@@ -45,6 +45,11 @@ VarValue::VarValue(const Variable &variable, double val, std::uint64_t ts)
 VarValue::VarValue(Variable &&variable, double &&val, std::uint64_t &&ts)
     : variable_{variable}, val_{val}, timestamp_{ts} {}
 
+VarValue::VarValue(VarValue &&var) noexcept
+    : variable_{var.variable_},
+      val_{std::move(var.val_)},
+      timestamp_{std::move(var.timestamp_)} {}
+
 const Variable &VarValue::variable() const noexcept { return variable_; }
 
 void VarValue::set_vaiable(Variable &&var) noexcept {
@@ -58,3 +63,5 @@ void VarValue::set_val(double val) noexcept { val_ = val; }
 std::uint64_t VarValue::timestamp() const noexcept { return timestamp_; }
 
 void VarValue::set_timestamp(std::uint64_t ts) noexcept { timestamp_ = ts; }
+
+const std::string &VarValue::name() const noexcept { return variable_.name(); }

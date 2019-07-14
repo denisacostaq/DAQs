@@ -42,9 +42,10 @@
 
 class VarValue {
  public:
+  VarValue() = default;
   VarValue(const Variable &variable, double val, std::uint64_t ts);
   VarValue(Variable &&variable, double &&val, std::uint64_t &&ts);
-  VarValue(VarValue &&var) noexcept = default;
+  VarValue(VarValue &&var) noexcept;
 
   const Variable &variable() const noexcept;
   void set_vaiable(Variable &&var) noexcept;
@@ -52,6 +53,15 @@ class VarValue {
   void set_val(double val) noexcept;
   std::uint64_t timestamp() const noexcept;
   void set_timestamp(std::uint64_t ts) noexcept;
+  const std::string &name() const noexcept;
+
+  VarValue DeepCopy() {
+    VarValue v{};
+    v.val_ = this->val_;
+    v.variable_ = this->variable_;
+    v.timestamp_ = this->timestamp_;
+    return std::move(v);
+  }
 
  private:
   Variable variable_;
