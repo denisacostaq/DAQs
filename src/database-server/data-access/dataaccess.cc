@@ -42,60 +42,68 @@
 DataAccess::DataAccess(IDataSource* ds) noexcept : IDataAccess{}, ds_{ds} {}
 
 IDataAccess::Err DataAccess::add_variable(const std::string& name) noexcept {
-  return ds_->add_variable(name) == IDataSource::Err::Ok ? Err::Ok : Err::Failed;
+  return ds_->add_variable(name) == IDataSource::Err::Ok ? Err::Ok
+                                                         : Err::Failed;
 }
 
-IDataAccess::Err DataAccess::add_variable_value(
-    const IDataSource::VarValue& var) noexcept {
-  return ds_->add_variable_value(var) == IDataSource::Err::Ok ? Err::Ok
-                                                             : Err::Failed;
+IDataAccess::Err DataAccess::add_variable_value(VarValue&& var) noexcept {
+  return ds_->add_variable_value(std::move(var)) == IDataSource::Err::Ok
+             ? Err::Ok
+             : Err::Failed;
 }
 
-std::tuple<std::vector<IDataSource::VarValue>, IDataAccess::Err>
+std::tuple<std::vector<VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(const std::string& var_name,
                                   size_t max_len) noexcept {
-  std::vector<IDataSource::VarValue> values{};
+  std::vector<VarValue> values{};
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
     try {
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<IDataSource::VarValue>{},
-                             Err::InvalidArgument);
+      auto v{std::vector<VarValue>{}};
+      auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
+      return std::move(ret);
     }
   }
-  if (ds_->fetch_variable_values(var_name,
-                                 [&values](const IDataSource::VarValue& val) {
-                                   values.push_back(val);
-                                 }) != IDataSource::Err::Ok) {
-    return std::make_tuple(std::vector<IDataSource::VarValue>{}, Err::Failed);
+  if (ds_->fetch_variable_values(var_name, [&values](VarValue&& val) {
+        values.push_back(std::move(val));
+      }) != IDataSource::Err::Ok) {
+    auto v{std::vector<VarValue>{}};
+    auto ret{std::make_tuple(std::move(v), Err::Failed)};
+    return std::move(ret);
   }
   values.shrink_to_fit();
-  return std::make_tuple(values, Err::Ok);
+  auto ret{std::make_tuple(std::move(values), Err::Ok)};
+  return std::move(ret);
 }
 
-std::tuple<std::vector<IDataSource::VarValue>, IDataAccess::Err>
+std::tuple<std::vector<VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(
     const std::string& var_name,
     const std::chrono::system_clock::time_point& start_date,
     const std::chrono::system_clock::time_point& end_date,
     size_t max_len) noexcept {
-  std::vector<IDataSource::VarValue> values{};
+  std::vector<VarValue> values{};
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
     try {
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<IDataSource::VarValue>{},
-                             Err::InvalidArgument);
+      auto v{std::vector<VarValue>{}};
+      auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
+      return std::move(ret);
     }
   }
   if (ds_->fetch_variable_values(var_name, start_date, end_date,
-                                 [&values](const IDataSource::VarValue& val) {
-                                   values.push_back(val);
+                                 [&values](VarValue&& val) {
+                                   values.push_back(std::move(val));
                                  }) != IDataSource::Err::Ok) {
-    return std::make_tuple(std::vector<IDataSource::VarValue>{}, Err::Failed);
+    auto v{std::vector<VarValue>{}};
+    auto ret{std::make_tuple(std::move(v), Err::Failed)};
+    return std::move(ret);
   }
   values.shrink_to_fit();
-  return std::make_tuple(values, Err::Ok);
+  auto ret{std::make_tuple(std::move(values), Err::Ok)};
+  return std::move(ret);
 }

@@ -12,8 +12,7 @@ endif(NOT GCC_EXE)
 ExternalProject_Add(sqlite3_project
     SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite3
-    #https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
-    URL http://localhost:8000/sqlite/sqlite-snapshot-201906171413.tar.gz
+    URL https://www.sqlite.org/snapshot/sqlite-snapshot-201906171413.tar.gz
     CONFIGURE_COMMAND ${CMAKE_SOURCE_DIR}/3rdparty/sqlite3/configure --enable-threadsafe=true CC=${GCC_EXE}
     BUILD_COMMAND ${MAKE_EXE} -C ${CMAKE_CURRENT_BINARY_DIR}/sqlite3 -j${N_PROC}
     INSTALL_COMMAND echo "Skipping install sqlite3"
@@ -36,7 +35,7 @@ endif(NOT CMAKE_USE_PTHREADS_INIT)
 add_library(sqlitedatasource
   ${CMAKE_CURRENT_SOURCE_DIR}/sqlitewrapper.cc)
 target_include_directories(sqlitedatasource SYSTEM PUBLIC ${SQLITE3_INCLUDE_DIR})
-target_link_libraries(sqlitedatasource PUBLIC ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
+target_link_libraries(sqlitedatasource PUBLIC datamodel ${SQLITE3_LIBRARY} Threads::Threads ${CMAKE_DL_LIBS})
 
 if(SQLITEDATASOURCE_TEST_ENABLED)
   find_package(Boost 1.67 REQUIRED filesystem)

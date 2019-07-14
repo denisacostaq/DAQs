@@ -52,15 +52,14 @@ HistoricData::HistoricData(QObject *parent)
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
   QObject::connect(
-      m_cl, &Client::valuesReceived,
-      [this](const std::vector<IDataSource::VarValue> &vals) {
+      m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
         m_vals.clear();
         m_emulated.clear();
         m_dates.clear();
         for (const auto &val : vals) {
           m_vals.append(m_vals.size());
-          m_emulated.append(val.val);
-          auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp, Qt::UTC)};
+          m_emulated.append(val.val());
+          auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp(), Qt::UTC)};
           m_dates.append(dt.toLocalTime());
         }
         if (!m_vals.empty()) {

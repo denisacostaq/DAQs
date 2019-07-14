@@ -81,12 +81,12 @@ class Session : public std::enable_shared_from_this<Session> {
       std::size_t* out_b_size);
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
-      const std::vector<IDataSource::VarValue>& values, std::size_t* out_b_size);
+      std::vector<VarValue>&& values, std::size_t* out_b_size);
 
   void send_status_response(const std::string& msg,
                             message::ResponseStatus status);
 
-  void send_values_response(const std::vector<IDataSource::VarValue>& values);
+  void send_values_response(std::vector<VarValue>&& values);
 
   boost::asio::ip::tcp::socket socket_;
   IDataAccess* da_;

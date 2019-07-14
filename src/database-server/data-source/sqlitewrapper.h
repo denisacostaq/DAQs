@@ -83,7 +83,7 @@ class SQLiteWrapper : public IDataSource {
    * @return Err::Ok on success.
    * @sa IDataSource::add_variable_value
    */
-  Err add_variable_value(const VarValue& var) noexcept override;
+  Err add_variable_value(VarValue&& var) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable.
@@ -92,9 +92,9 @@ class SQLiteWrapper : public IDataSource {
    * @return Err::Ok on success.
    * @sa IDataSource::fetch_variable_values
    */
-  Err fetch_variable_values(const std::string& var_name,
-                            const std::function<void(const VarValue& val)>&
-                                send_vale) noexcept override;
+  Err fetch_variable_values(
+      const std::string& var_name,
+      const std::function<void(VarValue&&)>& send_vale) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable in a date
@@ -109,8 +109,7 @@ class SQLiteWrapper : public IDataSource {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(const VarValue& val)>&
-          send_vale) noexcept override;
+      const std::function<void(VarValue&& val)>& send_vale) noexcept override;
 
  private:
   sqlite3* db_;

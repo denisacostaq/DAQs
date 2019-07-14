@@ -59,7 +59,7 @@ class DataAccess : public IDataAccess {
    * @return Ok on success.
    * @sa IDataAccess::add_variable_value
    */
-  Err add_variable_value(const IDataSource::VarValue& var) noexcept override;
+  Err add_variable_value(VarValue&& var) noexcept override;
 
   /**
    * @brief fetch_variable_values get values for a given variable.
@@ -68,7 +68,7 @@ class DataAccess : public IDataAccess {
    * @return a vector of values if any and an error code.
    * @sa IDataAccess::fetch_variable_values
    */
-  std::tuple<std::vector<IDataSource::VarValue>, Err> fetch_variable_values(
+  std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name, size_t max_len) noexcept override;
 
   /**
@@ -80,7 +80,7 @@ class DataAccess : public IDataAccess {
    * @return a vector of values if any and an error code.
    * @sa IDataAccess::fetch_variable_values
    */
-  std::tuple<std::vector<IDataSource::VarValue>, Err> fetch_variable_values(
+  std::tuple<std::vector<VarValue>, Err> fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
