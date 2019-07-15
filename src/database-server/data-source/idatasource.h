@@ -46,8 +46,8 @@
 #include "src/database-server/data-model/varvalue.h"
 
 /**
- * @brief The IDataSource class is an interface for the data model
- * @details A variable is related for example for sensors, like temperature,
+ * @brief The IDataSource class is an interface for the physycal storage.
+ * @details A variable is related for example with sensors, like temperature,
  * luminosity, ... A value is for example the numerica value for a
  * temperature sensor.
  * @sa add_variable_value, add_variable_value
@@ -72,23 +72,23 @@ class IDataSource {
 
   /**
    * @brief add_variable add a variable to be tracket for the system (by default
-   * the only supported variabe value type is double)
-   * @param name of the variable
-   * @return Err::Ok on succes
+   * the only supported variabe value type is double).
+   * @param variable to be created in the physical storage.
+   * @return Err::Ok on succes.
    * @sa add_variable_value
    */
-  virtual Err add_variable(const std::string& name) noexcept = 0;
+  virtual Err add_variable(const Variable& variable) noexcept = 0;
 
   /**
    * @brief add_variable_value add a new value for the variable.
-   * @param var variable infor with tha variable name and value.
+   * @param var_value variable value to be inserted in the storage.
    * @return Err::Ok on succes
    * @sa add_variable
    */
-  virtual Err add_variable_value(VarValue&&) noexcept = 0;
+  virtual Err add_variable_value(VarValue&& var_value) noexcept = 0;
 
   /**
-   * @brief fetch_variable_values get all values of a given variables
+   * @brief fetch_variable_values get all values of a given variable
    * @param var_name variable name to get the values from
    * @param send_vale the values will be send in this callback, one at a time
    * @return Err::Ok on succes
@@ -98,7 +98,7 @@ class IDataSource {
       const std::function<void(VarValue&& val)>& send_vale) noexcept = 0;
 
   /**
-   * @brief fetch_variable_values  get all values of a given variables in a date
+   * @brief fetch_variable_values get all values of a given variables in a date
    * range
    * @param var_name variable name to get the values from
    * @param start_date begin of the date range

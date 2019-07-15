@@ -58,7 +58,9 @@ TEST(NotInitializedSchema, CanNotAddVariable) {
     std::cerr << "Unextpected error\n";
   }
   EXPECT_NE(nullptr, ds);
-  EXPECT_NE(IDataSource::Err::Ok, ds->add_variable("temp"));
+  // FIXME(denisacostaq@gmail.com): "color"
+  Variable var{"temp", "color"};
+  EXPECT_NE(IDataSource::Err::Ok, ds->add_variable(var));
   delete ds;
 }
 
@@ -92,16 +94,22 @@ class SQLiteWrapperTest : public ::testing::Test {
 };
 
 TEST_F(SQLiteWrapperTest, AddVariable) {
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable("var1"));
-  EXPECT_NE(IDataSource::Err::Ok, ds_->add_variable("var1"));
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable("var2"));
+  // TODO(denisacostaq@gmail.com): "color"
+  Variable var1{"var1", "color"};
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
+  // TODO(denisacostaq@gmail.com): "color"
+  Variable var2{"var1", "color"};
+  EXPECT_NE(IDataSource::Err::Ok, ds_->add_variable(var2));
+  // TODO(denisacostaq@gmail.com): "color"
+  Variable var3{"var2", "color"};
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var3));
 }
 
 TEST_F(SQLiteWrapperTest, AddVariableValue) {
   // FIXME(denisacostaq@gmail.com)" color
   Variable variable("var1", "color");
   VarValue var{variable, 23.1, 0};
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var.name()));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(variable));
   EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(var)));
   // FIXME(denisacostaq@gmail.com)" color
   Variable varNone{"varNone", "color"};
@@ -120,8 +128,8 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   VarValue varValueNone{varNone, 0, 0};
   std::vector<double> var1OrgValues{23.1, 21.1};
   std::vector<double> varNoneOrgValues{13.1, 13.2, 3.32};
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varValue1.name()));
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varValueNone.name()));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varNone));
   for (auto v : var1OrgValues) {
     auto t = varValue1.DeepCopy();
     auto vv{varValue1.DeepCopy()};
@@ -134,10 +142,7 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
     EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
   }
   std::vector<VarValue> var1Values, varNoneValues;
-  VarValue varCopy{};
-  auto callback = [/*varCopy = std::move(varCopy)*/](
-                      std::vector<VarValue>* container,
-                      VarValue&& val) mutable {
+  auto callback = [](std::vector<VarValue>* container, VarValue&& val) mutable {
     container->push_back(std::move(val));
   };
   auto var1ValuesCallback =
@@ -158,7 +163,7 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   EXPECT_EQ(varNoneOrgValues.size(), varNoneValues.size());
   for (auto v : varNoneOrgValues) {
     EXPECT_NE(std::find_if(varNoneValues.cbegin(), varNoneValues.cend(),
-                           [v = std::move(v)](const VarValue& var1Val) {
+                           [v](const VarValue& var1Val) {
                              return var1Val.val() == v;
                            }),
               varNoneValues.end());
@@ -171,7 +176,7 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   const int ammount{100};
   std::vector<double> var1OrgValues{};
   var1OrgValues.reserve(100);
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1.name()));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
   for (int i = 0; i < ammount; ++i) {
     var1OrgValues.push_back(i);
   }

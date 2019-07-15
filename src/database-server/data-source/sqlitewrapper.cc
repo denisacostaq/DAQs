@@ -47,6 +47,9 @@
 
 #include <sqlite3.h>
 
+#include "src/database-server/data-model/variable.h"
+#include "src/database-server/data-model/varvalue.h"
+
 SQLiteWrapper::SQLiteWrapper(const std::string &db_path) : IDataSource() {
   int err = sqlite3_open(db_path.c_str(), &db_);
   if (err != SQLITE_OK) {
@@ -92,13 +95,13 @@ IDataSource::Err SQLiteWrapper::create_scheme() noexcept {
   return Err::Ok;
 }
 
-IDataSource::Err SQLiteWrapper::add_variable(const std::string &name) noexcept {
-  std::string sql =
-      sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')", name.c_str());
+IDataSource::Err SQLiteWrapper::add_variable(const Variable &var) noexcept {
+  std::string sql = sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')",
+                                    var.name().c_str());
   char *err = nullptr;
   int res = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err);
   if (res != SQLITE_OK) {
-    std::cerr << "Can not insert " << name << ". " << err << "\n";
+    std::cerr << "Can not insert " << var.name() << ". " << err << "\n";
     sqlite3_free(err);
     return Err::Failed;
   }

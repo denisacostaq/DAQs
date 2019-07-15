@@ -70,11 +70,11 @@ class SQLiteWrapper : public IDataSource {
 
   /**
    * @brief add_variable add an entry to the variable table.
-   * @param name of the variable.
+   * @param var variable info.
    * @return Err::Ok on success.
    * @sa IDataSource::add_variable
    */
-  Err add_variable(const std::string& name) noexcept override;
+  Err add_variable(const Variable& var) noexcept override;
 
   /**
    * @brief add_variable_value add an entry ti the vriable value table, related
