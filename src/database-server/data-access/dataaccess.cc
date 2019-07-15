@@ -41,9 +41,8 @@
 
 DataAccess::DataAccess(IDataSource* ds) noexcept : IDataAccess{}, ds_{ds} {}
 
-IDataAccess::Err DataAccess::add_variable(const std::string& name) noexcept {
-  return ds_->add_variable(name) == IDataSource::Err::Ok ? Err::Ok
-                                                         : Err::Failed;
+IDataAccess::Err DataAccess::add_variable(const Variable& var) noexcept {
+  return ds_->add_variable(var) == IDataSource::Err::Ok ? Err::Ok : Err::Failed;
 }
 
 IDataAccess::Err DataAccess::add_variable_value(VarValue&& var) noexcept {
@@ -61,21 +60,16 @@ DataAccess::fetch_variable_values(const std::string& var_name,
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      auto v{std::vector<VarValue>{}};
-      auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
-      return ret;
+      return std::make_tuple(std::vector<VarValue>{}, Err::InvalidArgument);
     }
   }
   if (ds_->fetch_variable_values(var_name, [&values](VarValue&& val) {
         values.push_back(std::move(val));
       }) != IDataSource::Err::Ok) {
-    auto v{std::vector<VarValue>{}};
-    auto ret{std::make_tuple(std::move(v), Err::Failed)};
-    return ret;
+    return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   values.shrink_to_fit();
-  auto ret{std::make_tuple(std::move(values), Err::Ok)};
-  return ret;
+  return std::make_tuple(std::move(values), Err::Ok);
 }
 
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
@@ -90,20 +84,15 @@ DataAccess::fetch_variable_values(
       values.reserve(max_len);
     } catch (const std::length_error& e) {
       std::cerr << e.what() << "\n";
-      auto v{std::vector<VarValue>{}};
-      auto ret{std::make_tuple(std::move(v), Err::InvalidArgument)};
-      return ret;
+      return std::make_tuple(std::vector<VarValue>{}, Err::InvalidArgument);
     }
   }
   if (ds_->fetch_variable_values(var_name, start_date, end_date,
                                  [&values](VarValue&& val) {
                                    values.push_back(std::move(val));
                                  }) != IDataSource::Err::Ok) {
-    auto v{std::vector<VarValue>{}};
-    auto ret{std::make_tuple(std::move(v), Err::Failed)};
-    return ret;
+    return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   values.shrink_to_fit();
-  auto ret{std::make_tuple(std::move(values), Err::Ok)};
-  return ret;
+  return std::make_tuple(std::move(values), Err::Ok);
 }

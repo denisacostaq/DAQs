@@ -44,7 +44,8 @@
 #include <tuple>
 #include <vector>
 
-#include "src/database-server/data-source/idatasource.h"
+#include "src/database-server/data-model/variable.h"
+#include "src/database-server/data-model/varvalue.h"
 
 /**
  * @brief The IDataAccess interface is like a proxy for the data layer
@@ -64,11 +65,11 @@ class IDataAccess {
 
   /**
    * @brief add_variable add a new variable.
-   * @param name variable name.
+   * @param var variable info.
    * @return Ok on success.
    * @sa IDataSource::add_variable
    */
-  virtual Err add_variable(const std::string& name) noexcept = 0;
+  virtual Err add_variable(const Variable& var) noexcept = 0;
 
   /**
    * @brief add_variable_value add a new variable value related to a variable.

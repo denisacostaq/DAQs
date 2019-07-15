@@ -47,11 +47,11 @@ class DataAccess : public IDataAccess {
 
   /**
    * @brief add_variable add a new variable.
-   * @param name variable name.
+   * @param var variable info.
    * @return Ok on success.
    * @sa IDataAccess::add_variable
    */
-  Err add_variable(const std::string& name) noexcept override;
+  Err add_variable(const Variable& var) noexcept override;
 
   /**
    * @brief add_variable_value add a new value for a given variable.
