@@ -126,23 +126,82 @@ IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
   return Err::Ok;
 }
 
+namespace {
+struct CountCallback {
+  size_t index;
+  std::function<void(VarValue &&val, size_t)> *send_vale;
+};
+};  // namespace
 IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
-    const std::function<void(VarValue &&val)> &send_vale) noexcept {
+    const std::function<void(VarValue &&val, size_t index)>
+        &send_vale) noexcept {
   char *err_msg = nullptr;
   std::string query = sqlite3_mprintf(
       "SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
       "ID FROM VARIABLE WHERE NAME = '%q')",
       var_name.c_str());
+  CountCallback cc{
+      0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
+  if (sqlite3_exec(db_, query.c_str(),
+                   +[](void *cc, int argc, char **argv, char **azColName) {
+                     VarValue val{};
+                     for (int i = 0; i < argc; i++) {
+                       if (strcmp("VAL", azColName[i]) == 0) {
+                         try {
+                           size_t processed = 0;
+                           val.set_val(std::stod(argv[i], &processed));
+                         } catch (std::invalid_argument e) {
+                           std::cerr << e.what();
+                           return -1;
+                         } catch (std::out_of_range e) {
+                           std::cerr << e.what();
+                           return -1;
+                         }
+                       } else if (strcmp("TIMESTAMP", azColName[i]) == 0) {
+                         try {
+                           size_t processed = 0;
+                           val.set_timestamp(std::stoull(argv[i], &processed));
+                         } catch (std::invalid_argument e) {
+                           std::cerr << e.what();
+                           return -1;
+                         } catch (std::out_of_range e) {
+                           std::cerr << e.what();
+                           return -1;
+                         }
+                       }
+                     }
+                     auto count_callback{static_cast<CountCallback *>(cc)};
+                     auto cb{count_callback->send_vale};
+                     (*cb)(std::move(val), count_callback->index);
+                     ++count_callback->index;
+                     return 0;
+                   },
+                   &cc, &err_msg) != SQLITE_OK) {
+    std::cerr << "error " << err_msg << "\n";
+    sqlite3_free(err_msg);
+    return Err::Failed;
+  }
+  return Err::Ok;
+}
+
+IDataSource::Err SQLiteWrapper::count_variable_values(
+    const std::string &var_name,
+    const std::function<void(size_t count)> &send_count) noexcept {
+  char *err_msg = nullptr;
+  std::string count_query = sqlite3_mprintf(
+      "SELECT COUNT(*) FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
+      "ID FROM VARIABLE WHERE NAME = '%q')",
+      var_name.c_str());
   if (sqlite3_exec(
-          db_, query.c_str(),
+          db_, count_query.c_str(),
           +[](void *callback, int argc, char **argv, char **azColName) {
-            VarValue val{};
-            for (int i = 0; i < argc; i++) {
-              if (strcmp("VAL", azColName[i]) == 0) {
+            for (int i = 0; i < argc; ++i) {
+              if (strcmp("COUNT(*)", azColName[i]) == 0) {
+                size_t count{};
                 try {
                   size_t processed = 0;
-                  val.set_val(std::stod(argv[i], &processed));
+                  count = std::stoull(argv[i], &processed);
                 } catch (std::invalid_argument e) {
                   std::cerr << e.what();
                   return -1;
@@ -150,24 +209,14 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
                   std::cerr << e.what();
                   return -1;
                 }
-              } else if (strcmp("TIMESTAMP", azColName[i]) == 0) {
-                try {
-                  size_t processed = 0;
-                  val.set_timestamp(std::stoull(argv[i], &processed));
-                } catch (std::invalid_argument e) {
-                  std::cerr << e.what();
-                  return -1;
-                } catch (std::out_of_range e) {
-                  std::cerr << e.what();
-                  return -1;
-                }
+                (*static_cast<std::function<void(size_t count)> *>(callback))(
+                    count);
+                return 0;
               }
             }
-            (*static_cast<std::function<void(const VarValue &)> *>(callback))(
-                val);
             return 0;
           },
-          const_cast<std::function<void(VarValue &&)> *>(&send_vale),
+          const_cast<std::function<void(size_t count)> *>(&send_count),
           &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
@@ -180,7 +229,8 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,
-    const std::function<void(VarValue &&val)> &send_vale) noexcept {
+    const std::function<void(VarValue &&val, size_t index)>
+        &send_vale) noexcept {
   char *err_msg = nullptr;
   const std::int64_t sd{std::chrono::duration_cast<std::chrono::milliseconds>(
                             start_date.time_since_epoch())
@@ -192,15 +242,65 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
       "SELECT VAL FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
       "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
       var_name.c_str(), sd, ed);
+  CountCallback cc{
+      0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
+  if (sqlite3_exec(db_, query.c_str(),
+                   +[](void *cc, int argc, char **argv, char **azColName) {
+                     for (int i = 0; i < argc; i++) {
+                       if (strcmp("VAL", azColName[i]) == 0) {
+                         VarValue val{};
+                         try {
+                           size_t processed = 0;
+                           val.set_val(std::stod(argv[i], &processed));
+                         } catch (std::invalid_argument e) {
+                           std::cerr << e.what();
+                           return -1;
+                         } catch (std::out_of_range e) {
+                           std::cerr << e.what();
+                           return -1;
+                         }
+                         auto count_callback{static_cast<CountCallback *>(cc)};
+                         auto cb{count_callback->send_vale};
+                         (*cb)(std::move(val), count_callback->index);
+                         ++count_callback->index;
+                         return 0;
+                       }
+                     }
+                     return -1;
+                   },
+                   &cc, &err_msg) != SQLITE_OK) {
+    std::cerr << "error " << err_msg << "\n";
+    sqlite3_free(err_msg);
+    return Err::Failed;
+  }
+  return Err::Ok;
+}
+
+IDataSource::Err SQLiteWrapper::count_variable_values(
+    const std::string &var_name,
+    const std::chrono::system_clock::time_point &start_date,
+    const std::chrono::system_clock::time_point &end_date,
+    const std::function<void(size_t count)> &send_count) noexcept {
+  char *err_msg = nullptr;
+  const std::int64_t sd{std::chrono::duration_cast<std::chrono::milliseconds>(
+                            start_date.time_since_epoch())
+                            .count()};
+  const std::int64_t ed{std::chrono::duration_cast<std::chrono::milliseconds>(
+                            end_date.time_since_epoch())
+                            .count()};
+  std::string count_query = sqlite3_mprintf(
+      "SELECT COUNT(*) FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
+      "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
+      var_name.c_str(), sd, ed);
   if (sqlite3_exec(
-          db_, query.c_str(),
+          db_, count_query.c_str(),
           +[](void *callback, int argc, char **argv, char **azColName) {
-            for (int i = 0; i < argc; i++) {
-              if (strcmp("VAL", azColName[i]) == 0) {
-                double val = 0.;
+            for (int i = 0; i < argc; ++i) {
+              if (strcmp("COUNT(*)", azColName[i]) == 0) {
+                size_t count{};
                 try {
                   size_t processed = 0;
-                  val = std::stod(argv[i], &processed);
+                  count = std::stoull(argv[i], &processed);
                 } catch (std::invalid_argument e) {
                   std::cerr << e.what();
                   return -1;
@@ -208,13 +308,14 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
                   std::cerr << e.what();
                   return -1;
                 }
-                (*static_cast<std::function<void(double)> *>(callback))(val);
+                (*static_cast<std::function<void(size_t count)> *>(callback))(
+                    count);
                 return 0;
               }
             }
-            return -1;
+            return 0;
           },
-          const_cast<std::function<void(VarValue &&)> *>(&send_vale),
+          const_cast<std::function<void(size_t)> *>(&send_count),
           &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);

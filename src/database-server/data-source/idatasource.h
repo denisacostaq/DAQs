@@ -90,12 +90,25 @@ class IDataSource {
   /**
    * @brief fetch_variable_values get all values of a given variable
    * @param var_name variable name to get the values from
-   * @param send_vale the values will be send in this callback, one at a time
+   * @param send_vale the values will be send in this callback, one at a time,
+   * index is the current value index.
    * @return Err::Ok on succes
    */
   virtual Err fetch_variable_values(
       const std::string& var_name,
-      const std::function<void(VarValue&& val)>& send_vale) noexcept = 0;
+      const std::function<void(VarValue&& val, size_t index)>&
+          send_vale) noexcept = 0;
+
+  /**
+   * @brief count_variable_values count all values of a given variable
+   * @param var_name variable name to count the values from
+   * @param send_count in this callack you can receive the number of values for
+   * the given variable
+   * @return Err::Ok on success
+   */
+  virtual Err count_variable_values(
+      const std::string& var_name,
+      const std::function<void(size_t count)>& send_count) noexcept = 0;
 
   /**
    * @brief fetch_variable_values get all values of a given variables in a date
@@ -103,14 +116,31 @@ class IDataSource {
    * @param var_name variable name to get the values from
    * @param start_date begin of the date range
    * @param end_date end of the date range
-   * @param send_vale the values will be send in this callback, one at a time
+   * @param send_vale the values will be send in this callback, one at a time,
+   * index is the current value index.
    * @return Err::Ok on succes
    */
   virtual Err fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(VarValue&& val)>& send_vale) noexcept = 0;
+      const std::function<void(VarValue&& val, size_t index)>&
+          send_vale) noexcept = 0;
+
+  /**
+   * @brief count_variable_values count all values of a given variable
+   * @param var_name variable name to count the values from
+   * @param start_date begin of the date range
+   * @param end_date end of the date range
+   * @param send_count in this callack you can receive the number of values for
+   * the given variable
+   * @return Err::Ok on success.
+   */
+  virtual Err count_variable_values(
+      const std::string& var_name,
+      const std::chrono::system_clock::time_point& start_date,
+      const std::chrono::system_clock::time_point& end_date,
+      const std::function<void(size_t count)>& send_count) noexcept = 0;
 };
 
 #endif  //  DATABASE_SERVER_IDATASOURCE_H

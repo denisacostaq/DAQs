@@ -162,10 +162,9 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
             ds_->fetch_variable_values(varNone.name(), varNoneValuesCallback));
   EXPECT_EQ(varNoneOrgValues.size(), varNoneValues.size());
   for (auto v : varNoneOrgValues) {
-    EXPECT_NE(std::find_if(varNoneValues.cbegin(), varNoneValues.cend(),
-                           [v](const VarValue& var1Val) {
-                             return var1Val.val() == v;
-                           }),
+    EXPECT_NE(std::find_if(
+                  varNoneValues.cbegin(), varNoneValues.cend(),
+                  [v](const VarValue& var1Val) { return var1Val.val() == v; }),
               varNoneValues.end());
   }
 }
@@ -194,22 +193,30 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   laps.push_back(std::chrono::system_clock::now());
   int count{0};
   EXPECT_EQ(IDataSource::Err::Ok,
-            ds_->fetch_variable_values(var1.name(), laps[0], laps[1],
-                                       [&count](const VarValue&) { ++count; }));
+            ds_->fetch_variable_values(
+                var1.name(), laps[0], laps[1],
+                // TODO(denisacostaq@gmail.com): use index and/or count_
+                [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(31, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
-            ds_->fetch_variable_values(var1.name(), laps[1], laps[2],
-                                       [&count](const VarValue&) { ++count; }));
+            ds_->fetch_variable_values(
+                var1.name(), laps[1], laps[2],
+                // TODO(denisacostaq@gmail.com): use index and/or count_
+                [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
-            ds_->fetch_variable_values(var1.name(), laps[2], laps[3],
-                                       [&count](const VarValue&) { ++count; }));
+            ds_->fetch_variable_values(
+                var1.name(), laps[2], laps[3],
+                // TODO(denisacostaq@gmail.com): use index and/or count_
+                [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
-            ds_->fetch_variable_values(var1.name(), laps[3], laps[4],
-                                       [&count](const VarValue&) { ++count; }));
+            ds_->fetch_variable_values(
+                var1.name(), laps[3], laps[4],
+                // TODO(denisacostaq@gmail.com): use index and/or count_
+                [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(9, count);
 }
