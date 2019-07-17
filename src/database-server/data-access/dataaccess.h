@@ -86,6 +86,16 @@ class DataAccess : public IDataAccess {
       const std::chrono::system_clock::time_point& end_date,
       size_t max_len) noexcept override;
 
+  /**
+   * @brief compress a dumy compression algorithm
+   * @param in_vals input values.
+   * @param out_vals output(compressed) values.
+   * @param max_len len of the compressed values.
+   * @return Err::Ok on success.
+   */
+  Err compress(const std::vector<VarValue>& in_vals,
+               std::vector<VarValue>* out_vals, size_t max_len) noexcept;
+
  private:
   IDataSource* ds_;
 };
