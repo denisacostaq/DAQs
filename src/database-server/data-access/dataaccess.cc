@@ -97,22 +97,23 @@ IDataAccess::Err DataAccess::compress(const std::vector<VarValue>& in_vals,
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(const std::string& var_name,
                                   size_t max_len) noexcept {
-  std::vector<VarValue> values{};
-  if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
-    try {
-      values.reserve(max_len);
-    } catch (const std::length_error& e) {
-      std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<VarValue>{}, Err::InvalidArgument);
-    }
-  }
-  if (ds_->fetch_variable_values(var_name, [&values](VarValue&& val) {
-        values.push_back(std::move(val));
-      }) != IDataSource::Err::Ok) {
+  std::vector<VarValue> tmp_values{};
+  if (ds_->fetch_variable_values(var_name,
+                                 [&tmp_values](VarValue&& val, size_t index) {
+                                   tmp_values.push_back(std::move(val));
+                                 }) != IDataSource::Err::Ok) {
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
-  values.shrink_to_fit();
-  return std::make_tuple(std::move(values), Err::Ok);
+  if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&
+      tmp_values.size() != max_len) {
+    std::vector<VarValue> values{};
+    auto err{compress(tmp_values, &values, max_len)};
+    if (err != Err::Ok) {
+      return std::make_tuple(std::vector<VarValue>{}, Err::Ok);
+    }
+    return std::make_tuple(std::move(values), Err::Ok);
+  }
+  return std::make_tuple(std::move(tmp_values), Err::Ok);
 }
 
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
@@ -121,21 +122,21 @@ DataAccess::fetch_variable_values(
     const std::chrono::system_clock::time_point& start_date,
     const std::chrono::system_clock::time_point& end_date,
     size_t max_len) noexcept {
-  std::vector<VarValue> values{};
-  if (max_len != std::numeric_limits<decltype(max_len)>::infinity()) {
-    try {
-      values.reserve(max_len);
-    } catch (const std::length_error& e) {
-      std::cerr << e.what() << "\n";
-      return std::make_tuple(std::vector<VarValue>{}, Err::InvalidArgument);
-    }
-  }
+  std::vector<VarValue> tmp_values{};
   if (ds_->fetch_variable_values(var_name, start_date, end_date,
-                                 [&values](VarValue&& val) {
-                                   values.push_back(std::move(val));
+                                 [&tmp_values](VarValue&& val, size_t index) {
+                                   tmp_values.push_back(std::move(val));
                                  }) != IDataSource::Err::Ok) {
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
-  values.shrink_to_fit();
-  return std::make_tuple(std::move(values), Err::Ok);
+  if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&
+      tmp_values.size() != max_len) {
+    std::vector<VarValue> values{};
+    auto err{compress(tmp_values, &values, max_len)};
+    if (err != Err::Ok) {
+      return std::make_tuple(std::vector<VarValue>{}, Err::Ok);
+    }
+    return std::make_tuple(std::move(values), Err::Ok);
+  }
+  return std::make_tuple(std::move(tmp_values), Err::Ok);
 }
