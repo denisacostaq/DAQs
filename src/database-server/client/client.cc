@@ -118,7 +118,7 @@ void Client::onReadyRead() {
     std::for_each(p_vals->begin(), p_vals->end(),
                   [&vals](const ::message::VarValue& val) {
                     // FIXME(denisacostaq@gmail.com)" color
-                    Variable variable(val.name(), "color");
+                    Variable variable{val.name(), "color"};
                     VarValue v{variable, val.value(), val.timestamp()};
                     vals.push_back(std::move(v));
                   });

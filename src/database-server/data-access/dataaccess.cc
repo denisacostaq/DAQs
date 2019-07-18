@@ -111,6 +111,8 @@ DataAccess::fetch_variable_values(const std::string& var_name,
     if (err != Err::Ok) {
       return std::make_tuple(std::vector<VarValue>{}, Err::Ok);
     }
+    std::clog << "compression from " << tmp_values.size() << " to "
+              << values.size() << "\n";
     return std::make_tuple(std::move(values), Err::Ok);
   }
   return std::make_tuple(std::move(tmp_values), Err::Ok);
