@@ -105,7 +105,7 @@ DataAccess::fetch_variable_values(const std::string& var_name,
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&
-      tmp_values.size() != max_len) {
+      tmp_values.size() > max_len) {
     std::vector<VarValue> values{};
     auto err{compress(tmp_values, &values, max_len)};
     if (err != Err::Ok) {
@@ -130,7 +130,7 @@ DataAccess::fetch_variable_values(
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&
-      tmp_values.size() != max_len) {
+      tmp_values.size() > max_len) {
     std::vector<VarValue> values{};
     auto err{compress(tmp_values, &values, max_len)};
     if (err != Err::Ok) {
