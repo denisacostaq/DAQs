@@ -47,11 +47,11 @@ class DataAccess : public IDataAccess {
 
   /**
    * @brief add_variable add a new variable.
-   * @param name variable name.
+   * @param var variable info.
    * @return Ok on success.
    * @sa IDataAccess::add_variable
    */
-  Err add_variable(const std::string& name) noexcept override;
+  Err add_variable(const Variable& var) noexcept override;
 
   /**
    * @brief add_variable_value add a new value for a given variable.
@@ -85,6 +85,16 @@ class DataAccess : public IDataAccess {
       const std::chrono::system_clock::time_point& start_date,
       const std::chrono::system_clock::time_point& end_date,
       size_t max_len) noexcept override;
+
+  /**
+   * @brief compress a dumy compression algorithm
+   * @param in_vals input values.
+   * @param out_vals output(compressed) values.
+   * @param max_len len of the compressed values.
+   * @return Err::Ok on success.
+   */
+  Err compress(const std::vector<VarValue>& in_vals,
+               std::vector<VarValue>* out_vals, size_t max_len) noexcept;
 
  private:
   IDataSource* ds_;

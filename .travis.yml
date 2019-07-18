@@ -122,6 +122,8 @@ after_success:
 notifications:
   email:
   - denisacostaq@gmail.com
+before_deploy:
+ cp -r -p ${TRAVIS_BUILD_DIR}/3rdparty/build/coverage/html ${TRAVIS_BUILD_DIR}/3rdparty/build/src/doc/html/coverage_html
 deploy:
   provider: pages
   skip_cleanup: true

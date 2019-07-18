@@ -70,11 +70,11 @@ class SQLiteWrapper : public IDataSource {
 
   /**
    * @brief add_variable add an entry to the variable table.
-   * @param name of the variable.
+   * @param var variable info.
    * @return Err::Ok on success.
    * @sa IDataSource::add_variable
    */
-  Err add_variable(const std::string& name) noexcept override;
+  Err add_variable(const Variable& var) noexcept override;
 
   /**
    * @brief add_variable_value add an entry ti the vriable value table, related
@@ -92,9 +92,20 @@ class SQLiteWrapper : public IDataSource {
    * @return Err::Ok on success.
    * @sa IDataSource::fetch_variable_values
    */
-  Err fetch_variable_values(
+  Err fetch_variable_values(const std::string& var_name,
+                            const std::function<void(VarValue&&, size_t index)>&
+                                send_vale) noexcept override;
+
+  /**
+   * @brief count_variable_values count the number of values for a given
+   * variable.
+   * @param var_name variable to count related values from.
+   * @param send_count get the values amount from this callback.
+   * @return Err::Ok on success.
+   */
+  Err count_variable_values(
       const std::string& var_name,
-      const std::function<void(VarValue&&)>& send_vale) noexcept override;
+      const std::function<void(size_t count)>& send_count) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable in a date
@@ -103,13 +114,29 @@ class SQLiteWrapper : public IDataSource {
    * @param start_data begin of the date range.
    * @param end_date end of the date range.
    * @param send_vale get values one at a time from this callback.
-   * @return
+   * @return Err::Ok on success.
    */
   Err fetch_variable_values(
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(VarValue&& val)>& send_vale) noexcept override;
+      const std::function<void(VarValue&& val, size_t index)>&
+          send_vale) noexcept override;
+
+  /**
+   * @brief count_variable_values count the number of values for a given
+   * variable in a date range.
+   * @param var_name variable to count related values from.
+   * @param start_data begin of the date range.
+   * @param end_date end of the date range.
+   * @param send_count get the values amount from this callback.
+   * @return Err::Ok on success.
+   */
+  virtual Err count_variable_values(
+      const std::string& var_name,
+      const std::chrono::system_clock::time_point& start_date,
+      const std::chrono::system_clock::time_point& end_date,
+      const std::function<void(size_t count)>& send_count) noexcept override;
 
  private:
   sqlite3* db_;
