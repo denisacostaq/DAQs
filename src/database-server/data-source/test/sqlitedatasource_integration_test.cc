@@ -51,7 +51,7 @@
 TEST(NotInitializedSchema, CanNotAddVariable) {
   IDataSource* ds = nullptr;
   try {
-    ds = new SQLiteWrapper(get_random_sqlite_file_path());
+    ds = new SQLiteWrapper{get_random_sqlite_file_path()};
   } catch (const std::string& msg) {
     std::cerr << msg << "\n";
   } catch (...) {
@@ -66,7 +66,7 @@ TEST(NotInitializedSchema, CanNotAddVariable) {
 
 TEST(OpenDb, CanOpenDb) {
   auto path = get_random_sqlite_file_path();
-  EXPECT_NO_THROW(SQLiteWrapper(path.c_str()));
+  EXPECT_NO_THROW(SQLiteWrapper{path});
 }
 
 TEST(OpenDb, CanNotOpenDb) {
@@ -78,7 +78,7 @@ class SQLiteWrapperTest : public ::testing::Test {
   SQLiteWrapperTest() : ds_{nullptr} {}
   void SetUp() override {
     try {
-      ds_ = new SQLiteWrapper(get_random_sqlite_file_path());
+      ds_ = new SQLiteWrapper{get_random_sqlite_file_path()};
     } catch (const std::string& msg) {
       std::cerr << msg << "\n";
     } catch (...) {

@@ -63,7 +63,9 @@ class server {
         ds_{new SQLiteWrapper(db_file)},
         da_{new DataAccess(ds_)} {
     if (ds_->create_scheme() == IDataSource::Err::Ok) {
-      da_->add_variable("temp");
+      // FIXME(denisacostaq@gmail.com): "color"
+      Variable var{"temp", "color"};
+      da_->add_variable(var);
     } else {
       throw std::string{"Unable to create schema."};
     }

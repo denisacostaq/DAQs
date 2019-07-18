@@ -142,11 +142,11 @@ std::unique_ptr<std::uint8_t[]> Session::build_h_msg(
   h_msg.set_msg_type(msg_type);
   h_msg.set_bodysize(b_size);
   auto h_buf{std::make_unique<std::uint8_t[]>(h_msg.ByteSizeLong())};
-  h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSizeLong());
+  h_msg.SerializeToArray(h_buf.get(), h_msg.ByteSize());
   message::MetaHeader mh_msg{};
   mh_msg.set_headersize(h_msg.ByteSizeLong());
   auto mh_buf{std::make_unique<std::uint8_t[]>(mh_msg.ByteSizeLong())};
-  mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSizeLong());
+  mh_msg.SerializeToArray(mh_buf.get(), mh_msg.ByteSize());
   const auto fh_size{mh_msg.ByteSizeLong() + h_msg.ByteSizeLong()};
   auto f_buf_addr{new std::uint8_t[fh_size]};
   auto fh_buf{std::unique_ptr<std::uint8_t[]>(f_buf_addr)};

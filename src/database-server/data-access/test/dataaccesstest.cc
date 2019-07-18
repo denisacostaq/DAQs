@@ -47,7 +47,7 @@
 
 #include "src/database-server/data-access/dataaccess.h"
 
-//FIXME(denisacostaq@gmail.com): improve all tests based on WithModValues3
+// FIXME(denisacostaq@gmail.com): improve all tests based on WithModValues3
 TEST(DataCompression, WithoutModSize) {
   DataAccess da{nullptr};
   // FIXME(denisacostaq@gmail.com): "color"
