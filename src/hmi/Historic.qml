@@ -5,13 +5,12 @@ import QtCharts 2.3
 Page {
     width: 600
     height: 400
-
+    
     header: Label {
         id: headerLabel
         text: qsTr("Historic")
         font.pixelSize: Qt.application.font.pixelSize * 2
         padding: 10
-        visible: Qt.platform.os !== "android";
     }
     
     Connections {
@@ -38,7 +37,7 @@ Page {
             headerLabel.text = qsTr("Historic data from ") + xTime.min + qsTr(" to ") + xTime.max
         }
     }
-
+    
     ChartView {
         id: line
         anchors.fill: parent
@@ -65,10 +64,27 @@ Page {
             axisX: xTime
             useOpenGL: true
         }
-        RubberBand {
+        
+        MouseArea {
+            id: charMouseArea
             anchors.fill: parent
-            onSlectedChanged: {
-                line.zoomIn(slected);
+            onPositionChanged: {
+                console.log('onPositionChanged', mouse.x, mouse.y)
+            }
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: {
+                console.log('onClicked', mouse.button, mouse.x, mouse.y)
+                if(mouse.button & Qt.RightButton) {
+                    line.zoomIn()
+                } else {
+                    line.zoomOut()
+                }
+            }
+            onPressed: {
+                console.log("onPressed", mouse.button, mouse.x, mouse.y)
+            }
+            onReleased: {
+                console.log("onReleased", mouse.button, mouse.x, mouse.y)
             }
         }
     }

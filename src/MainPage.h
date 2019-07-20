@@ -41,7 +41,6 @@
 <h1>Index:</h1>
 
 - \subpage protocol "Protocol definition"
-- \subpage source_code "Download source code"
 */
 
 //-----------------------------------------------------------
@@ -63,15 +62,4 @@ http://www.mcternan.me.uk/mscgen/
     - [Releases](https://github.com/denisacostaq/DAQs/releases)
 - Last code:\n
     - [Nightly builds](https://github.com/denisacostaq/DAQs.git)
-
-\subpage code_coverage "Code coverage".
 */
-
-/*! \page code_coverage Code coverage.
- * The current code coveage value can be found in [the
- * readme](https://github.com/denisacostaq/DAQs). For more details you can
- * checkout the [lcov autodeployed
- * report](https://denisacostaq.github.io/DAQs/coverage_html/index.html) or the
- * [Source Files on master in the
- * coverallas](https://coveralls.io/github/denisacostaq/DAQs)
- */

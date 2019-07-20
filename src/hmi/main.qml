@@ -13,19 +13,18 @@ ApplicationWindow {
         id: swipeView
         anchors.fill: parent
         currentIndex: tabBar.currentIndex
-        interactive: Qt.platform.os === "android";
-
+        
         Page1Form {
         }
-
+        
         Historic {
         }
     }
-
+    
     footer: TabBar {
         id: tabBar
         currentIndex: swipeView.currentIndex
-        visible: !swipeView.interactive;
+        
         TabButton {
             text: qsTr("Page 1")
         }

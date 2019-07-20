@@ -237,24 +237,23 @@ void Session::read_get_values_request(std::size_t b_size) {
   auto self(shared_from_this());
   auto body_buff{std::shared_ptr<std::uint8_t>{
       new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>()}};
-  ba::async_read(
-      socket_, ba::buffer(body_buff.get(), b_size),
-      [this, self, body_buff, b_size](boost::system::error_code ec,
-                                      size_t length) {
-        if (!ec && length == b_size) {
-          message::GetValues gv{};
-          gv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
-          auto res{
-              da_->fetch_variable_values(gv.variable(), max_values_ammount)};
-          if (std::get<1>(res) == IDataAccess::Err::Ok) {
-            send_values_response(std::move(std::get<0>(res)));
-          } else {
-            std::cerr << "database error\n";
-            send_status_response("Failed to get values",
-                                 message::ResponseStatus::FAILED);
-          }
-        } else {
-          std::cerr << "reading body_buf" << ec.message() << "\n";
-        }
-      });
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::GetValues gv{};
+                     gv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     auto res{da_->fetch_variable_values(gv.variable())};
+                     if (std::get<1>(res) == IDataAccess::Err::Ok) {
+                       send_values_response(std::move(std::get<0>(res)));
+                     } else {
+                       std::cerr << "database error\n";
+                       send_status_response("Failed to get values",
+                                            message::ResponseStatus::FAILED);
+                     }
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
 }

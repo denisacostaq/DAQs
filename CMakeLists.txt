@@ -76,10 +76,9 @@ if(ANDROID)
         DEPENDS hmi
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/libs/${ANDROID_ABI} # it seems that recompiled libraries are not copied if we don't remove them first
         COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:hmi> ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:proto-messages> ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:datamodel> ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
-        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:database-client> ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/hmi/libhmi.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/protocol/libproto-messages.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/src/database-server/client/libdatabase-client.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
         COMMAND ${CMAKE_COMMAND} -E copy ${Protobuf_DIR}/../../libprotobuf.so ${CMAKE_CURRENT_BINARY_DIR}/android-build/libs/${ANDROID_ABI}
         COMMAND ${Qt5SDK_DIR}/bin/androiddeployqt --verbose --output ${CMAKE_CURRENT_BINARY_DIR}/android-build --input ${CMAKE_CURRENT_BINARY_DIR}/configAndroid.json --android-platform android-21 --gradle ${INSTALL_OPTIONS}
      )

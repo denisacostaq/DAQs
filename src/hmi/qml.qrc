@@ -5,7 +5,5 @@
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>Historic.qml</file>
-        <file>RubberBand.qml</file>
-        <file>+android/RubberBand.qml</file>
     </qresource>
 </RCC>
