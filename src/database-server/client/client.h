@@ -76,6 +76,13 @@ class Client : public QObject {
   QTcpSocket socket_;
   const QString host_;
   std::uint16_t port_;
+#ifdef __ANDROID__
+  // TODO(denisacostaq@gmail.com): send this in the request
+  // max_values_ammount
+  static constexpr size_t max_values_ammount{40};
+#else
+  static constexpr size_t max_values_ammount{120};
+#endif
 };
 
 #endif  // CLIENT_H
