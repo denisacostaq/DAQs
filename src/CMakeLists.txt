@@ -24,6 +24,7 @@ endif(BUILD_TESTING)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/protocol)
 if(ANDROID)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server/data-model)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server/client)
 else(ANDROID)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/database-server)

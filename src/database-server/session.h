@@ -90,6 +90,8 @@ class Session : public std::enable_shared_from_this<Session> {
 
   boost::asio::ip::tcp::socket socket_;
   IDataAccess* da_;
+
+  static constexpr size_t max_values_ammount{120};
 };
 
 #endif  // DAQS_DATABASESERVER_SESSION_H

@@ -47,7 +47,11 @@ HistoricData::HistoricData(QObject *parent)
       m_vals{},
       m_dates{},
       m_emulated{},
+#ifdef __ANDROID__
+      m_cl{new Client{"192.168.43.65", 4444}},
+#else
       m_cl{new Client{"127.0.0.1", 4444}},
+#endif
       m_now{std::chrono::system_clock::now()} {
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
