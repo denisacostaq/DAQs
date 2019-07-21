@@ -90,7 +90,8 @@ void Client::onReadyRead() {
   mh.ParseFromArray(mh_data.get(), static_cast<int>(mh_size));
   message::Header h{};
   std::unique_ptr<char[]> h_data{new char[mh.headersize()]};
-  auto readed1{socket_.read(h_data.get(), static_cast<qint64>(mh.headersize()))};
+  auto readed1{
+      socket_.read(h_data.get(), static_cast<qint64>(mh.headersize()))};
   if (static_cast<std::size_t>(readed1) != mh.headersize()) {
     qDebug() << "header error, trying to read" << mh.headersize()
              << "but readed" << readed1;
