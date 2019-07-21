@@ -112,13 +112,26 @@ void Client::onReadyRead() {
     emit responseReceived(resp.status(), resp.msg().c_str());
   } else if (h.msg_type() == message::RESPONSE_VALUES) {
     message::ValuesResponse valsResp{};
-    QByteArray respBytes{socket_.read(static_cast<qint64>(h.bodysize()))};
-    if (respBytes.size() != static_cast<qint64>(h.bodysize())) {
-      qDebug() << "body error, trying to read" << h.bodysize() << "but readed"
-               << respBytes.size();
-      return;
-    }
-    valsResp.ParseFromArray(respBytes.data(), respBytes.size());
+    std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
+    qint64 readed{0};
+    do {
+      qint64 r{socket_.read(&data_r.get()[readed],
+                            static_cast<qint64>(h.bodysize()) - readed)};
+      if (r == 0 && !socket_.waitForReadyRead()) {
+        // FIXME(denisacostaq@gmail.com): uint64 to int64
+        qDebug() << "body error, trying to read" << h.bodysize() - readed + r
+                 << "but there is no more data";
+        return;
+      } else if (r == -1) {
+        // FIXME(denisacostaq@gmail.com): uint64 to int64
+        qDebug() << "body error, trying to read" << h.bodysize() - readed
+                 << "but readed" << readed;
+        return;
+      }
+      readed += r;
+      // FIXME(denisacostaq@gmail.com): uint64 to int64
+    } while (readed != static_cast<qint64>(h.bodysize()));
+    valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
     ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
         p_vals{valsResp.mutable_values()};
     std::vector<VarValue> vals{};
