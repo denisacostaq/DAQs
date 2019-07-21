@@ -98,6 +98,11 @@ void Client::onReadyRead() {
     return;
   }
   h.ParseFromArray(h_data.get(), static_cast<int>(mh.headersize()));
+  if (h.bodysize() > std::numeric_limits<int>::max()) {
+    qDebug() << "h.bodysize() do not fit in the ParseFromArray arguments"
+             << h.bodysize();
+    return;
+  }
   if (h.msg_type() == message::RESPONSE_FAILURE) {
     message::Failure resp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
