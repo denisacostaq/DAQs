@@ -81,7 +81,7 @@ void Client::onReadyRead() {
   }
   message::MetaHeader mh{};
   std::unique_ptr<char[]> mh_data{new char[mh_size]};
-  qint64 readed0 = socket_.read(mh_data.get(), static_cast<qint64>(mh_size));
+  auto readed0{socket_.read(mh_data.get(), static_cast<qint64>(mh_size))};
   if (static_cast<std::size_t>(readed0) != mh_size) {
     qDebug() << "meta header error, trying to read" << mh_size << "but readed"
              << readed0;
@@ -90,8 +90,7 @@ void Client::onReadyRead() {
   mh.ParseFromArray(mh_data.get(), static_cast<int>(mh_size));
   message::Header h{};
   std::unique_ptr<char[]> h_data{new char[mh.headersize()]};
-  qint64 readed1 =
-      socket_.read(h_data.get(), static_cast<qint64>(mh.headersize()));
+  auto readed1{socket_.read(h_data.get(), static_cast<qint64>(mh.headersize()))};
   if (static_cast<std::size_t>(readed1) != mh.headersize()) {
     qDebug() << "header error, trying to read" << mh.headersize()
              << "but readed" << readed1;
@@ -106,8 +105,7 @@ void Client::onReadyRead() {
   if (h.msg_type() == message::RESPONSE_FAILURE) {
     message::Failure resp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
-    qint64 readed2 =
-        socket_.read(data_r.get(), static_cast<qint64>(h.bodysize()));
+    auto readed2{socket_.read(data_r.get(), static_cast<qint64>(h.bodysize()))};
     if (readed2 != static_cast<qint64>(h.bodysize())) {
       qDebug() << "body error, trying to read" << h.bodysize() << "but readed"
                << readed2;
