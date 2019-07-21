@@ -65,6 +65,14 @@ Client::Client(const QString& host, std::uint16_t port, QObject* parent)
 }
 
 void Client::onReadyRead() {
+  QObject::disconnect(&socket_, &QIODevice::readyRead, this,
+                      &Client::onReadyRead);
+  std::unique_ptr<char, std::function<void(char*)>> readyReadDeferReconnect{
+      new char(), [this](char* i) {
+        delete i;
+        QObject::connect(&socket_, &QIODevice::readyRead, this,
+                         &Client::onReadyRead);
+      }};
   size_t mh_size{0};
   {
     message::MetaHeader mh{};
