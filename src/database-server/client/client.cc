@@ -172,13 +172,27 @@ void Client::send_var_val(const QString& var_name, double value) {
   socket_.write(bytes);
 }
 
+void Client::request_var_values(const QString& var_name) {
+  message::GetValues gv{};
+  gv.set_variable(var_name.toStdString());
+  do_request(gv);
+}
+
 void Client::request_var_values(
     const QString& var_name, const std::chrono::system_clock::time_point& start,
     const std::chrono::system_clock::time_point& end) {
   message::GetValues gv{};
   gv.set_variable(var_name.toStdString());
-  gv.set_start(start.time_since_epoch().count());
-  gv.set_end(end.time_since_epoch().count());
+  gv.set_start(std::chrono::time_point_cast<std::chrono::milliseconds>(start)
+                   .time_since_epoch()
+                   .count());
+  gv.set_end(std::chrono::time_point_cast<std::chrono::milliseconds>(end)
+                 .time_since_epoch()
+                 .count());
+  do_request(gv);
+}
+
+void Client::do_request(const message::GetValues& gv) {
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_GET_VALUES);
   hdr.set_bodysize(gv.ByteSizeLong());
