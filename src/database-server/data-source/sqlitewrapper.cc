@@ -243,16 +243,17 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
               .time_since_epoch())
           .count()};
   std::string query = sqlite3_mprintf(
-      "SELECT VAL FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
+      "SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
+      "ID FROM "
       "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
       var_name.c_str(), sd, ed);
   CountCallback cc{
       0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
   if (sqlite3_exec(db_, query.c_str(),
                    +[](void *cc, int argc, char **argv, char **azColName) {
+                     VarValue val{};
                      for (int i = 0; i < argc; i++) {
                        if (strcmp("VAL", azColName[i]) == 0) {
-                         VarValue val{};
                          try {
                            size_t processed = 0;
                            val.set_val(std::stod(argv[i], &processed));
@@ -263,14 +264,24 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
                            std::cerr << e.what();
                            return -1;
                          }
-                         auto count_callback{static_cast<CountCallback *>(cc)};
-                         auto cb{count_callback->send_vale};
-                         (*cb)(std::move(val), count_callback->index);
-                         ++count_callback->index;
-                         return 0;
+                       } else if (strcmp("TIMESTAMP", azColName[i]) == 0) {
+                         try {
+                           size_t processed = 0;
+                           val.set_timestamp(std::stoull(argv[i], &processed));
+                         } catch (std::invalid_argument e) {
+                           std::cerr << e.what();
+                           return -1;
+                         } catch (std::out_of_range e) {
+                           std::cerr << e.what();
+                           return -1;
+                         }
                        }
                      }
-                     return -1;
+                     auto count_callback{static_cast<CountCallback *>(cc)};
+                     auto cb{count_callback->send_vale};
+                     (*cb)(std::move(val), count_callback->index);
+                     ++count_callback->index;
+                     return 0;
                    },
                    &cc, &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
