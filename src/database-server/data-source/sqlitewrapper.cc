@@ -232,12 +232,16 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::function<void(VarValue &&val, size_t index)>
         &send_vale) noexcept {
   char *err_msg = nullptr;
-  const std::int64_t sd{std::chrono::duration_cast<std::chrono::milliseconds>(
-                            start_date.time_since_epoch())
-                            .count()};
-  const std::int64_t ed{std::chrono::duration_cast<std::chrono::milliseconds>(
-                            end_date.time_since_epoch())
-                            .count()};
+  const std::int64_t sd{
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::time_point_cast<std::chrono::milliseconds>(start_date)
+              .time_since_epoch())
+          .count()};
+  const std::int64_t ed{
+      std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::time_point_cast<std::chrono::milliseconds>(end_date)
+              .time_since_epoch())
+          .count()};
   std::string query = sqlite3_mprintf(
       "SELECT VAL FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM "
       "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
