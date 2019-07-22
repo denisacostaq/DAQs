@@ -73,8 +73,16 @@ HistoricData::HistoricData(QObject *parent)
   m_cl->connect();
   QTimer *m_wTimer{new QTimer{this}};
   m_wTimer->setInterval(6000);
-  QObject::connect(m_wTimer, &QTimer::timeout, this, [this]() {
-    m_cl->request_var_values("temp", m_now, std::chrono::system_clock::now());
-  });
+  m_wTimer->setSingleShot(true);
+  QObject::connect(m_wTimer, &QTimer::timeout, this,
+                   [this]() { m_cl->request_var_values("temp"); });
   m_wTimer->start();
+}
+
+Q_INVOKABLE void HistoricData::getValues(QString var, qint64 s, qint64 e) {
+  std::chrono::time_point<std::chrono::system_clock> satart{
+      std::chrono::duration<qint64, std::milli>{s}};
+  std::chrono::time_point<std::chrono::system_clock> end{
+      std::chrono::duration<qint64, std::milli>{e}};
+  m_cl->request_var_values(var, satart, end);
 }
