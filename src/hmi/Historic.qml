@@ -19,8 +19,11 @@ Page {
         onValsChanged: {
             var vals = dataLayer.m_vals;
             lineSeries.clear();
-            var max = 0;
+            if (vals.length === 0) {
+                return;
+            }
             var min = 0;
+            var max = 0;
             xTime.min = dataLayer.getEmulatedDateTime(0);
             for (var i = 0; i < vals.length; ++i) {
                 var emulated = dataLayer.getEmulatedValue(vals[i]);
@@ -32,10 +35,14 @@ Page {
                 }
                 lineSeries.append(dataLayer.getEmulatedDateTime(i), emulated);
             }
-            xTime.max = dataLayer.getEmulatedDateTime(vals.length - 1);
-            yAxis.max = max;
+            var d = dataLayer.getEmulatedDateTime(vals.length - 1);
+            if (xTime.min.getTime() === d.getTime()) {
+                d.setSeconds(d.getSeconds() + 1);
+            }
+            xTime.max = d;
             yAxis.min = min;
-            headerLabel.text = qsTr("Historic data from ") + xTime.min + qsTr(" to ") + xTime.max
+            yAxis.max = min === max ? max + 1 : max;
+            headerLabel.text = qsTr("Historic data from ") + xTime.min + qsTr(" to ") + xTime.max;
         }
     }
 
@@ -69,6 +76,16 @@ Page {
             anchors.fill: parent
             onSlectedChanged: {
                 line.zoomIn(slected);
+                var startPoint = Qt.point(slected.x, slected.y);
+                var endPoint = Qt.point(
+                            slected.x + slected.width, slected.height);
+                // FIXME(denisacostaq@gmail.com): Improve resolution of
+                // mapToValue. xTime.min.getTime(), xTime.max.getTime()
+                var startVal = line.mapToValue(startPoint, lineSeries);
+                var endVal = line.mapToValue(endPoint, lineSeries);
+                var startDate = Math.floor(startVal.x);
+                var endDate = Math.floor(endVal.x);
+                dataLayer.getValues("temp", startDate, endDate);
             }
         }
     }
