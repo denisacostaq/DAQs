@@ -14,4 +14,5 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_SRC})
 add_library(proto-messages SHARED ${PROTO_SRCS} ${PROTO_HDRS})
 target_include_directories(proto-messages SYSTEM PUBLIC ${Protobuf_INCLUDE_DIRS})
 target_include_directories(proto-messages SYSTEM PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(proto-messages PUBLIC ${Protobuf_LIBRARIES})
+target_link_libraries(proto-messages PUBLIC protobuf::libprotobuf)
+#protobuf::libprotobuf-lite
