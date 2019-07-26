@@ -56,8 +56,17 @@ class HistoricData : public QObject {
   HistoricData(QObject *parent = nullptr);
 
   QVector<int> getVals() { return m_vals; }
-  Q_INVOKABLE double getEmulatedValue(int i) { return m_emulated[i]; }
-  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) { return m_dates[i]; }
+  Q_INVOKABLE double getEmulatedValue(int i) {
+    // FIXME(denisacostaq@gmail.com): should be valid checking var vals =
+    // dataLayer.m_vals;
+    return i >= m_emulated.size() ? .0 : m_emulated[i];
+  }
+  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) {
+    // FIXME(denisacostaq@gmail.com): should be valid checking var vals =
+    // dataLayer.m_vals;
+    return i >= m_dates.size() ? QDateTime::currentDateTimeUtc() : m_dates[i];
+  }
+  Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
 
  signals:
   void valsChanged();

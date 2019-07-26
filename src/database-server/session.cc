@@ -244,8 +244,17 @@ void Session::read_get_values_request(std::size_t b_size) {
         if (!ec && length == b_size) {
           message::GetValues gv{};
           gv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
-          auto res{
-              da_->fetch_variable_values(gv.variable(), max_values_ammount)};
+          std::tuple<std::vector<VarValue>, IDataAccess::Err> res{};
+          if (gv.has_start() && gv.has_end()) {
+            std::chrono::time_point<std::chrono::system_clock> start{
+                std::chrono::duration<std::int64_t, std::milli>{gv.start()}};
+            std::chrono::time_point<std::chrono::system_clock> end{
+                std::chrono::duration<std::int64_t, std::milli>{gv.end()}};
+            res = da_->fetch_variable_values(gv.variable(), start, end,
+                                             max_values_ammount);
+          } else {
+            res = da_->fetch_variable_values(gv.variable(), max_values_ammount);
+          }
           if (std::get<1>(res) == IDataAccess::Err::Ok) {
             send_values_response(std::move(std::get<0>(res)));
           } else {

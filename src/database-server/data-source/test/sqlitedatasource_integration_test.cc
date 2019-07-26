@@ -220,3 +220,77 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
                 [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(9, count);
 }
+
+TEST_F(SQLiteWrapperTest, CountVariableValues) {
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable var1{"var1", "color"};
+  VarValue varValue1{var1, 0, 0};
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable varNone{"varNone", "color"};
+  VarValue varValueNone{varNone, 0, 0};
+  std::vector<double> var1OrgValues{23.1, 21.1};
+  std::vector<double> varNoneOrgValues{13.1, 13.2, 3.32};
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varNone));
+  for (auto v : var1OrgValues) {
+    auto t = varValue1.DeepCopy();
+    auto vv{varValue1.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+  }
+  for (auto v : varNoneOrgValues) {
+    auto vv{varValueNone.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+  }
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(var1.name(),
+                                       [&var1OrgValues](std::size_t count) {
+                                         EXPECT_EQ(var1OrgValues.size(), count);
+                                       }));
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                varNone.name(), [&varNoneOrgValues](std::size_t count) {
+                  EXPECT_EQ(varNoneOrgValues.size(), count);
+                }));
+}
+
+TEST_F(SQLiteWrapperTest, CountVariableValuesInRange) {
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable var1{"var1", "color"};
+  const int ammount{100};
+  std::vector<double> var1OrgValues{};
+  var1OrgValues.reserve(100);
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
+  for (int i = 0; i < ammount; ++i) {
+    var1OrgValues.push_back(i);
+  }
+  std::vector<std::chrono::system_clock::time_point> laps;
+  laps.push_back(std::chrono::system_clock::now());
+  std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  for (size_t i = 0; i < var1OrgValues.size(); ++i) {
+    VarValue vvar1{var1, var1OrgValues[i], 0};
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vvar1)));
+    if (i == 30 || i == 60 || i == 90) {
+      laps.push_back(std::chrono::system_clock::now());
+      std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+  }
+  laps.push_back(std::chrono::system_clock::now());
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                var1.name(), laps[0], laps[1],
+                [](std::size_t count) { EXPECT_EQ(31, count); }));
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                var1.name(), laps[1], laps[2],
+                [](std::size_t count) { EXPECT_EQ(30, count); }));
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                var1.name(), laps[2], laps[3],
+                [](std::size_t count) { EXPECT_EQ(30, count); }));
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                var1.name(), laps[3], laps[4],
+                [](std::size_t count) { EXPECT_EQ(9, count); }));
+}
