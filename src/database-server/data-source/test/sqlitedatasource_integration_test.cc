@@ -220,3 +220,37 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
                 [&count](VarValue&&, size_t index) { ++count; }));
   EXPECT_EQ(9, count);
 }
+
+TEST_F(SQLiteWrapperTest, CountVariableValues) {
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable var1{"var1", "color"};
+  VarValue varValue1{var1, 0, 0};
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable varNone{"varNone", "color"};
+  VarValue varValueNone{varNone, 0, 0};
+  std::vector<double> var1OrgValues{23.1, 21.1};
+  std::vector<double> varNoneOrgValues{13.1, 13.2, 3.32};
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varNone));
+  for (auto v : var1OrgValues) {
+    auto t = varValue1.DeepCopy();
+    auto vv{varValue1.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+  }
+  for (auto v : varNoneOrgValues) {
+    auto vv{varValueNone.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+  }
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(var1.name(),
+                                       [&var1OrgValues](std::size_t count) {
+                                         EXPECT_EQ(var1OrgValues.size(), count);
+                                       }));
+  EXPECT_EQ(IDataSource::Err::Ok,
+            ds_->count_variable_values(
+                varNone.name(), [&varNoneOrgValues](std::size_t count) {
+                  EXPECT_EQ(varNoneOrgValues.size(), count);
+                }));
+}
