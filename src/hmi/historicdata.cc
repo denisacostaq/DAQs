@@ -58,10 +58,10 @@ HistoricData::HistoricData(QObject *parent)
   QObject::connect(
       m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
         m_vals.clear();
+        m_vals.reserve(vals.size());
         for (const auto &val : vals) {
-          m_vals.push_back(VarValueModel{val.val(), val.timestamp()});
+          m_vals.emplace_back(VarValueModel{val.val(), val.timestamp()});
         }
-        qDebug() << "vals.size()" << m_vals.size();
         if (!m_vals.empty()) {
           emit valsChanged();
         }
