@@ -17,22 +17,22 @@ Page {
     Connections {
         target: dataLayer
         onValsChanged: {
-            var vals = dataLayer.m_vals;
+            var vals = dataLayer.vals;
             lineSeries.clear();
             var max = 0;
             var min = 0;
-            xTime.min = dataLayer.getEmulatedDateTime(0);
+            xTime.min = vals[0].timestamp;
             for (var i = 0; i < vals.length; ++i) {
-                var emulated = dataLayer.getEmulatedValue(vals[i]);
+                var emulated = vals[i].val;
                 if (max < emulated) {
                     max = emulated;
                 }
                 if (min > emulated) {
                     min = emulated;
                 }
-                lineSeries.append(dataLayer.getEmulatedDateTime(i), emulated);
+                lineSeries.append(vals[i].timestamp, emulated);
             }
-            xTime.max = dataLayer.getEmulatedDateTime(vals.length - 1);
+            xTime.max = vals[vals.length - 1].timestamp;
             yAxis.max = max;
             yAxis.min = min;
             headerLabel.text = qsTr("Historic data from ") + xTime.min + qsTr(" to ") + xTime.max
