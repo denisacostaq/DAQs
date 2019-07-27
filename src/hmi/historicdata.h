@@ -56,9 +56,7 @@ class HistoricData : public QObject {
   Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
   HistoricData(QObject *parent = nullptr);
 
-  QQmlListProperty<VarValueModel> getVals() {
-    return m_qml_vals;
-  }
+  QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
   Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
 
  signals:
@@ -78,10 +76,10 @@ class HistoricData : public QObject {
     return reinterpret_cast<decltype(m_vals) *>(property->data)->at(index);
   }
   static int listSize(QQmlListProperty<VarValueModel> *property) {
-    return reinterpret_cast<decltype(m_vals)*>(property->data)->size();
+    return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
   }
   static void clearListPtr(QQmlListProperty<VarValueModel> *property) {
-    reinterpret_cast<decltype(m_vals)*>(property->data)->clear();
+    reinterpret_cast<decltype(m_vals) *>(property->data)->clear();
   }
 };
 
