@@ -52,15 +52,16 @@ HistoricData::HistoricData(QObject *parent)
       m_now{std::chrono::system_clock::now()},
       m_vals{},
       m_qml_vals{QQmlListProperty<VarValueModel>(
-          this, &m_vals, &appendList, &listSize, &cardAt, &clearListPtr)} {
+          this, &m_vals, &add_val, &val_size, &val_at, &clear_vals)} {
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
   QObject::connect(
       m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
         m_vals.clear();
         for (const auto &val : vals) {
-          m_vals.append(new VarValueModel{val.val(), val.timestamp()});
+          m_vals.push_back(VarValueModel{val.val(), val.timestamp()});
         }
+        qDebug() << "vals.size()" << m_vals.size();
         if (!m_vals.empty()) {
           emit valsChanged();
         }

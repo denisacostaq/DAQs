@@ -65,21 +65,20 @@ class HistoricData : public QObject {
  private:
   Client *m_cl;  // FIXME(denisacostaq@gmail.com): RAII even delete.
   std::chrono::system_clock::time_point m_now;
-  QVector<VarValueModel *> m_vals;
-  QQmlListProperty<VarValueModel> m_qml_vals;
-  static void appendList(QQmlListProperty<VarValueModel> *property,
-                         VarValueModel *note) {
-    reinterpret_cast<decltype(m_vals) *>(property->data)->push_back(note);
+  std::vector<VarValueModel> m_vals;
+  QQmlListProperty<decltype(m_vals)::value_type> m_qml_vals;
+  static void add_val(decltype(m_qml_vals) *, decltype(m_vals)::value_type *) {
+    qDebug() << "unsupported operation, so ignored";
   }
-  static VarValueModel *cardAt(QQmlListProperty<VarValueModel> *property,
-                               int index) {
-    return reinterpret_cast<decltype(m_vals) *>(property->data)->at(index);
+  static decltype(m_vals)::value_type *val_at(decltype(m_qml_vals) *property,
+                                              int index) {
+    return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
   }
-  static int listSize(QQmlListProperty<VarValueModel> *property) {
+  static int val_size(decltype(m_qml_vals) *property) {
     return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
   }
-  static void clearListPtr(QQmlListProperty<VarValueModel> *property) {
-    reinterpret_cast<decltype(m_vals) *>(property->data)->clear();
+  static void clear_vals(decltype(m_qml_vals) *) {
+    qDebug() << "unsupported operation, so ignored";
   }
 };
 
