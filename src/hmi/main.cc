@@ -40,10 +40,14 @@
 #include <QtWidgets/QApplication>
 
 #include "src/hmi/historicdata.h"
+#include "src/hmi/model/varvaluemodel.h"
 
 int main(int argc, char *argv[]) {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QApplication app{argc, argv};
+  qmlRegisterUncreatableType<VarValueModel>(
+      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
+      "Can not create var value instance in QML, use as no editable property");
   QQmlApplicationEngine engine{};
   engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
   engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
