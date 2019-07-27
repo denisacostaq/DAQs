@@ -59,6 +59,7 @@ class HistoricData : public QObject {
   QQmlListProperty<VarValueModel> getVals() {
     return m_qml_vals;
   }
+  Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
 
  signals:
   void valsChanged();

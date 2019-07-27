@@ -118,23 +118,25 @@ void Client::onReadyRead() {
     message::ValuesResponse valsResp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
     qint64 readed{0};
-    do {
-      qint64 r{socket_.read(&data_r.get()[readed],
-                            static_cast<qint64>(h.bodysize()) - readed)};
-      if (r == 0 && !socket_.waitForReadyRead()) {
+    if (h.bodysize() != 0) {
+      do {
+        qint64 r{socket_.read(&data_r.get()[readed],
+                              static_cast<qint64>(h.bodysize()) - readed)};
+        if (r == 0 && !socket_.waitForReadyRead(3000)) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed + r
+                   << "but there is no more data";
+          return;
+        } else if (r == -1) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed
+                   << "but readed" << readed;
+          return;
+        }
+        readed += r;
         // FIXME(denisacostaq@gmail.com): uint64 to int64
-        qDebug() << "body error, trying to read" << h.bodysize() - readed + r
-                 << "but there is no more data";
-        return;
-      } else if (r == -1) {
-        // FIXME(denisacostaq@gmail.com): uint64 to int64
-        qDebug() << "body error, trying to read" << h.bodysize() - readed
-                 << "but readed" << readed;
-        return;
-      }
-      readed += r;
-      // FIXME(denisacostaq@gmail.com): uint64 to int64
-    } while (readed != static_cast<qint64>(h.bodysize()));
+      } while (readed != static_cast<qint64>(h.bodysize()));
+    }
     valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
     ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
         p_vals{valsResp.mutable_values()};
@@ -172,13 +174,27 @@ void Client::send_var_val(const QString& var_name, double value) {
   socket_.write(bytes);
 }
 
+void Client::request_var_values(const QString& var_name) {
+  message::GetValues gv{};
+  gv.set_variable(var_name.toStdString());
+  do_request(gv);
+}
+
 void Client::request_var_values(
     const QString& var_name, const std::chrono::system_clock::time_point& start,
     const std::chrono::system_clock::time_point& end) {
   message::GetValues gv{};
   gv.set_variable(var_name.toStdString());
-  gv.set_start(start.time_since_epoch().count());
-  gv.set_end(end.time_since_epoch().count());
+  gv.set_start(std::chrono::time_point_cast<std::chrono::milliseconds>(start)
+                   .time_since_epoch()
+                   .count());
+  gv.set_end(std::chrono::time_point_cast<std::chrono::milliseconds>(end)
+                 .time_since_epoch()
+                 .count());
+  do_request(gv);
+}
+
+void Client::do_request(const message::GetValues& gv) {
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_GET_VALUES);
   hdr.set_bodysize(gv.ByteSizeLong());
