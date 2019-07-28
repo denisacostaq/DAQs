@@ -1,7 +1,7 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for VarValueModel class.
+    @file varvaluemodel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,24 +35,33 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
+#ifndef HMI_VARVALUEMODEL_H
+#define HMI_VARVALUEMODEL_H
 
-#include "src/hmi/historicdata.h"
-#include "src/hmi/model/varvaluemodel.h"
+#include <QtCore/QDateTime>
+#include <QtCore/QObject>
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
-  }
-  return app.exec();
-}
+class VarValueModel : public QObject {
+  Q_OBJECT
+  Q_PROPERTY(double val READ val NOTIFY valCHanged)
+  Q_PROPERTY(QDateTime timestamp READ timestamp)
+ public:
+  explicit VarValueModel(QObject *parent = nullptr);
+  explicit VarValueModel(double val, std::uint64_t timestamp,
+                         QObject *parent = nullptr);
+  VarValueModel(VarValueModel &&other)
+      : m_val{std::move(other.m_val)},
+        m_timestamp{std::move(other.m_timestamp)} {};
+  inline double val() const noexcept { return m_val; }
+  inline const QDateTime &timestamp() const noexcept { return m_timestamp; }
+
+ signals:
+  void valCHanged(double);
+ public slots:
+
+ private:
+  double m_val;
+  QDateTime m_timestamp;
+};
+
+#endif  // HMI_VARVALUEMODEL_H

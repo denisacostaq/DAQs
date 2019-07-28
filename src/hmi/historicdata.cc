@@ -44,27 +44,23 @@
 
 HistoricData::HistoricData(QObject *parent)
     : QObject{parent},
-      m_vals{},
-      m_dates{},
-      m_emulated{},
 #ifdef __ANDROID__
       m_cl{new Client{"192.168.43.65", 4444}},
 #else
       m_cl{new Client{"127.0.0.1", 4444}},
 #endif
-      m_now{std::chrono::system_clock::now()} {
+      m_now{std::chrono::system_clock::now()},
+      m_vals{},
+      m_qml_vals{QQmlListProperty<VarValueModel>(
+          this, &m_vals, &add_val, &val_size, &val_at, &clear_vals)} {
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
   QObject::connect(
       m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
         m_vals.clear();
-        m_emulated.clear();
-        m_dates.clear();
+        m_vals.reserve(vals.size());
         for (const auto &val : vals) {
-          m_vals.append(m_vals.size());
-          m_emulated.append(val.val());
-          auto dt{QDateTime::fromMSecsSinceEpoch(val.timestamp(), Qt::UTC)};
-          m_dates.append(dt.toLocalTime());
+          m_vals.emplace_back(VarValueModel{val.val(), val.timestamp()});
         }
         if (!m_vals.empty()) {
           emit valsChanged();

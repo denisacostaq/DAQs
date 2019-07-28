@@ -5,8 +5,9 @@ find_package(Qt5 5.11.3 COMPONENTS Core Quick Charts REQUIRED)
 
 set(HMI_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/model/varvaluemodel.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/historicdata.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/qml.qrc)
+    ${CMAKE_CURRENT_SOURCE_DIR}/qml/qml.qrc)
 if(ANDROID)
     add_library(hmi SHARED ${HMI_SRC})
 else(ANDROID)
