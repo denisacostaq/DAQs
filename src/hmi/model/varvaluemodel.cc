@@ -1,7 +1,7 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for VarValueModel class.
+    @file varvaluemodel.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,24 +35,13 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
-
-#include "src/hmi/historicdata.h"
 #include "src/hmi/model/varvaluemodel.h"
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
-  }
-  return app.exec();
-}
+VarValueModel::VarValueModel(QObject *parent)
+    : QObject{parent}, m_val{}, m_timestamp{} {}
+
+VarValueModel::VarValueModel(double val, std::uint64_t timestamp,
+                             QObject *parent)
+    : QObject{parent},
+      m_val{val},
+      m_timestamp{QDateTime::fromMSecsSinceEpoch(timestamp, Qt::UTC)} {}

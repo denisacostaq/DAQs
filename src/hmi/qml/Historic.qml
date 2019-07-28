@@ -17,28 +17,29 @@ Page {
     Connections {
         target: dataLayer
         onValsChanged: {
-            var vals = dataLayer.m_vals;
+            var vals = dataLayer.vals;
             lineSeries.clear();
             if (vals.length === 0) {
                 return;
             }
             var min = 0;
             var max = 0;
-            xTime.min = dataLayer.getEmulatedDateTime(0);
+            xTime.min = vals[0].timestamp;
             for (var i = 0; i < vals.length; ++i) {
-                var emulated = dataLayer.getEmulatedValue(vals[i]);
+                var emulated = vals[i].val;
                 if (max < emulated) {
                     max = emulated;
                 }
                 if (min > emulated) {
                     min = emulated;
                 }
-                lineSeries.append(dataLayer.getEmulatedDateTime(i), emulated);
+                lineSeries.append(vals[i].timestamp, emulated);
             }
-            var d = dataLayer.getEmulatedDateTime(vals.length - 1);
+            var d = vals[vals.length - 1].timestamp;
             if (xTime.min.getTime() === d.getTime()) {
                 d.setSeconds(d.getSeconds() + 1);
             }
+            xTime.max = vals[vals.length - 1].timestamp;
             xTime.max = d;
             yAxis.min = min;
             yAxis.max = min === max ? max + 1 : max;

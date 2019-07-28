@@ -48,35 +48,38 @@
 #include <QtCore/QVector>
 
 #include "src/database-server/client/client.h"
+#include "src/hmi/model/varvaluemodel.h"
 
 class HistoricData : public QObject {
   Q_OBJECT
  public:
-  Q_PROPERTY(QVector<int> m_vals READ getVals NOTIFY valsChanged)
+  Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
   HistoricData(QObject *parent = nullptr);
 
-  QVector<int> getVals() { return m_vals; }
-  Q_INVOKABLE double getEmulatedValue(int i) {
-    // FIXME(denisacostaq@gmail.com): should be valid checking var vals =
-    // dataLayer.m_vals;
-    return i >= m_emulated.size() ? .0 : m_emulated[i];
-  }
-  Q_INVOKABLE QDateTime getEmulatedDateTime(int i) {
-    // FIXME(denisacostaq@gmail.com): should be valid checking var vals =
-    // dataLayer.m_vals;
-    return i >= m_dates.size() ? QDateTime::currentDateTimeUtc() : m_dates[i];
-  }
+  QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
   Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
 
  signals:
   void valsChanged();
 
  private:
-  QVector<int> m_vals;
-  QVector<QDateTime> m_dates;
-  QVector<double> m_emulated;
   Client *m_cl;  // FIXME(denisacostaq@gmail.com): RAII even delete.
   std::chrono::system_clock::time_point m_now;
+  std::vector<VarValueModel> m_vals;
+  QQmlListProperty<decltype(m_vals)::value_type> m_qml_vals;
+  static void add_val(decltype(m_qml_vals) *, decltype(m_vals)::value_type *) {
+    qDebug() << "unsupported operation, so ignored";
+  }
+  static decltype(m_vals)::value_type *val_at(decltype(m_qml_vals) *property,
+                                              int index) {
+    return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
+  }
+  static int val_size(decltype(m_qml_vals) *property) {
+    return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
+  }
+  static void clear_vals(decltype(m_qml_vals) *) {
+    qDebug() << "unsupported operation, so ignored";
+  }
 };
 
 #endif  // HISTORICDATA_H
