@@ -39,10 +39,10 @@
 #include <QtQml/QQmlContext>
 #include <QtWidgets/QApplication>
 
-#include "src/hmi/model/varvaluesmodel.h"
 #include "src/hmi/model/varmodel.h"
-#include "src/hmi/model/varvaluemodel.h"
 #include "src/hmi/model/varsmodel.h"
+#include "src/hmi/model/varvaluemodel.h"
+#include "src/hmi/model/varvaluesmodel.h"
 
 int main(int argc, char *argv[]) {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
