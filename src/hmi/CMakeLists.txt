@@ -8,7 +8,7 @@ set(HMI_SRC
     ${CMAKE_CURRENT_SOURCE_DIR}/model/varsmodel.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model/varmodel.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model/varvaluemodel.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/historicdata.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/model/varvaluesmodel.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/qml/qml.qrc)
 if(ANDROID)
     add_library(hmi SHARED ${HMI_SRC})

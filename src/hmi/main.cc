@@ -39,7 +39,7 @@
 #include <QtQml/QQmlContext>
 #include <QtWidgets/QApplication>
 
-#include "src/hmi/historicdata.h"
+#include "src/hmi/model/varvaluesmodel.h"
 #include "src/hmi/model/varmodel.h"
 #include "src/hmi/model/varvaluemodel.h"
 #include "src/hmi/model/varsmodel.h"
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
       "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
       "Can not create var value instance in QML, use as no editable property");
   QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
+  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{});
   engine.rootContext()->setContextProperty("varsModel", new VarsModel{});
   engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
   if (engine.rootObjects().isEmpty()) {

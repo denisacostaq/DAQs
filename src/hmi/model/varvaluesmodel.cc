@@ -1,5 +1,5 @@
-/*! @brief This file have the interface for HistoricData class.
-    @file historicdata.h
+/*! @brief This file have the implementation for VarValuesModel class.
+    @file varvaluesmodel.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/29/2019
 
@@ -35,51 +35,50 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef HISTORICDATA_H
-#define HISTORICDATA_H
+#include "src/hmi/model/varvaluesmodel.h"
 
-#include <chrono>
-#include <thread>
+#include <algorithm>
+#include <random>
 
-#include <QtCore/QDateTime>
-#include <QtCore/QObject>
-#include <QtCore/QPointF>
-#include <QtCore/QVector>
-#include <QtQml/QQmlListProperty>
+#include <QtCore/QTimer>
 
-#include "src/database-server/client/client.h"
-#include "src/hmi/model/varvaluemodel.h"
+VarValuesModel::VarValuesModel(QObject *parent)
+    : QObject{parent},
+#ifdef __ANDROID__
+      m_cl{new Client{"192.168.43.65", 4444}},
+#else
+      m_cl{new Client{"127.0.0.1", 4444}},
+#endif
+      m_now{std::chrono::system_clock::now()},
+      m_vals{},
+      m_qml_vals{QQmlListProperty<VarValueModel>(
+          this, &m_vals, &add_val, &vals_size, &val_at, &clear_vals)} {
+  QObject::connect(m_cl, &Client::connected,
+                   []() { qDebug() << "connected recived"; });
+  QObject::connect(
+      m_cl, &Client::valuesReceived, [this](const std::vector<VarValue> &vals) {
+        m_vals.clear();
+        m_vals.reserve(vals.size());
+        for (const auto &val : vals) {
+          m_vals.emplace_back(VarValueModel{val.val(), val.timestamp()});
+        }
+        if (!m_vals.empty()) {
+          emit valsChanged();
+        }
+      });
+  m_cl->connect();
+  QTimer *m_wTimer{new QTimer{this}};
+  m_wTimer->setInterval(6000);
+  m_wTimer->setSingleShot(true);
+  QObject::connect(m_wTimer, &QTimer::timeout, this,
+                   [this]() { m_cl->request_var_values("temp"); });
+  m_wTimer->start();
+}
 
-class HistoricData : public QObject {
-  Q_OBJECT
- public:
-  Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
-  HistoricData(QObject *parent = nullptr);
-
-  QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
-  Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
-
- signals:
-  void valsChanged();
-
- private:
-  Client *m_cl;  // FIXME(denisacostaq@gmail.com): RAII even delete.
-  std::chrono::system_clock::time_point m_now;
-  std::vector<VarValueModel> m_vals;
-  QQmlListProperty<decltype(m_vals)::value_type> m_qml_vals;
-  static void add_val(decltype(m_qml_vals) *, decltype(m_vals)::value_type *) {
-    qDebug() << "unsupported operation, so ignored";
-  }
-  static decltype(m_vals)::value_type *val_at(decltype(m_qml_vals) *property,
-                                              int index) {
-    return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
-  }
-  static int vals_size(decltype(m_qml_vals) *property) {
-    return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
-  }
-  static void clear_vals(decltype(m_qml_vals) *) {
-    qDebug() << "unsupported operation, so ignored";
-  }
-};
-
-#endif  // HISTORICDATA_H
+Q_INVOKABLE void VarValuesModel::getValues(QString var, qint64 s, qint64 e) {
+  std::chrono::time_point<std::chrono::system_clock> satart{
+      std::chrono::duration<qint64, std::milli>{s}};
+  std::chrono::time_point<std::chrono::system_clock> end{
+      std::chrono::duration<qint64, std::milli>{e}};
+  m_cl->request_var_values(var, satart, end);
+}
