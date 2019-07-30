@@ -52,7 +52,7 @@ HistoricData::HistoricData(QObject *parent)
       m_now{std::chrono::system_clock::now()},
       m_vals{},
       m_qml_vals{QQmlListProperty<VarValueModel>(
-          this, &m_vals, &add_val, &val_size, &val_at, &clear_vals)} {
+          this, &m_vals, &add_val, &vals_size, &val_at, &clear_vals)} {
   QObject::connect(m_cl, &Client::connected,
                    []() { qDebug() << "connected recived"; });
   QObject::connect(

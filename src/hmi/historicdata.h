@@ -41,11 +41,11 @@
 #include <chrono>
 #include <thread>
 
-#include <QQmlListProperty>
 #include <QtCore/QDateTime>
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
+#include <QtQml/QQmlListProperty>
 
 #include "src/database-server/client/client.h"
 #include "src/hmi/model/varvaluemodel.h"
@@ -74,7 +74,7 @@ class HistoricData : public QObject {
                                               int index) {
     return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
   }
-  static int val_size(decltype(m_qml_vals) *property) {
+  static int vals_size(decltype(m_qml_vals) *property) {
     return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
   }
   static void clear_vals(decltype(m_qml_vals) *) {
