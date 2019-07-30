@@ -1,0 +1,121 @@
+import QtQuick 2.12
+import QtQuick.Controls 2.4
+import QtQuick.Layouts 1.12
+import QtQuick.Dialogs 1.2
+import QtGraphicalEffects 1.0
+import com.github.denisacostaq.daqs 1.0
+
+Page {
+    width: 600
+    height: 400
+    
+    header: Label {
+        id: hdr
+        text: qsTr("Page 1")
+        font.pixelSize: Qt.application.font.pixelSize * 2
+        padding: 10
+    }
+    
+    Column {
+        anchors.fill: parent
+        spacing: 10
+        //        color: "steelblue"
+        Button {
+            id: btn
+//            z: 3
+            icon.name: "list-add"
+            onClicked: {
+                model.name = "jeje";
+                model.color = idd.colorSelector.selectedColor;
+                console.log("colorSelector", idd.colorSelector.selectedColor);
+                variableDialog.visible = true
+            }
+        }
+        ScrollView {
+            width: parent.width
+            height: parent.height - btn.height - btn.padding
+            ListView {
+                header: Label {
+                    text: "cabecera"
+//                    z: 20
+                }
+                clip: true
+                model: varsModel.vars
+                delegate: Rectangle {
+                    y: hdr.y + hdr.height + hdr.bottomPadding
+                    height: 50
+                    width: parent.width
+//                    z: 1
+                    RowLayout {
+                        id: entry
+                        anchors.fill: parent
+                        Column {
+                            Label {
+                                id: text
+                                Layout.alignment: Qt.AlignLeft
+                                text: modelData.name
+                            }
+                            Rectangle {
+                                z: -1
+    //                                anchors.fill: parent
+                                width: entry.width/2
+                                height: text.height/10
+                                LinearGradient  {
+                                    anchors.fill: parent
+                                        gradient: Gradient {
+                                            orientation: Gradient.Horizontal
+                                            GradientStop { position: 0; color: modelData.color }
+                                            GradientStop { position: 1; color: "transparent" }
+                                        }
+                                    }
+                            }
+                        }
+                        Row {
+                            Layout.alignment: Qt.AlignRight
+                            spacing: 5
+                            Button {
+                                icon.name: "edit-entry"
+                            }
+                            Button {
+                                icon.name: "delete"
+                            }
+                            Button {
+                                icon.name: "dialog-ok"
+                                visible: false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    VarModel {
+        id: model
+        name: "pepe"
+        onNameChanged: {
+            console.log("name", name);
+        }
+        onColorChanged: {
+            console.log("color", color);
+        }
+    }
+    
+    Dialog {
+        id: variableDialog
+        visible: false
+        title: qsTr("Add variable")
+        width: 360
+        height: 240
+        modality: Qt.WindowModal
+        VariableDialog {
+            id: idd
+            anchors.fill: parent
+        }
+    }
+    Component.onCompleted: {
+        console.log(varsModel.vars, varsModel.vars.length);
+        
+    }
+    
+}

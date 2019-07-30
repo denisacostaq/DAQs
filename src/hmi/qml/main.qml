@@ -15,7 +15,7 @@ ApplicationWindow {
         currentIndex: tabBar.currentIndex
         interactive: Qt.platform.os === "android";
 
-        Page1Form {
+        Variable{
         }
 
         Historic {
@@ -27,7 +27,7 @@ ApplicationWindow {
         currentIndex: swipeView.currentIndex
         visible: !swipeView.interactive;
         TabButton {
-            text: qsTr("Page 1")
+            text: qsTr("Variable")
         }
         TabButton {
             text: qsTr("Historic")
