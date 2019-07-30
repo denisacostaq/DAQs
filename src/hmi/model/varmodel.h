@@ -1,7 +1,7 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for VarModel class.
+    @file varmodel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,26 +35,47 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
+#ifndef HMI_MODEL_VARMODEL_H
+#define HMI_MODEL_VARMODEL_H
 
-#include "src/hmi/historicdata.h"
-#include "src/hmi/model/varmodel.h"
-#include "src/hmi/model/varvaluemodel.h"
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtGui/QColor>
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterType<VarModel>("com.github.denisacostaq.daqs", 1, 0, "VarModel");
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
+class VarModel : public QObject {
+  Q_OBJECT
+  Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+  Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+ public:
+  explicit VarModel(const QString &name, const QString &color,
+                    QObject *parent = nullptr);
+  explicit VarModel(QObject *parent = nullptr);
+  VarModel(VarModel &&other)
+      : QObject{other.parent()}, m_name{other.m_name}, m_color{other.m_color} {}
+
+  inline const QString &name() const noexcept { return m_name; }
+  inline void setName(const QString &name) {
+    if (name != m_name) {
+      m_name = name;
+      emit nameChanged(m_name);
+    }
   }
-  return app.exec();
-}
+  inline const QColor &color() const noexcept { return m_color; }
+  inline void setColor(const QColor &color) {
+    if (color != m_color) {
+      m_color = color;
+      emit colorChanged(m_color);
+    }
+  }
+
+ signals:
+  void nameChanged(QString);
+  void colorChanged(QColor);
+
+ public slots:
+
+ private:
+  QString m_name;
+  QColor m_color;
+};
+#endif  // HMI_MODEL_VARMODEL_H
