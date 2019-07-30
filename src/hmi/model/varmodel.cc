@@ -1,7 +1,7 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the implementation for VarModel class.
+    @file variablemodel.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,28 +35,9 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
-
 #include "src/hmi/model/varmodel.h"
-#include "src/hmi/model/varsmodel.h"
-#include "src/hmi/model/varvaluemodel.h"
-#include "src/hmi/model/varvaluesmodel.h"
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterType<VarModel>("com.github.denisacostaq.daqs", 1, 0, "VarModel");
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
-  }
-  return app.exec();
-}
+VarModel::VarModel(const QString &name, const QString &color, QObject *parent)
+    : QObject{parent}, m_name{name}, m_color{color} {}
+
+VarModel::VarModel(QObject *parent) : QObject{parent}, m_name{}, m_color{} {}

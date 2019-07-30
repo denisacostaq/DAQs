@@ -1,5 +1,5 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for VarValuesModel class.
+    @file varvaluesmodel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
     @date 6/29/2019
 
@@ -35,28 +35,51 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
+#ifndef HMI_MODEL_VARVALUESMODEL
+#define HMI_MODEL_VARVALUESMODEL
 
-#include "src/hmi/model/varmodel.h"
-#include "src/hmi/model/varsmodel.h"
+#include <chrono>
+#include <thread>
+
+#include <QtCore/QDateTime>
+#include <QtCore/QObject>
+#include <QtCore/QPointF>
+#include <QtCore/QVector>
+#include <QtQml/QQmlListProperty>
+
+#include "src/database-server/client/client.h"
 #include "src/hmi/model/varvaluemodel.h"
-#include "src/hmi/model/varvaluesmodel.h"
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterType<VarModel>("com.github.denisacostaq.daqs", 1, 0, "VarModel");
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
+class VarValuesModel : public QObject {
+  Q_OBJECT
+ public:
+  Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
+  VarValuesModel(QObject *parent = nullptr);
+
+  QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
+  Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
+
+ signals:
+  void valsChanged();
+
+ private:
+  Client *m_cl;  // FIXME(denisacostaq@gmail.com): RAII even delete.
+  std::chrono::system_clock::time_point m_now;
+  std::vector<VarValueModel> m_vals;
+  QQmlListProperty<decltype(m_vals)::value_type> m_qml_vals;
+  static void add_val(decltype(m_qml_vals) *, decltype(m_vals)::value_type *) {
+    qDebug() << "unsupported operation, so ignored";
   }
-  return app.exec();
-}
+  static decltype(m_vals)::value_type *val_at(decltype(m_qml_vals) *property,
+                                              int index) {
+    return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
+  }
+  static int vals_size(decltype(m_qml_vals) *property) {
+    return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
+  }
+  static void clear_vals(decltype(m_qml_vals) *) {
+    qDebug() << "unsupported operation, so ignored";
+  }
+};
+
+#endif  // HMI_MODEL_VARVALUESMODEL

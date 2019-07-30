@@ -1,7 +1,7 @@
-/*! @brief This file have the interface for HistoricData class.
-    @file historicdata.h
+/*! @brief This file have the implementation for VarsModel class.
+    @file varsmodel.cc
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,51 +35,33 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#ifndef HISTORICDATA_H
-#define HISTORICDATA_H
+#include "src/hmi/model/varsmodel.h"
 
-#include <chrono>
-#include <thread>
-
-#include <QQmlListProperty>
-#include <QtCore/QDateTime>
-#include <QtCore/QObject>
-#include <QtCore/QPointF>
-#include <QtCore/QVector>
-
-#include "src/database-server/client/client.h"
-#include "src/hmi/model/varvaluemodel.h"
-
-class HistoricData : public QObject {
-  Q_OBJECT
- public:
-  Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
-  HistoricData(QObject *parent = nullptr);
-
-  QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
-  Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);
-
- signals:
-  void valsChanged();
-
- private:
-  Client *m_cl;  // FIXME(denisacostaq@gmail.com): RAII even delete.
-  std::chrono::system_clock::time_point m_now;
-  std::vector<VarValueModel> m_vals;
-  QQmlListProperty<decltype(m_vals)::value_type> m_qml_vals;
-  static void add_val(decltype(m_qml_vals) *, decltype(m_vals)::value_type *) {
-    qDebug() << "unsupported operation, so ignored";
+VarsModel::VarsModel(QObject *parent)
+    : QObject{parent},
+      m_qml_vars{QQmlListProperty<VarModel>(this, &m_vars, &add_var, &vars_size,
+                                            &var_at, &clear_vars)} {
+  for (int i = 0; i < 1000; ++i) {
+    QString color{};
+    switch (i % 5) {
+      case 0:
+        color = "black";
+        break;
+      case 1:
+        color = "blue";
+        break;
+      case 2:
+        color = "yellow";
+        break;
+      case 3:
+        color = "green";
+        break;
+      case 4:
+        color = "cyan";
+        break;
+    }
+    VarModel v{QString{"aa %1"}.arg(i), color};
+    m_vars.push_back(std::move(v));
   }
-  static decltype(m_vals)::value_type *val_at(decltype(m_qml_vals) *property,
-                                              int index) {
-    return &(reinterpret_cast<decltype(m_vals) *>(property->data)->at(index));
-  }
-  static int val_size(decltype(m_qml_vals) *property) {
-    return reinterpret_cast<decltype(m_vals) *>(property->data)->size();
-  }
-  static void clear_vals(decltype(m_qml_vals) *) {
-    qDebug() << "unsupported operation, so ignored";
-  }
-};
-
-#endif  // HISTORICDATA_H
+  emit varsChanged();
+}
