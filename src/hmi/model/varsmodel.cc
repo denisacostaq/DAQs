@@ -39,11 +39,11 @@
 
 VarsModel::VarsModel(QObject *parent)
     : QObject{parent},
-      m_qml_vars{QQmlListProperty<VarModel>(
-          this, &m_vars, &add_var, &vars_size, &var_at, &clear_vars)} {
+      m_qml_vars{QQmlListProperty<VarModel>(this, &m_vars, &add_var, &vars_size,
+                                            &var_at, &clear_vars)} {
   for (int i = 0; i < 1000; ++i) {
     QString color{};
-    switch (i%5) {
+    switch (i % 5) {
       case 0:
         color = "black";
         break;
@@ -59,7 +59,6 @@ VarsModel::VarsModel(QObject *parent)
       case 4:
         color = "cyan";
         break;
-        
     }
     VarModel v{QString{"aa %1"}.arg(i), color};
     m_vars.push_back(std::move(v));
