@@ -1,7 +1,7 @@
-/*! @brief This file have the startup/seupt for the HMI application.
-    @file main.cc
+/*! @brief This file have the interface for VarsModel class.
+    @file varsmodel.h
     @author Alvaro Denis <denisacostaq@gmail.com>
-    @date 6/29/2019
+    @date 7/27/2019
 
     @copyright
     @attention <h1><center><strong>COPYRIGHT &copy; 2019 </strong>
@@ -35,28 +35,46 @@
     [denisacostaq-URL]: https://about.me/denisacostaq "Alvaro Denis Acosta"
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
-#include <QtWidgets/QApplication>
+#ifndef HMI_MODEL_VARSMODEL_H
+#define HMI_MODEL_VARSMODEL_H
 
-#include "src/hmi/historicdata.h"
+#include <vector>
+
+#include <QtCore/QObject>
+#include <QtQml/QQmlListProperty>
+
 #include "src/hmi/model/varmodel.h"
-#include "src/hmi/model/varvaluemodel.h"
-#include "src/hmi/model/varsmodel.h"
 
-int main(int argc, char *argv[]) {
-  QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication app{argc, argv};
-  qmlRegisterType<VarModel>("com.github.denisacostaq.daqs", 1, 0, "VarModel");
-  qmlRegisterUncreatableType<VarValueModel>(
-      "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
-      "Can not create var value instance in QML, use as no editable property");
-  QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new HistoricData{});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{});
-  engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
-  if (engine.rootObjects().isEmpty()) {
-    return -1;
+class VarsModel : public QObject {
+  Q_OBJECT
+ public:
+  Q_PROPERTY(QQmlListProperty<VarModel> vars READ getVars NOTIFY varsChanged)
+ public:
+  explicit VarsModel(QObject *parent = nullptr);
+  QQmlListProperty<VarModel> getVars() { return m_qml_vars; }
+
+ signals:
+  void varsChanged();
+ public slots:
+ private:
+  std::vector<VarModel> m_vars;
+  QQmlListProperty<decltype(m_vars)::value_type> m_qml_vars;
+  static void add_var(decltype(m_qml_vars) *property,
+                      decltype(m_vars)::value_type *var) {
+    VarModel v{var->name(), "var->color()"};
+    reinterpret_cast<decltype(m_vars) *>(property->data)
+        ->push_back(std::move(v));
   }
-  return app.exec();
-}
+  static decltype(m_vars)::value_type *var_at(decltype(m_qml_vars) *property,
+                                              int index) {
+    return &(reinterpret_cast<decltype(m_vars) *>(property->data)->at(index));
+  }
+  static int vars_size(decltype(m_qml_vars) *property) {
+    return reinterpret_cast<decltype(m_vars) *>(property->data)->size();
+  }
+  static void clear_vars(decltype(m_qml_vars) *) {
+    //    qDebug() << "unsupported operation, so ignored";
+  }
+};
+
+#endif  // HMI_MODEL_VARSMODEL_H
