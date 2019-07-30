@@ -7,6 +7,8 @@
         <file>Historic.qml</file>
         <file>RubberBand.qml</file>
         <file>+android/RubberBand.qml</file>
+        <file>VariableDialog.qml</file>
+        <file>VariableDialogForm.ui.qml</file>
         <file>ColorSelector.qml</file>
         <file>ColorSelectorForm.ui.qml</file>
     </qresource>
