@@ -36,6 +36,7 @@
     [DAQs-URL]: https://github.com/denisacostaq/DAQs "DAQs"
  */
 #include "src/hmi/model/varvaluemodel.h"
+#include "src/database-server/client/client.h"
 
 VarValueModel::VarValueModel(QObject *parent)
     : QObject{parent}, m_val{}, m_timestamp{} {}

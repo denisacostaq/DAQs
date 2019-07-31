@@ -38,23 +38,25 @@
 #ifndef HMI_MODEL_VARVALUESMODEL
 #define HMI_MODEL_VARVALUESMODEL
 
+class Client;
+
 #include <chrono>
 #include <thread>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 #include <QtCore/QObject>
 #include <QtCore/QPointF>
 #include <QtCore/QVector>
 #include <QtQml/QQmlListProperty>
 
-#include "src/database-server/client/client.h"
 #include "src/hmi/model/varvaluemodel.h"
 
 class VarValuesModel : public QObject {
   Q_OBJECT
  public:
   Q_PROPERTY(QQmlListProperty<VarValueModel> vals READ getVals)
-  VarValuesModel(QObject *parent = nullptr);
+  VarValuesModel(Client *cl, QObject *parent = nullptr);
 
   QQmlListProperty<VarValueModel> getVals() { return m_qml_vals; }
   Q_INVOKABLE void getValues(QString var, qint64 s, qint64 e);

@@ -37,10 +37,14 @@
  */
 #include "src/hmi/model/varsmodel.h"
 
-VarsModel::VarsModel(QObject *parent)
+#include "src/database-server/client/client.h"
+
+VarsModel::VarsModel(Client *cl, QObject *parent)
     : QObject{parent},
+      m_vars{},
       m_qml_vars{QQmlListProperty<VarModel>(this, &m_vars, &add_var, &vars_size,
-                                            &var_at, &clear_vars)} {
+                                            &var_at, &clear_vars)},
+      m_cl{cl} {
   for (int i = 0; i < 1000; ++i) {
     QString color{};
     switch (i % 5) {
@@ -64,4 +68,9 @@ VarsModel::VarsModel(QObject *parent)
     m_vars.push_back(std::move(v));
   }
   emit varsChanged();
+}
+
+Q_INVOKABLE void VarsModel::saveVar(const VarModel &var) noexcept {
+  // TODO(denisacostaq@gmail.com):
+  // m_cl->send_var(var);
 }

@@ -43,20 +43,27 @@
 #include "src/hmi/model/varsmodel.h"
 #include "src/hmi/model/varvaluemodel.h"
 #include "src/hmi/model/varvaluesmodel.h"
+#include "src/database-server/client/client.h"
 
 int main(int argc, char *argv[]) {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   QApplication app{argc, argv};
+#ifdef __ANDROID__
+  auto cl{new Client{"192.168.43.65", 4444}};
+#else
+  auto cl{new Client{"127.0.0.1", 4444}};
+#endif
   qmlRegisterType<VarModel>("com.github.denisacostaq.daqs", 1, 0, "VarModel");
   qmlRegisterUncreatableType<VarValueModel>(
       "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
       "Can not create var value instance in QML, use as no editable property");
   QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{});
+  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{cl});
+  engine.rootContext()->setContextProperty("varsModel", new VarsModel{cl});
   engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
   if (engine.rootObjects().isEmpty()) {
     return -1;
   }
+  cl->connect();
   return app.exec();
 }

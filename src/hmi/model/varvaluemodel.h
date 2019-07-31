@@ -50,8 +50,9 @@ class VarValueModel : public QObject {
   explicit VarValueModel(double val, std::uint64_t timestamp,
                          QObject *parent = nullptr);
   VarValueModel(VarValueModel &&other)
-      : QObject{std::move(other.parent())}, m_val{std::move(other.m_val)},
-        m_timestamp{std::move(other.m_timestamp)} {};
+      : QObject{std::move(other.parent())},
+        m_val{std::move(other.m_val)},
+        m_timestamp{std::move(other.m_timestamp)} {}
   inline double val() const noexcept { return m_val; }
   inline const QDateTime &timestamp() const noexcept { return m_timestamp; }
 

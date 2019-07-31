@@ -42,13 +42,11 @@
 
 #include <QtCore/QTimer>
 
-VarValuesModel::VarValuesModel(QObject *parent)
+#include "src/database-server/client/client.h"
+
+VarValuesModel::VarValuesModel(Client *cl, QObject *parent)
     : QObject{parent},
-#ifdef __ANDROID__
-      m_cl{new Client{"192.168.43.65", 4444}},
-#else
-      m_cl{new Client{"127.0.0.1", 4444}},
-#endif
+      m_cl{cl},
       m_now{std::chrono::system_clock::now()},
       m_vals{},
       m_qml_vals{QQmlListProperty<VarValueModel>(
@@ -66,7 +64,6 @@ VarValuesModel::VarValuesModel(QObject *parent)
           emit valsChanged();
         }
       });
-  m_cl->connect();
   QTimer *m_wTimer{new QTimer{this}};
   m_wTimer->setInterval(6000);
   m_wTimer->setSingleShot(true);

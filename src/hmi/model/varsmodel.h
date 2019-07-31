@@ -38,6 +38,8 @@
 #ifndef HMI_MODEL_VARSMODEL_H
 #define HMI_MODEL_VARSMODEL_H
 
+class Client;
+
 #include <vector>
 
 #include <QtCore/QObject>
@@ -49,9 +51,9 @@ class VarsModel : public QObject {
   Q_OBJECT
  public:
   Q_PROPERTY(QQmlListProperty<VarModel> vars READ getVars NOTIFY varsChanged)
- public:
-  explicit VarsModel(QObject *parent = nullptr);
+  explicit VarsModel(Client *cl, QObject *parent = nullptr);
   QQmlListProperty<VarModel> getVars() { return m_qml_vars; }
+  Q_INVOKABLE void saveVar(const VarModel &var) noexcept;
 
  signals:
   void varsChanged();
@@ -59,6 +61,7 @@ class VarsModel : public QObject {
  private:
   std::vector<VarModel> m_vars;
   QQmlListProperty<decltype(m_vars)::value_type> m_qml_vars;
+  Client *m_cl;
   static void add_var(decltype(m_qml_vars) *property,
                       decltype(m_vars)::value_type *var) {
     VarModel v{var->name(), "var->color()"};
