@@ -96,8 +96,9 @@ IDataSource::Err SQLiteWrapper::create_scheme() noexcept {
 }
 
 IDataSource::Err SQLiteWrapper::add_variable(const Variable &var) noexcept {
-  std::string sql = sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')",
-                                    var.name().c_str());
+  std::string sql =
+      sqlite3_mprintf("INSERT INTO VARIABLE(NAME, COLOR) VALUES('%q', '%q')",
+                      var.name().c_str(), var.color().c_str());
   char *err = nullptr;
   int res = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err);
   if (res != SQLITE_OK) {
