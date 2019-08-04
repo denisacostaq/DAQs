@@ -35,6 +35,7 @@ Page {
             width: parent.width
             height: parent.height - btn.height - btn.padding
             ListView {
+                id: listView
                 header: Label {
                     text: "cabecera"
 //                    z: 20
@@ -44,7 +45,7 @@ Page {
                 delegate: Rectangle {
                     y: hdr.y + hdr.height + hdr.bottomPadding
                     height: 50
-                    width: parent.width
+                    width: listView.width
 //                    z: 1
                     RowLayout {
                         id: entry
