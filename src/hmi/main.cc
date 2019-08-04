@@ -39,11 +39,11 @@
 #include <QtQml/QQmlContext>
 #include <QtWidgets/QApplication>
 
+#include "src/database-server/client/client.h"
 #include "src/hmi/model/varmodel.h"
 #include "src/hmi/model/varsmodel.h"
 #include "src/hmi/model/varvaluemodel.h"
 #include "src/hmi/model/varvaluesmodel.h"
-#include "src/database-server/client/client.h"
 
 int main(int argc, char *argv[]) {
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -58,8 +58,10 @@ int main(int argc, char *argv[]) {
       "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
       "Can not create var value instance in QML, use as no editable property");
   QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{cl, &engine});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{cl, &engine});
+  engine.rootContext()->setContextProperty("dataLayer",
+                                           new VarValuesModel{cl, &engine});
+  engine.rootContext()->setContextProperty("varsModel",
+                                           new VarsModel{cl, &engine});
   engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
   if (engine.rootObjects().isEmpty()) {
     return -1;

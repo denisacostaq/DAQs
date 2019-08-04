@@ -39,7 +39,7 @@
 
 #include "src/database-server/client/client.h"
 
-VarsModel::VarsModel(Client *cl, QObject *parent)
+VarsModel::VarsModel(Client* cl, QObject* parent)
     : QObject{parent},
       m_vars{},
       m_qml_vars{QQmlListProperty<VarModel>(this, this, &add_var, &vars_size,
