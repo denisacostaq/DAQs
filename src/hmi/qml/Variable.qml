@@ -25,9 +25,6 @@ Page {
 //            z: 3
             icon.name: "list-add"
             onClicked: {
-                model.name = "jeje";
-                model.color = idd.colorSelector.selectedColor;
-                console.log("colorSelector", idd.colorSelector.selectedColor);
                 variableDialog.visible = true
             }
         }
@@ -91,17 +88,6 @@ Page {
         }
     }
     
-    VarModel {
-        id: model
-        name: "pepe"
-        onNameChanged: {
-            console.log("name", name);
-        }
-        onColorChanged: {
-            console.log("color", color);
-        }
-    }
-    
     Dialog {
         id: variableDialog
         visible: false
@@ -110,8 +96,21 @@ Page {
         height: 240
         modality: Qt.WindowModal
         VariableDialog {
-            id: idd
+            id: varDialog
             anchors.fill: parent
+        }
+        VarModel {
+            id: model
+        }
+        onAccepted: {
+            model.name = varDialog.name;
+            model.color = varDialog.color;
+            varsModel.vars.push(model);
+        }
+        onVisibilityChanged: {
+            if (variableDialog.visible) {
+                varDialog.name = qsTr('var name')
+            }
         }
     }
     Component.onCompleted: {
