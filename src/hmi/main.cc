@@ -58,8 +58,8 @@ int main(int argc, char *argv[]) {
       "com.github.denisacostaq.daqs", 1, 0, "VarValueModel",
       "Can not create var value instance in QML, use as no editable property");
   QQmlApplicationEngine engine{};
-  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{cl});
-  engine.rootContext()->setContextProperty("varsModel", new VarsModel{cl});
+  engine.rootContext()->setContextProperty("dataLayer", new VarValuesModel{cl, &engine});
+  engine.rootContext()->setContextProperty("varsModel", new VarsModel{cl, &engine});
   engine.load(QUrl{QStringLiteral("qrc:/main.qml")});
   if (engine.rootObjects().isEmpty()) {
     return -1;
