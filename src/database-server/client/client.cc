@@ -120,6 +120,42 @@ void Client::onReadyRead() {
   } else if (h.msg_type() == message::RESPONSE_VALUES) {
     message::ValuesResponse valsResp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
+    if (h.bodysize() != 0) {
+      qint64 readed{0};
+      do {
+        qint64 r{socket_.read(&data_r.get()[readed],
+                              static_cast<qint64>(h.bodysize()) - readed)};
+        if (r == 0 && !socket_.waitForReadyRead(3000)) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed + r
+                   << "but there is no more data";
+          return;
+        } else if (r == -1) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed
+                   << "but readed" << readed;
+          return;
+        }
+        readed += r;
+        // FIXME(denisacostaq@gmail.com): uint64 to int64
+      } while (readed != static_cast<qint64>(h.bodysize()));
+      valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
+      ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
+          p_vals{valsResp.mutable_values()};
+      std::vector<VarValue> vals{};
+      vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
+      std::for_each(p_vals->begin(), p_vals->end(),
+                    [&vals](const ::message::VarValue& val) {
+                      // FIXME(denisacostaq@gmail.com)" color
+                      Variable variable{val.name(), "color"};
+                      VarValue v{variable, val.value(), val.timestamp()};
+                      vals.push_back(std::move(v));
+                    });
+      emit valuesReceived(vals);
+    }
+  } else if (h.msg_type() == message::RESPONSE_VARIABLES) {
+    message::VariablesResponse varsResp{};
+    std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
     qint64 readed{0};
     if (h.bodysize() != 0) {
       do {
@@ -139,20 +175,20 @@ void Client::onReadyRead() {
         readed += r;
         // FIXME(denisacostaq@gmail.com): uint64 to int64
       } while (readed != static_cast<qint64>(h.bodysize()));
+      varsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
+      ::google::protobuf::RepeatedPtrField<::message::SaveVariable> const* const
+          p_vars{varsResp.mutable_variables()};
+      std::vector<Variable> vars{};
+      vars.reserve(static_cast<decltype(vars)::size_type>(p_vars->size()));
+      std::for_each(p_vars->begin(), p_vars->end(),
+                    [&vars](const ::message::SaveVariable& var) {
+                      Variable v{var.name(), var.color()};
+                      vars.push_back(std::move(v));
+                    });
+      emit variablesReceived(vars);
     }
-    valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
-    ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
-        p_vals{valsResp.mutable_values()};
-    std::vector<VarValue> vals{};
-    vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::for_each(p_vals->begin(), p_vals->end(),
-                  [&vals](const ::message::VarValue& val) {
-                    // FIXME(denisacostaq@gmail.com)" color
-                    Variable variable{val.name(), "color"};
-                    VarValue v{variable, val.value(), val.timestamp()};
-                    vals.push_back(std::move(v));
-                  });
-    emit valuesReceived(vals);
+  } else {
+    std::cerr << "unexpected message" << std::endl;
   }
 }
 
