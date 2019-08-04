@@ -54,7 +54,6 @@ class VarsModel : public QObject {
   Q_PROPERTY(QQmlListProperty<VarModel> vars READ getVars NOTIFY varsChanged)
   explicit VarsModel(Client *cl, QObject *parent = nullptr);
   QQmlListProperty<VarModel> getVars() { return m_qml_vars; }
-  Q_INVOKABLE void saveVar(const VarModel &var) noexcept;
 
  signals:
   void varsChanged();
@@ -66,13 +65,13 @@ class VarsModel : public QObject {
       m_qml_vars;
   Client *m_cl;
 
-  inline void add_var(decltype(m_vars)::value_type var) {
-    using model_t =
-        decltype(std::remove_pointer<decltype(m_vars)::value_type>::type());
-    m_vars.push_back(new model_t{var->name(), var->color(), this});
-    var->setParent(this);
+  void clear() {
+    std::for_each(m_vars.begin(), m_vars.end(),
+                  [](auto v) { v->deleteLater(); });
+    m_vars.clear();
     emit varsChanged();
   }
+  void add_var(decltype(m_vars)::value_type var);
   static void add_var(decltype(m_qml_vars) *property,
                       decltype(m_vars)::value_type var) {
     // FIXME(denisacostaq@gmail.com): Memory leak for VarModel*?

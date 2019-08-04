@@ -67,9 +67,36 @@ VarsModel::VarsModel(Client *cl, QObject *parent)
     m_vars.push_back(new VarModel{QString{"aa %1"}.arg(i), color, this});
   }
   emit varsChanged();
+  QObject::connect(m_cl, &Client::variablesReceived,
+                   [this](const std::vector<Variable>& vars) {
+                     clear();
+                     std::transform(
+                         vars.begin(), vars.end(), std::back_inserter(m_vars),
+                         [this](const Variable& var) {
+                           QColor color{};
+                           color.setNamedColor(var.color().c_str());
+                           return new VarModel{var.name().c_str(), color, this};
+                         });
+                     emit varsChanged();
+                   });
+  QObject::connect(
+      m_cl, &Client::responseReceived,
+      [this](message::MessageType* prev_msg, message::ResponseStatus status,
+             const QString& msg) {
+        if (status == message::ResponseStatus::OK) {
+          if (prev_msg && *prev_msg == message::MessageType::REQUEST_ADD_VAR) {
+            qDebug() << "if (prev_msg && *prev_msg == "
+                        "message::MessageType::REQUEST_ADD_VAR) {";
+            m_cl->request_vars();
+          }
+        } else {
+          qDebug() << message::ResponseStatus_Name(status).c_str() << msg;
+        }
+      });
 }
 
-Q_INVOKABLE void VarsModel::saveVar(const VarModel &var) noexcept {
-  // TODO(denisacostaq@gmail.com):
-  // m_cl->send_var(var);
+void VarsModel::add_var(decltype(VarsModel::m_vars)::value_type var) {
+  Variable variable{var->name().toStdString(),
+                    var->color().name().toStdString()};
+  m_cl->send_var(variable);
 }
