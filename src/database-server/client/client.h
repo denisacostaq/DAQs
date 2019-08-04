@@ -57,6 +57,7 @@ class Client : public QObject {
 
   void send_var(const Variable &var);
   void send_var_val(const QString &var_name, double value);
+  void request_vars();
   void request_var_values(const QString &var_name);
   void request_var_values(const QString &var_name,
                           const std::chrono::system_clock::time_point &start,
@@ -76,6 +77,7 @@ class Client : public QObject {
 
  private:
   bool is_connected() const;
+  void do_request(const message::GetVariables &gv);
   void do_request(const message::GetValues &gv);
   QTcpSocket socket_;
   const QString host_;

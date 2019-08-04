@@ -106,6 +106,7 @@ void Client::onReadyRead() {
   if (h.msg_type() == message::RESPONSE_FAILURE) {
     message::Failure resp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
+    // FIXME(denisacostaq@gmail.com): if h.bodysize()
     auto readed2{socket_.read(data_r.get(), static_cast<qint64>(h.bodysize()))};
     if (readed2 != static_cast<qint64>(h.bodysize())) {
       qDebug() << "body error, trying to read" << h.bodysize() << "but readed"
@@ -196,6 +197,11 @@ void Client::send_var_val(const QString& var_name, double value) {
   socket_.write(bytes);
 }
 
+void Client::request_vars() {
+  message::GetVariables gv{};
+  do_request(gv);
+}
+
 void Client::request_var_values(const QString& var_name) {
   message::GetValues gv{};
   gv.set_variable(var_name.toStdString());
@@ -219,6 +225,22 @@ void Client::request_var_values(
 void Client::do_request(const message::GetValues& gv) {
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_GET_VALUES);
+  hdr.set_bodysize(gv.ByteSizeLong());
+  std::ostringstream out{};
+  message::MetaHeader mh{};
+  mh.set_headersize(hdr.ByteSizeLong());
+  mh.SerializeToOstream(&out);
+  hdr.SerializeToOstream(&out);
+  gv.SerializeToOstream(&out);
+  QByteArray bytes{out.str().c_str(),
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    gv.ByteSizeLong())};
+  socket_.write(bytes);
+}
+
+void Client::do_request(const message::GetVariables& gv) {
+  message::Header hdr{};
+  hdr.set_msg_type(message::REQUEST_GET_VARIABLES);
   hdr.set_bodysize(gv.ByteSizeLong());
   std::ostringstream out{};
   message::MetaHeader mh{};
