@@ -55,6 +55,7 @@ class Client : public QObject {
 
   void connect();
 
+  void send_var(const Variable &var);
   void send_var_val(const QString &var_name, double value);
   void request_var_values(const QString &var_name);
   void request_var_values(const QString &var_name,

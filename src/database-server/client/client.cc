@@ -155,6 +155,26 @@ void Client::onReadyRead() {
 
 void Client::connect() { socket_.connectToHost(host_, port_); }
 
+void Client::send_var(const Variable& var) {
+  // FIXME(denisacostaq@gmail.com): duplicate code, for example send_var_val.
+  message::SaveVariable sv{};
+  sv.set_name(var.name());
+  sv.set_color(var.color());
+  message::Header hdr{};
+  hdr.set_msg_type(message::REQUEST_ADD_VAR);
+  hdr.set_bodysize(sv.ByteSizeLong());
+  std::ostringstream out{};
+  message::MetaHeader mh{};
+  mh.set_headersize(hdr.ByteSizeLong());
+  mh.SerializeToOstream(&out);
+  hdr.SerializeToOstream(&out);
+  sv.SerializeToOstream(&out);
+  QByteArray bytes{out.str().c_str(),
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    sv.ByteSizeLong())};
+  socket_.write(bytes);
+}
+
 void Client::send_var_val(const QString& var_name, double value) {
   message::SaveValue sv{};
   sv.set_variable(var_name.toStdString());
