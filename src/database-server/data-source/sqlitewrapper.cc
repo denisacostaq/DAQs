@@ -290,8 +290,8 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
           .count()};
   std::string query = sqlite3_mprintf(
       "SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
-      "ID FROM "
-      "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
+      "ID FROM VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP "
+      "<= %ld;",
       var_name.c_str(), sd, ed);
   CountCallback cc{
       0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
