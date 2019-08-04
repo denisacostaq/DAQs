@@ -52,7 +52,7 @@ Page {
                         anchors.fill: parent
                         Column {
                             Label {
-                                id: text
+                                id: modelName
                                 Layout.alignment: Qt.AlignLeft
                                 text: modelData.name
                             }
@@ -60,7 +60,7 @@ Page {
                                 z: -1
     //                                anchors.fill: parent
                                 width: entry.width/2
-                                height: text.height/10
+                                height: modelName.height/10
                                 LinearGradient  {
                                     anchors.fill: parent
                                         gradient: Gradient {
