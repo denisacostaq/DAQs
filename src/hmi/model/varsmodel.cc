@@ -42,7 +42,7 @@
 VarsModel::VarsModel(Client *cl, QObject *parent)
     : QObject{parent},
       m_vars{},
-      m_qml_vars{QQmlListProperty<VarModel>(this, &m_vars, &add_var, &vars_size,
+      m_qml_vars{QQmlListProperty<VarModel>(this, this, &add_var, &vars_size,
                                             &var_at, &clear_vars)},
       m_cl{cl} {
   for (int i = 0; i < 1000; ++i) {
@@ -64,8 +64,7 @@ VarsModel::VarsModel(Client *cl, QObject *parent)
         color = "cyan";
         break;
     }
-    VarModel v{QString{"aa %1"}.arg(i), color};
-    m_vars.push_back(std::move(v));
+    m_vars.push_back(new VarModel{QString{"aa %1"}.arg(i), color, this});
   }
   emit varsChanged();
 }

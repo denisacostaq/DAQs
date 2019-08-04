@@ -42,6 +42,7 @@ class Client;
 
 #include <vector>
 
+#include <QtCore/QDebug>
 #include <QtCore/QObject>
 #include <QtQml/QQmlListProperty>
 
@@ -59,24 +60,34 @@ class VarsModel : public QObject {
   void varsChanged();
  public slots:
  private:
-  std::vector<VarModel> m_vars;
-  QQmlListProperty<decltype(m_vars)::value_type> m_qml_vars;
+  std::vector<VarModel *> m_vars;
+  QQmlListProperty<decltype(
+      std::remove_pointer<decltype(m_vars)::value_type>::type())>
+      m_qml_vars;
   Client *m_cl;
+
+  inline void add_var(decltype(m_vars)::value_type var) {
+    using model_t =
+        decltype(std::remove_pointer<decltype(m_vars)::value_type>::type());
+    m_vars.push_back(new model_t{var->name(), var->color(), this});
+    var->setParent(this);
+    emit varsChanged();
+  }
   static void add_var(decltype(m_qml_vars) *property,
-                      decltype(m_vars)::value_type *var) {
-    VarModel v{var->name(), "var->color()"};
-    reinterpret_cast<decltype(m_vars) *>(property->data)
-        ->push_back(std::move(v));
+                      decltype(m_vars)::value_type var) {
+    // FIXME(denisacostaq@gmail.com): Memory leak for VarModel*?
+    reinterpret_cast<VarsModel *>(property->data)->add_var(var);
   }
-  static decltype(m_vars)::value_type *var_at(decltype(m_qml_vars) *property,
-                                              int index) {
-    return &(reinterpret_cast<decltype(m_vars) *>(property->data)->at(index));
+  auto var_at(int index) { return m_vars.at(index); }
+  static auto var_at(decltype(m_qml_vars) *property, int index) {
+    return reinterpret_cast<VarsModel *>(property->data)->var_at(index);
   }
+  int vars_size() { return m_vars.size(); }
   static int vars_size(decltype(m_qml_vars) *property) {
-    return reinterpret_cast<decltype(m_vars) *>(property->data)->size();
+    return reinterpret_cast<VarsModel *>(property->data)->vars_size();
   }
   static void clear_vars(decltype(m_qml_vars) *) {
-    //    qDebug() << "unsupported operation, so ignored";
+    qDebug() << "unsupported operation, so ignored";
   }
 };
 
