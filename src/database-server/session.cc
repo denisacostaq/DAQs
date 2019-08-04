@@ -242,32 +242,32 @@ void Session::read_add_variable_request(std::size_t b_size) {
   auto self(shared_from_this());
   auto body_buff{std::shared_ptr<std::uint8_t>(
       new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>())};
-  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
-                 [this, self, body_buff, b_size](boost::system::error_code ec,
-                                                 size_t length) {
-                   if (!ec && length == b_size) {
-                     message::SaveVariable sv{};
-                     sv.ParseFromArray(body_buff.get(),
-                                       static_cast<int>(b_size));
-                     std::clog << "finally"
-                               << "\n";
-                     std::clog << "name " << sv.name() << "\n";
-                     std::clog << "value " << sv.color() << "\n\n";
-                     Variable var{sv.name(), sv.color()};
-                     // FIXME(denisacostaq@gmail.com): move contructor here.
-                     auto err{da_->add_variable(var)};
-                     if (IDataAccess::Err::Ok == err) {
-                       auto prev{message::MessageType::REQUEST_ADD_VAR};
-                       send_status_response("Ok", message::ResponseStatus::OK, &prev);
-                     } else {
-                       std::cerr << "database error\n";
-                       send_status_response("Failed to save value",
-                                            message::ResponseStatus::FAILED);
-                     }
-                   } else {
-                     std::cerr << "reading body_buf" << ec.message() << "\n";
-                   }
-                 });
+  ba::async_read(
+      socket_, ba::buffer(body_buff.get(), b_size),
+      [this, self, body_buff, b_size](boost::system::error_code ec,
+                                      size_t length) {
+        if (!ec && length == b_size) {
+          message::SaveVariable sv{};
+          sv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
+          std::clog << "finally"
+                    << "\n";
+          std::clog << "name " << sv.name() << "\n";
+          std::clog << "value " << sv.color() << "\n\n";
+          Variable var{sv.name(), sv.color()};
+          // FIXME(denisacostaq@gmail.com): move contructor here.
+          auto err{da_->add_variable(var)};
+          if (IDataAccess::Err::Ok == err) {
+            auto prev{message::MessageType::REQUEST_ADD_VAR};
+            send_status_response("Ok", message::ResponseStatus::OK, &prev);
+          } else {
+            std::cerr << "database error\n";
+            send_status_response("Failed to save value",
+                                 message::ResponseStatus::FAILED);
+          }
+        } else {
+          std::cerr << "reading body_buf" << ec.message() << "\n";
+        }
+      });
 }
 
 void Session::read_save_value_request(std::size_t b_size) {
