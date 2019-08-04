@@ -62,6 +62,8 @@ class Session : public std::enable_shared_from_this<Session> {
 
   void read_get_values_request(std::size_t b_size);
 
+  void read_add_variable_request(std::size_t b_size);
+
   void read_body(message::MessageType msg_type, std::size_t b_size);
 
   void do_read() { read_header(); }
