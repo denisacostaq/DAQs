@@ -8,10 +8,11 @@ enum ResponseStatus {
 }
 
 enum MessageType {
-  REQUEST_SAVE_VALUE = 1;
-  REQUEST_GET_VALUES = 2;
-  RESPONSE_FAILURE = 3;
-  RESPONSE_VALUES = 4;
+  REQUEST_ADD_VAR = 1;
+  REQUEST_SAVE_VALUE = 5;
+  REQUEST_GET_VALUES = 10;
+  RESPONSE_FAILURE = 15;
+  RESPONSE_VALUES = 20;
 }
 
 // Package format
@@ -38,6 +39,15 @@ message MetaHeader {
 message Header {
   required MessageType msg_type = 1;
   required fixed64 bodySize = 2;
+}
+
+/**
+ * Request save (register) a new variable.
+ * @next Failure packaged as body.
+ */
+message SaveVariable {
+  required string name = 1;
+  required string color = 5;
 }
 
 /**
