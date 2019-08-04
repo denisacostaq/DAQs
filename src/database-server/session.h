@@ -87,11 +87,16 @@ class Session : public std::enable_shared_from_this<Session> {
   std::unique_ptr<std::uint8_t[]> build_b_response(
       std::vector<VarValue>&& values, std::size_t* out_b_size);
 
+  std::unique_ptr<std::uint8_t[]> build_b_response(std::vector<Variable>&& vars,
+                                                   std::size_t* out_b_size);
+
   void send_status_response(const std::string& msg,
                             message::ResponseStatus status,
                             message::MessageType* prev_msg = nullptr);
 
   void send_values_response(std::vector<VarValue>&& values);
+
+  void send_variables_response(std::vector<Variable>&& variables);
 
   boost::asio::ip::tcp::socket socket_;
   IDataAccess* da_;

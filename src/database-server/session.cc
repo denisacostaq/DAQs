@@ -109,11 +109,22 @@ void Session::send_values_response(std::vector<VarValue> &&values) {
   send_msg(f_buf, fh_size + b_size);
 }
 
+void Session::send_variables_response(std::vector<Variable> &&variables) {
+  std::size_t b_size{};
+  auto b_buf{build_b_response(std::move(variables), &b_size)};
+  std::size_t fh_size{};
+  auto fh_buf{
+      build_h_msg(b_size, message::MessageType::RESPONSE_VARIABLES, &fh_size)};
+  auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
+  send_msg(f_buf, fh_size + b_size);
+}
+
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     const std::string &msg, message::ResponseStatus status,
     std::size_t *out_b_size, message::MessageType *prev_msg) {
   message::Failure b_msg{};
-  if (prev_msg) {
+  if (prev_msg) {  // FIXME(denisacostaq@gmail.com): Make required for all
+                   // responses
     b_msg.set_prev_msg(*prev_msg);
   }
   b_msg.set_status(status);
@@ -132,6 +143,20 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     v->set_name(val.name());
     v->set_value(val.val());
     v->set_timestamp(val.timestamp());
+  });
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
+  *out_b_size = b_msg.ByteSizeLong();
+  return b_buf;
+}
+
+std::unique_ptr<std::uint8_t[]> Session::build_b_response(
+    std::vector<Variable> &&vars, std::size_t *out_b_size) {
+  message::VariablesResponse b_msg{};
+  std::for_each(vars.cbegin(), vars.cend(), [&b_msg](const Variable &var) {
+    auto v{b_msg.mutable_variables()->Add()};
+    v->set_name(var.name());
+    v->set_color(var.color());
   });
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
   b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
