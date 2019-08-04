@@ -88,6 +88,16 @@ class IDataSource {
   virtual Err add_variable_value(VarValue&& var_value) noexcept = 0;
 
   /**
+   * @brief fetch_variables get all variables
+   * @param send_vale the variables will be send in this callback, one at a
+   * time, index is the current value index.
+   * @return Err::Ok on succes
+   */
+  virtual Err fetch_variables(
+      const std::function<void(Variable&& var, size_t index)>&
+          send_vale) noexcept = 0;
+
+  /**
    * @brief fetch_variable_values get all values of a given variable
    * @param var_name variable name to get the values from
    * @param send_vale the values will be send in this callback, one at a time,

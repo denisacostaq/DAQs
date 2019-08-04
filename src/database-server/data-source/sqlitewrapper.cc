@@ -126,6 +126,51 @@ IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
   return Err::Ok;
 }
 
+IDataSource::Err SQLiteWrapper::fetch_variables(
+    const std::function<void(Variable &&var, size_t index)>
+        &send_vale) noexcept {
+  char *err_msg = nullptr;
+  std::string query = "SELECT COLOR, NAME FROM VARIABLE";
+  using callbac_t = decltype(send_vale);
+  using unqualified_callbac_t =
+      std::remove_const_t<std::remove_reference_t<callbac_t>>;
+  if (sqlite3_exec(
+          db_, query.c_str(),
+          +[](void *callback, int argc, char **argv, char **azColName) {
+            Variable var{};
+            std::cerr << "-----------" << std::endl;
+            for (int i = 0; i < argc; i++) {
+              if (strcmp("NAME", azColName[i]) == 0) {
+                std::string name{""};
+                if (argv[i] != nullptr && std::strcmp(argv[i], "")) {
+                  name = argv[i];
+                }
+                var.set_name(name);
+              } else if (strcmp("COLOR", azColName[i]) == 0) {
+                if (strcmp("COLOR", azColName[i]) == 0) {
+                  std::string color{""};
+                  if (argv[i] != nullptr && std::strcmp(argv[i], "")) {
+                    color = argv[i];
+                  }
+                  var.set_color(color);
+                }
+              } else {
+                return -1;
+              }
+            }
+            static_cast<callbac_t> (*static_cast<unqualified_callbac_t *>(
+                callback))(std::move(var), 0);
+            return 0;
+          },
+          const_cast<unqualified_callbac_t *>(&send_vale),
+          &err_msg) != SQLITE_OK) {
+    std::cerr << "error " << err_msg << "\n";
+    sqlite3_free(err_msg);
+    return Err::Failed;
+  }
+  return Err::Ok;
+}
+
 namespace {
 struct CountCallback {
   size_t index;
