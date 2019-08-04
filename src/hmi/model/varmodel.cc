@@ -37,7 +37,7 @@
  */
 #include "src/hmi/model/varmodel.h"
 
-VarModel::VarModel(const QString &name, const QString &color, QObject *parent)
+VarModel::VarModel(const QString &name, const QColor &color, QObject *parent)
     : QObject{parent}, m_name{name}, m_color{color} {}
 
 VarModel::VarModel(QObject *parent) : QObject{parent}, m_name{}, m_color{} {}
