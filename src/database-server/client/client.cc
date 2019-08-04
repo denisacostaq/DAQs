@@ -113,7 +113,9 @@ void Client::onReadyRead() {
       return;
     }
     resp.ParseFromArray(data_r.get(), static_cast<int>(readed2));
-    emit responseReceived(resp.status(), resp.msg().c_str());
+    auto prev_msg{resp.prev_msg()};
+    emit responseReceived(resp.has_prev_msg() ? &prev_msg : nullptr, resp.status(),
+                          resp.msg().c_str());
   } else if (h.msg_type() == message::RESPONSE_VALUES) {
     message::ValuesResponse valsResp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};

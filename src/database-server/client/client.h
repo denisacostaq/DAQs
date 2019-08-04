@@ -67,7 +67,8 @@ class Client : public QObject {
  signals:
   // FIXME(denisacostaq@gmail.com): expensive copy
   void valuesReceived(const std::vector<VarValue> &vals);
-  void responseReceived(message::ResponseStatus status, QString response);
+  void responseReceived(message::MessageType *prev_msg,
+                        message::ResponseStatus status, QString response);
   void connected();
 
  private slots:
