@@ -80,6 +80,13 @@ class IDataAccess {
   virtual Err add_variable_value(VarValue&& var) noexcept = 0;
 
   /**
+   * @brief fetch_variables get all variables.
+   * @return a vector with the variables.
+   * @sa IDataSource::add_variable
+   */
+  virtual std::tuple<std::vector<Variable>, Err> fetch_variables() noexcept = 0;
+
+  /**
    * @brief fetch_variable_values get values for a variable.
    * @param var_name variable name.
    * @param max_len max result len (for data compression for example).

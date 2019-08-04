@@ -94,6 +94,17 @@ IDataAccess::Err DataAccess::compress(const std::vector<VarValue>& in_vals,
   return Err::Ok;
 }
 
+std::tuple<std::vector<Variable>, IDataAccess::Err>
+DataAccess::fetch_variables() noexcept {
+  std::vector<Variable> variables{};
+  if (ds_->fetch_variables([&variables](Variable&& var, size_t index) {
+        variables.push_back(std::move(var));
+      }) != IDataSource::Err::Ok) {
+    return std::make_tuple(std::vector<Variable>{}, Err::Failed);
+  }
+  return std::make_tuple(variables, Err::Ok);
+}
+
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(const std::string& var_name,
                                   size_t max_len) noexcept {
