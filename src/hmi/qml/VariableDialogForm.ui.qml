@@ -4,13 +4,13 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.3
 
 Item {
+    property alias name: textInput.text
+    property alias selectedColor: colorSelector.selectedColor
+    id: dialog
     anchors.fill: parent
-    property alias colorSelector: colorSelector
     width: 320
     height: 240
-    
-    id: dialog
-    
+
     ColumnLayout {
         x: 9
         y: 60
@@ -26,7 +26,6 @@ Item {
             
             TextInput {
                 id: textInput
-                text: qsTr("Variable name")
                 horizontalAlignment: Text.AlignLeft
                 Layout.preferredHeight: 20
                 Layout.preferredWidth: 80

@@ -1,7 +1,11 @@
-import QtQuick 2.4
+import QtQuick 2.12
+import QtQuick.Controls 2.5
 
 VariableDialogForm {
-        anchors.fill: parent
+    id: varDialogForm
+    anchors.fill: parent
+    property alias color: varDialogForm.selectedColor
+    property alias name: varDialogForm.name
 }
 
 /*##^## Designer {
