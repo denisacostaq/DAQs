@@ -201,6 +201,9 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
     case message::MessageType::REQUEST_ADD_VAR:
       read_add_variable_request(b_size);
       break;
+    case message::MessageType::REQUEST_GET_VARIABLES:
+      read_get_variables_request(b_size);
+      break;
     default:
       std::cerr << "unknow request " << msg_type << "\n";
       send_status_response("unknow error", message::ResponseStatus::FAILED);
@@ -307,4 +310,30 @@ void Session::read_get_values_request(std::size_t b_size) {
           std::cerr << "reading body_buf" << ec.message() << "\n";
         }
       });
+}
+
+void Session::read_get_variables_request(std::size_t b_size) {
+  auto self(shared_from_this());
+  auto body_buff{std::shared_ptr<std::uint8_t>{
+      new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>()}};
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::GetVariables gv{};
+                     gv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     std::tuple<std::vector<Variable>, IDataAccess::Err> res{};
+                     res = da_->fetch_variables();
+                     if (std::get<1>(res) == IDataAccess::Err::Ok) {
+                       send_variables_response(std::move(std::get<0>(res)));
+                     } else {
+                       std::cerr << "database error\n";
+                       send_status_response("Failed to get variables",
+                                            message::ResponseStatus::FAILED);
+                     }
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
 }
