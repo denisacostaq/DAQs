@@ -88,9 +88,10 @@ void Session::read_header() {
 }
 
 void Session::send_status_response(const std::string &msg,
-                                   message::ResponseStatus status) {
+                                   message::ResponseStatus status,
+                                   message::MessageType *prev_msg) {
   std::size_t b_size{};
-  auto b_buf{build_b_response(msg, status, &b_size)};
+  auto b_buf{build_b_response(msg, status, &b_size, prev_msg)};
   std::size_t fh_size{};
   auto fh_buf{
       build_h_msg(b_size, message::MessageType::RESPONSE_FAILURE, &fh_size)};
@@ -110,8 +111,11 @@ void Session::send_values_response(std::vector<VarValue> &&values) {
 
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     const std::string &msg, message::ResponseStatus status,
-    std::size_t *out_b_size) {
+    std::size_t *out_b_size, message::MessageType *prev_msg) {
   message::Failure b_msg{};
+  if (prev_msg) {
+    b_msg.set_prev_msg(*prev_msg);
+  }
   b_msg.set_status(status);
   b_msg.set_msg(msg);
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};

@@ -78,13 +78,14 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       const std::string& msg, message::ResponseStatus status,
-      std::size_t* out_b_size);
+      std::size_t* out_b_size, message::MessageType* prev_msg = nullptr);
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       std::vector<VarValue>&& values, std::size_t* out_b_size);
 
   void send_status_response(const std::string& msg,
-                            message::ResponseStatus status);
+                            message::ResponseStatus status,
+                            message::MessageType* prev_msg = nullptr);
 
   void send_values_response(std::vector<VarValue>&& values);
 

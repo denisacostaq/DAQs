@@ -66,6 +66,8 @@ message SaveValue {
 message Failure {
   required ResponseStatus status = 1;
   optional string msg = 2;
+  // FIXME(denisacostaq@gmail.com): Make prev_msg required
+  optional MessageType prev_msg = 3;
 }
 
 /**
