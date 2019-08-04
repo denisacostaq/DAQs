@@ -11,8 +11,10 @@ enum MessageType {
   REQUEST_ADD_VAR = 1;
   REQUEST_SAVE_VALUE = 5;
   REQUEST_GET_VALUES = 10;
+  REQUEST_GET_VARIABLES = 11;
   RESPONSE_FAILURE = 15;
   RESPONSE_VALUES = 20;
+  RESPONSE_VARIABLES = 25;
 }
 
 // Package format
@@ -85,6 +87,14 @@ message GetValues {
 }
 
 /**
+ * Request: Get variables.
+ * @next Failure packaged as body.
+ * @next VariablesResponse packaged as body.
+ */
+message GetVariables {
+}
+
+/**
  * A repeated file for ValuesResponse
  */
 message VarValue {
@@ -103,4 +113,13 @@ message VarValue {
  */
 message ValuesResponse {
   repeated VarValue values = 1;
+}
+
+/**
+ * Response: Return variables.
+ * @prev GetVariables packaged as body.
+ FIXME(denisacostaq@gmail.com): add required for variables
+ */
+message VariablesResponse {
+  repeated SaveVariable variables = 1;
 }
