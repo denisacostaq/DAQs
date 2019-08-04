@@ -9,6 +9,5 @@
         <file>VariableDialog.qml</file>
         <file>VariableDialogForm.ui.qml</file>
         <file>ColorSelector.qml</file>
-        <file>ColorSelectorForm.ui.qml</file>
     </qresource>
 </RCC>
