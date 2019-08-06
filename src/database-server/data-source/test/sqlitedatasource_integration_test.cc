@@ -105,6 +105,29 @@ TEST_F(SQLiteWrapperTest, AddVariable) {
   EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var3));
 }
 
+TEST_F(SQLiteWrapperTest, FetchVariable) {
+  // NOTE(denisacostaq@gmail.com): Given
+  std::vector<Variable> vars{Variable{"var1", "color1"},
+                             Variable{"var2", "color2"},
+                             Variable{"var3", "color3"}};
+  for (const auto& v : vars) {
+    ASSERT_EQ(IDataSource::Err::Ok, ds_->add_variable(v));
+  }
+  // NOTE(denisacostaq@gmail.com): When
+  decltype(vars) retrieved{};
+  retrieved.reserve(vars.size());
+  ASSERT_EQ(IDataSource::Err::Ok,
+            ds_->fetch_variables([&retrieved](Variable&& v, size_t) {
+              retrieved.emplace_back(v);
+            }));
+  // NOTE(denisacostaq@gmail.com): Then
+  EXPECT_EQ(vars.size(), retrieved.size());
+  for (decltype(vars)::size_type i{}; i < vars.size(); ++i) {
+    EXPECT_EQ(vars[i].name(), retrieved[i].name());
+    EXPECT_EQ(vars[i].color(), retrieved[i].color());
+  }
+}
+
 TEST_F(SQLiteWrapperTest, AddVariableValue) {
   // FIXME(denisacostaq@gmail.com)" color
   Variable variable("var1", "color");
