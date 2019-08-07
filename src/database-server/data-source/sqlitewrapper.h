@@ -86,6 +86,15 @@ class SQLiteWrapper : public IDataSource {
   Err add_variable_value(VarValue&& var) noexcept override;
 
   /**
+   * @brief fetch_variables get all variables.
+   * @param send_vale the variables will be send in this callback, one at a
+   * time, index is the current value index.
+   * @return Err::Ok on succes
+   */
+  Err fetch_variables(const std::function<void(Variable&& var, size_t index)>&
+                          send_vale) noexcept override;
+
+  /**
    * @brief fetch_variable_values get all values related to a variable.
    * @param var_name variable to get related values from.
    * @param send_vale get values one at a time from this callback.

@@ -62,6 +62,13 @@ class DataAccess : public IDataAccess {
   Err add_variable_value(VarValue&& var) noexcept override;
 
   /**
+   * @brief fetch_variables get all variables.
+   * @return a vector with the variables.
+   * @sa IDataSource::add_variable
+   */
+  std::tuple<std::vector<Variable>, Err> fetch_variables() noexcept override;
+
+  /**
    * @brief fetch_variable_values get values for a given variable.
    * @param var_name variable name.
    * @param max_len TODO(denisacostaq@gmail.com): not implemented yet

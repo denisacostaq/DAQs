@@ -55,7 +55,9 @@ class Client : public QObject {
 
   void connect();
 
+  void send_var(const Variable &var);
   void send_var_val(const QString &var_name, double value);
+  void request_vars();
   void request_var_values(const QString &var_name);
   void request_var_values(const QString &var_name,
                           const std::chrono::system_clock::time_point &start,
@@ -66,7 +68,10 @@ class Client : public QObject {
  signals:
   // FIXME(denisacostaq@gmail.com): expensive copy
   void valuesReceived(const std::vector<VarValue> &vals);
-  void responseReceived(message::ResponseStatus status, QString response);
+  // FIXME(denisacostaq@gmail.com): expensive copy
+  void variablesReceived(const std::vector<Variable> &vals);
+  void responseReceived(message::MessageType *prev_msg,
+                        message::ResponseStatus status, QString response);
   void connected();
 
  private slots:
@@ -74,6 +79,7 @@ class Client : public QObject {
 
  private:
   bool is_connected() const;
+  void do_request(const message::GetVariables &gv);
   void do_request(const message::GetValues &gv);
   QTcpSocket socket_;
   const QString host_;

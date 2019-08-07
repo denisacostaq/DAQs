@@ -1,11 +1,13 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>Page1Form.ui.qml</file>
-        <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>Historic.qml</file>
         <file>RubberBand.qml</file>
         <file>+android/RubberBand.qml</file>
+        <file>Variable.qml</file>
+        <file>VariableDialog.qml</file>
+        <file>VariableDialogForm.ui.qml</file>
+        <file>ColorSelector.qml</file>
     </qresource>
 </RCC>

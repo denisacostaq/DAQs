@@ -47,7 +47,7 @@ class VarModel : public QObject {
   Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
   Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
  public:
-  explicit VarModel(const QString &name, const QString &color,
+  explicit VarModel(const QString &name, const QColor &color,
                     QObject *parent = nullptr);
   explicit VarModel(QObject *parent = nullptr);
   VarModel(VarModel &&other)

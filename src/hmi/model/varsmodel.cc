@@ -37,10 +37,14 @@
  */
 #include "src/hmi/model/varsmodel.h"
 
-VarsModel::VarsModel(QObject *parent)
+#include "src/database-server/client/client.h"
+
+VarsModel::VarsModel(Client* cl, QObject* parent)
     : QObject{parent},
-      m_qml_vars{QQmlListProperty<VarModel>(this, &m_vars, &add_var, &vars_size,
-                                            &var_at, &clear_vars)} {
+      m_vars{},
+      m_qml_vars{QQmlListProperty<VarModel>(this, this, &add_var, &vars_size,
+                                            &var_at, &clear_vars)},
+      m_cl{cl} {
   for (int i = 0; i < 1000; ++i) {
     QString color{};
     switch (i % 5) {
@@ -60,8 +64,39 @@ VarsModel::VarsModel(QObject *parent)
         color = "cyan";
         break;
     }
-    VarModel v{QString{"aa %1"}.arg(i), color};
-    m_vars.push_back(std::move(v));
+    m_vars.push_back(new VarModel{QString{"aa %1"}.arg(i), color, this});
   }
   emit varsChanged();
+  QObject::connect(m_cl, &Client::variablesReceived,
+                   [this](const std::vector<Variable>& vars) {
+                     clear();
+                     std::transform(
+                         vars.begin(), vars.end(), std::back_inserter(m_vars),
+                         [this](const Variable& var) {
+                           QColor color{};
+                           color.setNamedColor(var.color().c_str());
+                           return new VarModel{var.name().c_str(), color, this};
+                         });
+                     emit varsChanged();
+                   });
+  QObject::connect(
+      m_cl, &Client::responseReceived,
+      [this](message::MessageType* prev_msg, message::ResponseStatus status,
+             const QString& msg) {
+        if (status == message::ResponseStatus::OK) {
+          if (prev_msg && *prev_msg == message::MessageType::REQUEST_ADD_VAR) {
+            qDebug() << "if (prev_msg && *prev_msg == "
+                        "message::MessageType::REQUEST_ADD_VAR) {";
+            m_cl->request_vars();
+          }
+        } else {
+          qDebug() << message::ResponseStatus_Name(status).c_str() << msg;
+        }
+      });
+}
+
+void VarsModel::add_var(decltype(VarsModel::m_vars)::value_type var) {
+  Variable variable{var->name().toStdString(),
+                    var->color().name().toStdString()};
+  m_cl->send_var(variable);
 }

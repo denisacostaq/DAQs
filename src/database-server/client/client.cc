@@ -106,6 +106,7 @@ void Client::onReadyRead() {
   if (h.msg_type() == message::RESPONSE_FAILURE) {
     message::Failure resp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
+    // FIXME(denisacostaq@gmail.com): if h.bodysize()
     auto readed2{socket_.read(data_r.get(), static_cast<qint64>(h.bodysize()))};
     if (readed2 != static_cast<qint64>(h.bodysize())) {
       qDebug() << "body error, trying to read" << h.bodysize() << "but readed"
@@ -113,9 +114,47 @@ void Client::onReadyRead() {
       return;
     }
     resp.ParseFromArray(data_r.get(), static_cast<int>(readed2));
-    emit responseReceived(resp.status(), resp.msg().c_str());
+    auto prev_msg{resp.prev_msg()};
+    emit responseReceived(resp.has_prev_msg() ? &prev_msg : nullptr,
+                          resp.status(), resp.msg().c_str());
   } else if (h.msg_type() == message::RESPONSE_VALUES) {
     message::ValuesResponse valsResp{};
+    std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
+    if (h.bodysize() != 0) {
+      qint64 readed{0};
+      do {
+        qint64 r{socket_.read(&data_r.get()[readed],
+                              static_cast<qint64>(h.bodysize()) - readed)};
+        if (r == 0 && !socket_.waitForReadyRead(3000)) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed + r
+                   << "but there is no more data";
+          return;
+        } else if (r == -1) {
+          // FIXME(denisacostaq@gmail.com): uint64 to int64
+          qDebug() << "body error, trying to read" << h.bodysize() - readed
+                   << "but readed" << readed;
+          return;
+        }
+        readed += r;
+        // FIXME(denisacostaq@gmail.com): uint64 to int64
+      } while (readed != static_cast<qint64>(h.bodysize()));
+      valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
+      ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
+          p_vals{valsResp.mutable_values()};
+      std::vector<VarValue> vals{};
+      vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
+      std::for_each(p_vals->begin(), p_vals->end(),
+                    [&vals](const ::message::VarValue& val) {
+                      // FIXME(denisacostaq@gmail.com)" color
+                      Variable variable{val.name(), "color"};
+                      VarValue v{variable, val.value(), val.timestamp()};
+                      vals.push_back(std::move(v));
+                    });
+      emit valuesReceived(vals);
+    }
+  } else if (h.msg_type() == message::RESPONSE_VARIABLES) {
+    message::VariablesResponse varsResp{};
     std::unique_ptr<char[]> data_r{new char[h.bodysize()]};
     qint64 readed{0};
     if (h.bodysize() != 0) {
@@ -136,24 +175,44 @@ void Client::onReadyRead() {
         readed += r;
         // FIXME(denisacostaq@gmail.com): uint64 to int64
       } while (readed != static_cast<qint64>(h.bodysize()));
+      varsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
+      ::google::protobuf::RepeatedPtrField<::message::SaveVariable> const* const
+          p_vars{varsResp.mutable_variables()};
+      std::vector<Variable> vars{};
+      vars.reserve(static_cast<decltype(vars)::size_type>(p_vars->size()));
+      std::for_each(p_vars->begin(), p_vars->end(),
+                    [&vars](const ::message::SaveVariable& var) {
+                      Variable v{var.name(), var.color()};
+                      vars.push_back(std::move(v));
+                    });
+      emit variablesReceived(vars);
     }
-    valsResp.ParseFromArray(data_r.get(), static_cast<int>(readed));
-    ::google::protobuf::RepeatedPtrField<::message::VarValue> const* const
-        p_vals{valsResp.mutable_values()};
-    std::vector<VarValue> vals{};
-    vals.reserve(static_cast<decltype(vals)::size_type>(p_vals->size()));
-    std::for_each(p_vals->begin(), p_vals->end(),
-                  [&vals](const ::message::VarValue& val) {
-                    // FIXME(denisacostaq@gmail.com)" color
-                    Variable variable{val.name(), "color"};
-                    VarValue v{variable, val.value(), val.timestamp()};
-                    vals.push_back(std::move(v));
-                  });
-    emit valuesReceived(vals);
+  } else {
+    std::cerr << "unexpected message" << std::endl;
   }
 }
 
 void Client::connect() { socket_.connectToHost(host_, port_); }
+
+void Client::send_var(const Variable& var) {
+  // FIXME(denisacostaq@gmail.com): duplicate code, for example send_var_val.
+  message::SaveVariable sv{};
+  sv.set_name(var.name());
+  sv.set_color(var.color());
+  message::Header hdr{};
+  hdr.set_msg_type(message::REQUEST_ADD_VAR);
+  hdr.set_bodysize(sv.ByteSizeLong());
+  std::ostringstream out{};
+  message::MetaHeader mh{};
+  mh.set_headersize(hdr.ByteSizeLong());
+  mh.SerializeToOstream(&out);
+  hdr.SerializeToOstream(&out);
+  sv.SerializeToOstream(&out);
+  QByteArray bytes{out.str().c_str(),
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    sv.ByteSizeLong())};
+  socket_.write(bytes);
+}
 
 void Client::send_var_val(const QString& var_name, double value) {
   message::SaveValue sv{};
@@ -172,6 +231,11 @@ void Client::send_var_val(const QString& var_name, double value) {
                    static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
                                     sv.ByteSizeLong())};
   socket_.write(bytes);
+}
+
+void Client::request_vars() {
+  message::GetVariables gv{};
+  do_request(gv);
 }
 
 void Client::request_var_values(const QString& var_name) {
@@ -197,6 +261,22 @@ void Client::request_var_values(
 void Client::do_request(const message::GetValues& gv) {
   message::Header hdr{};
   hdr.set_msg_type(message::REQUEST_GET_VALUES);
+  hdr.set_bodysize(gv.ByteSizeLong());
+  std::ostringstream out{};
+  message::MetaHeader mh{};
+  mh.set_headersize(hdr.ByteSizeLong());
+  mh.SerializeToOstream(&out);
+  hdr.SerializeToOstream(&out);
+  gv.SerializeToOstream(&out);
+  QByteArray bytes{out.str().c_str(),
+                   static_cast<int>(mh.ByteSizeLong() + hdr.ByteSizeLong() +
+                                    gv.ByteSizeLong())};
+  socket_.write(bytes);
+}
+
+void Client::do_request(const message::GetVariables& gv) {
+  message::Header hdr{};
+  hdr.set_msg_type(message::REQUEST_GET_VARIABLES);
   hdr.set_bodysize(gv.ByteSizeLong());
   std::ostringstream out{};
   message::MetaHeader mh{};

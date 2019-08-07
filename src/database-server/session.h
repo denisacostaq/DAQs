@@ -62,6 +62,10 @@ class Session : public std::enable_shared_from_this<Session> {
 
   void read_get_values_request(std::size_t b_size);
 
+  void read_get_variables_request(std::size_t b_size);
+
+  void read_add_variable_request(std::size_t b_size);
+
   void read_body(message::MessageType msg_type, std::size_t b_size);
 
   void do_read() { read_header(); }
@@ -78,15 +82,21 @@ class Session : public std::enable_shared_from_this<Session> {
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       const std::string& msg, message::ResponseStatus status,
-      std::size_t* out_b_size);
+      std::size_t* out_b_size, message::MessageType* prev_msg = nullptr);
 
   std::unique_ptr<std::uint8_t[]> build_b_response(
       std::vector<VarValue>&& values, std::size_t* out_b_size);
 
+  std::unique_ptr<std::uint8_t[]> build_b_response(std::vector<Variable>&& vars,
+                                                   std::size_t* out_b_size);
+
   void send_status_response(const std::string& msg,
-                            message::ResponseStatus status);
+                            message::ResponseStatus status,
+                            message::MessageType* prev_msg = nullptr);
 
   void send_values_response(std::vector<VarValue>&& values);
+
+  void send_variables_response(std::vector<Variable>&& variables);
 
   boost::asio::ip::tcp::socket socket_;
   IDataAccess* da_;

@@ -96,8 +96,9 @@ IDataSource::Err SQLiteWrapper::create_scheme() noexcept {
 }
 
 IDataSource::Err SQLiteWrapper::add_variable(const Variable &var) noexcept {
-  std::string sql = sqlite3_mprintf("INSERT INTO VARIABLE(NAME) VALUES('%q')",
-                                    var.name().c_str());
+  std::string sql =
+      sqlite3_mprintf("INSERT INTO VARIABLE(NAME, COLOR) VALUES('%q', '%q')",
+                      var.name().c_str(), var.color().c_str());
   char *err = nullptr;
   int res = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &err);
   if (res != SQLITE_OK) {
@@ -119,6 +120,51 @@ IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
       "(SELECT ID FROM VARIABLE WHERE NAME = '%q'))",
       var.val(), timestamp.count(), var.name().c_str());
   if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &err_msg) != SQLITE_OK) {
+    std::cerr << "error " << err_msg << "\n";
+    sqlite3_free(err_msg);
+    return Err::Failed;
+  }
+  return Err::Ok;
+}
+
+IDataSource::Err SQLiteWrapper::fetch_variables(
+    const std::function<void(Variable &&var, size_t index)>
+        &send_vale) noexcept {
+  char *err_msg = nullptr;
+  std::string query = "SELECT COLOR, NAME FROM VARIABLE";
+  using callbac_t = decltype(send_vale);
+  using unqualified_callbac_t =
+      std::remove_const_t<std::remove_reference_t<callbac_t>>;
+  if (sqlite3_exec(
+          db_, query.c_str(),
+          +[](void *callback, int argc, char **argv, char **azColName) {
+            Variable var{};
+            std::cerr << "-----------" << std::endl;
+            for (int i = 0; i < argc; i++) {
+              if (strcmp("NAME", azColName[i]) == 0) {
+                std::string name{""};
+                if (argv[i] != nullptr && std::strcmp(argv[i], "")) {
+                  name = argv[i];
+                }
+                var.set_name(name);
+              } else if (strcmp("COLOR", azColName[i]) == 0) {
+                if (strcmp("COLOR", azColName[i]) == 0) {
+                  std::string color{""};
+                  if (argv[i] != nullptr && std::strcmp(argv[i], "")) {
+                    color = argv[i];
+                  }
+                  var.set_color(color);
+                }
+              } else {
+                return -1;
+              }
+            }
+            static_cast<callbac_t> (*static_cast<unqualified_callbac_t *>(
+                callback))(std::move(var), 0);
+            return 0;
+          },
+          const_cast<unqualified_callbac_t *>(&send_vale),
+          &err_msg) != SQLITE_OK) {
     std::cerr << "error " << err_msg << "\n";
     sqlite3_free(err_msg);
     return Err::Failed;
@@ -244,8 +290,8 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
           .count()};
   std::string query = sqlite3_mprintf(
       "SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT "
-      "ID FROM "
-      "VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP <= %ld;",
+      "ID FROM VARIABLE WHERE NAME = '%q') AND TIMESTAMP >= %ld AND TIMESTAMP "
+      "<= %ld;",
       var_name.c_str(), sd, ed);
   CountCallback cc{
       0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};

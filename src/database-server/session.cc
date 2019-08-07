@@ -88,9 +88,10 @@ void Session::read_header() {
 }
 
 void Session::send_status_response(const std::string &msg,
-                                   message::ResponseStatus status) {
+                                   message::ResponseStatus status,
+                                   message::MessageType *prev_msg) {
   std::size_t b_size{};
-  auto b_buf{build_b_response(msg, status, &b_size)};
+  auto b_buf{build_b_response(msg, status, &b_size, prev_msg)};
   std::size_t fh_size{};
   auto fh_buf{
       build_h_msg(b_size, message::MessageType::RESPONSE_FAILURE, &fh_size)};
@@ -108,10 +109,24 @@ void Session::send_values_response(std::vector<VarValue> &&values) {
   send_msg(f_buf, fh_size + b_size);
 }
 
+void Session::send_variables_response(std::vector<Variable> &&variables) {
+  std::size_t b_size{};
+  auto b_buf{build_b_response(std::move(variables), &b_size)};
+  std::size_t fh_size{};
+  auto fh_buf{
+      build_h_msg(b_size, message::MessageType::RESPONSE_VARIABLES, &fh_size)};
+  auto f_buf{build_f_msg(std::move(fh_buf), fh_size, std::move(b_buf), b_size)};
+  send_msg(f_buf, fh_size + b_size);
+}
+
 std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     const std::string &msg, message::ResponseStatus status,
-    std::size_t *out_b_size) {
+    std::size_t *out_b_size, message::MessageType *prev_msg) {
   message::Failure b_msg{};
+  if (prev_msg) {  // FIXME(denisacostaq@gmail.com): Make required for all
+                   // responses
+    b_msg.set_prev_msg(*prev_msg);
+  }
   b_msg.set_status(status);
   b_msg.set_msg(msg);
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
@@ -128,6 +143,20 @@ std::unique_ptr<std::uint8_t[]> Session::build_b_response(
     v->set_name(val.name());
     v->set_value(val.val());
     v->set_timestamp(val.timestamp());
+  });
+  std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
+  b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
+  *out_b_size = b_msg.ByteSizeLong();
+  return b_buf;
+}
+
+std::unique_ptr<std::uint8_t[]> Session::build_b_response(
+    std::vector<Variable> &&vars, std::size_t *out_b_size) {
+  message::VariablesResponse b_msg{};
+  std::for_each(vars.cbegin(), vars.cend(), [&b_msg](const Variable &var) {
+    auto v{b_msg.mutable_variables()->Add()};
+    v->set_name(var.name());
+    v->set_color(var.color());
   });
   std::unique_ptr<std::uint8_t[]> b_buf{new std::uint8_t[b_msg.ByteSizeLong()]};
   b_msg.SerializeToArray(b_buf.get(), b_msg.ByteSize());
@@ -194,11 +223,51 @@ void Session::read_body(message::MessageType msg_type, std::size_t b_size) {
     case message::MessageType::REQUEST_GET_VALUES:
       read_get_values_request(b_size);
       break;
+    case message::MessageType::REQUEST_ADD_VAR:
+      read_add_variable_request(b_size);
+      break;
+    case message::MessageType::REQUEST_GET_VARIABLES:
+      read_get_variables_request(b_size);
+      break;
     default:
       std::cerr << "unknow request " << msg_type << "\n";
       send_status_response("unknow error", message::ResponseStatus::FAILED);
+      // FIXME(denisacostaq@gmail.com): This can cause sync problems, the
+      // connection should be restarted.
       break;
   }
+}
+
+void Session::read_add_variable_request(std::size_t b_size) {
+  auto self(shared_from_this());
+  auto body_buff{std::shared_ptr<std::uint8_t>(
+      new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>())};
+  ba::async_read(
+      socket_, ba::buffer(body_buff.get(), b_size),
+      [this, self, body_buff, b_size](boost::system::error_code ec,
+                                      size_t length) {
+        if (!ec && length == b_size) {
+          message::SaveVariable sv{};
+          sv.ParseFromArray(body_buff.get(), static_cast<int>(b_size));
+          std::clog << "finally"
+                    << "\n";
+          std::clog << "name " << sv.name() << "\n";
+          std::clog << "value " << sv.color() << "\n\n";
+          Variable var{sv.name(), sv.color()};
+          // FIXME(denisacostaq@gmail.com): move contructor here.
+          auto err{da_->add_variable(var)};
+          if (IDataAccess::Err::Ok == err) {
+            auto prev{message::MessageType::REQUEST_ADD_VAR};
+            send_status_response("Ok", message::ResponseStatus::OK, &prev);
+          } else {
+            std::cerr << "database error\n";
+            send_status_response("Failed to save value",
+                                 message::ResponseStatus::FAILED);
+          }
+        } else {
+          std::cerr << "reading body_buf" << ec.message() << "\n";
+        }
+      });
 }
 
 void Session::read_save_value_request(std::size_t b_size) {
@@ -266,4 +335,30 @@ void Session::read_get_values_request(std::size_t b_size) {
           std::cerr << "reading body_buf" << ec.message() << "\n";
         }
       });
+}
+
+void Session::read_get_variables_request(std::size_t b_size) {
+  auto self(shared_from_this());
+  auto body_buff{std::shared_ptr<std::uint8_t>{
+      new std::uint8_t[b_size], std::default_delete<std::uint8_t[]>()}};
+  ba::async_read(socket_, ba::buffer(body_buff.get(), b_size),
+                 [this, self, body_buff, b_size](boost::system::error_code ec,
+                                                 size_t length) {
+                   if (!ec && length == b_size) {
+                     message::GetVariables gv{};
+                     gv.ParseFromArray(body_buff.get(),
+                                       static_cast<int>(b_size));
+                     std::tuple<std::vector<Variable>, IDataAccess::Err> res{};
+                     res = da_->fetch_variables();
+                     if (std::get<1>(res) == IDataAccess::Err::Ok) {
+                       send_variables_response(std::move(std::get<0>(res)));
+                     } else {
+                       std::cerr << "database error\n";
+                       send_status_response("Failed to get variables",
+                                            message::ResponseStatus::FAILED);
+                     }
+                   } else {
+                     std::cerr << "reading body_buf" << ec.message() << "\n";
+                   }
+                 });
 }
