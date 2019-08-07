@@ -243,3 +243,91 @@ TEST(DataCompression, WithModValues3) {
     EXPECT_DOUBLE_EQ(sum / floor, compresed[i].val());
   }
 }
+
+#include "src/database-server/data-source/sqlitewrapper.h"
+#include "src/database-server/data-source/test/testutil.h"
+
+class DataAccessTest : public ::testing::Test {
+ protected:
+  DataAccessTest() : da_{nullptr} {}
+  void SetUp() override {
+    try {
+      ds_ = new SQLiteWrapper(get_random_sqlite_file_path());
+      da_ = new DataAccess{ds_};
+    } catch (const std::string& msg) {
+      std::cerr << msg << "\n";
+    } catch (...) {
+      std::cerr << "Unextpected error\n";
+    }
+    EXPECT_NE(nullptr, ds_);
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->create_scheme());
+    EXPECT_NE(nullptr, da_);
+  }
+
+  void TearDown() override {
+    delete da_;
+    delete ds_;
+  }
+
+  IDataAccess* da_ = nullptr;
+
+ private:
+  IDataSource* ds_{nullptr};
+};
+
+TEST_F(DataAccessTest, AddVariableValue) {
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable variable("var1", "color");
+  VarValue var{variable, 23.1, 0};
+  EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable(variable));
+  EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable_value(std::move(var)));
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable varNone{"varNone", "color"};
+  EXPECT_NE(IDataAccess::Err::Ok,
+            da_->add_variable_value(VarValue{varNone, 13.1, 0}));
+  VarValue var2{variable, 21.1, 0};
+  EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable_value(std::move(var2)));
+}
+
+TEST_F(DataAccessTest, RetrieveVariableValue) {
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable var1{"var1", "color"};
+  VarValue varValue1{var1, 0, 0};
+  // FIXME(denisacostaq@gmail.com)" color
+  Variable varNone{"varNone", "color"};
+  VarValue varValueNone{varNone, 0, 0};
+  std::vector<double> var1OrgValues{23.1, 21.1};
+  std::vector<double> varNoneOrgValues{13.1, 13.2, 3.32};
+  EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable(var1));
+  EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable(varNone));
+  for (auto v : var1OrgValues) {
+    auto vv{varValue1.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable_value(std::move(vv)));
+  }
+  for (auto v : varNoneOrgValues) {
+    auto vv{varValueNone.DeepCopy()};
+    vv.set_val(v);
+    EXPECT_EQ(IDataAccess::Err::Ok, da_->add_variable_value(std::move(vv)));
+  }
+  auto var1Values{da_->fetch_variable_values(var1.name())};
+  EXPECT_EQ(IDataAccess::Err::Ok, std::get<1>(var1Values));
+  EXPECT_EQ(var1OrgValues.size(), std::get<0>(var1Values).size());
+  for (auto v : var1OrgValues) {
+    EXPECT_NE(
+        std::find_if(
+            std::get<0>(var1Values).cbegin(), std::get<0>(var1Values).cend(),
+            [v](const VarValue& var1Val) { return var1Val.val() == v; }),
+        std::get<0>(var1Values).end());
+  }
+  auto varNoneValues{da_->fetch_variable_values(varNone.name())};
+  EXPECT_EQ(IDataAccess::Err::Ok, std::get<1>(varNoneValues));
+  EXPECT_EQ(varNoneOrgValues.size(), std::get<0>(varNoneValues).size());
+  for (auto v : varNoneOrgValues) {
+    EXPECT_NE(std::find_if(
+                  std::get<0>(varNoneValues).cbegin(),
+                  std::get<0>(varNoneValues).cend(),
+                  [v](const VarValue& var1Val) { return var1Val.val() == v; }),
+              std::get<0>(varNoneValues).end());
+  }
+}
