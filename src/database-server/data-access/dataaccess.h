@@ -59,7 +59,7 @@ class DataAccess : public IDataAccess {
    * @return Ok on success.
    * @sa IDataAccess::add_variable_value
    */
-  Err add_variable_value(VarValue&& var) noexcept override;
+  Err add_variable_value(const VarValue& var) noexcept override;
 
   /**
    * @brief fetch_variables get all variables.
