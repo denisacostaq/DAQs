@@ -83,7 +83,7 @@ class SQLiteWrapper : public IDataSource {
    * @return Err::Ok on success.
    * @sa IDataSource::add_variable_value
    */
-  Err add_variable_value(VarValue&& var) noexcept override;
+  Err add_variable_value(const VarValue& var) noexcept override;
 
   /**
    * @brief fetch_variables get all variables.
@@ -91,8 +91,9 @@ class SQLiteWrapper : public IDataSource {
    * time, index is the current value index.
    * @return Err::Ok on succes
    */
-  Err fetch_variables(const std::function<void(Variable&& var, size_t index)>&
-                          send_vale) noexcept override;
+  Err fetch_variables(
+      const std::function<void(const Variable& var, size_t index)>&
+          send_vale) noexcept override;
 
   /**
    * @brief fetch_variable_values get all values related to a variable.
@@ -101,9 +102,10 @@ class SQLiteWrapper : public IDataSource {
    * @return Err::Ok on success.
    * @sa IDataSource::fetch_variable_values
    */
-  Err fetch_variable_values(const std::string& var_name,
-                            const std::function<void(VarValue&&, size_t index)>&
-                                send_vale) noexcept override;
+  Err fetch_variable_values(
+      const std::string& var_name,
+      const std::function<void(const VarValue&, size_t index)>&
+          send_vale) noexcept override;
 
   /**
    * @brief count_variable_values count the number of values for a given
@@ -129,7 +131,7 @@ class SQLiteWrapper : public IDataSource {
       const std::string& var_name,
       const std::chrono::system_clock::time_point& start_data,
       const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(VarValue&& val, size_t index)>&
+      const std::function<void(const VarValue& val, size_t index)>&
           send_vale) noexcept override;
 
   /**
