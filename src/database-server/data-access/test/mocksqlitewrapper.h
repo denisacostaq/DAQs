@@ -44,8 +44,7 @@
 
 class MockIDataSource : public IDataSource {
  public:
-  MOCK_METHOD0(mock_create_scheme, Err());
-  Err create_scheme() noexcept override { return mock_create_scheme(); }
+  Err create_scheme() noexcept override { return IDataSource::Err::Failed; }
 
   MOCK_METHOD1(mock_add_variable, Err(const Variable& variable));
   Err add_variable(const Variable& variable) noexcept override {
@@ -77,13 +76,10 @@ class MockIDataSource : public IDataSource {
     return mock_fetch_variable_values(var_name, send_vale);
   }
 
-  MOCK_METHOD2(mock_count_variable_values,
-               Err(const std::string& var_name,
-                   const std::function<void(size_t count)>& send_count));
   Err count_variable_values(
-      const std::string& var_name,
-      const std::function<void(size_t count)>& send_count) noexcept override {
-    return mock_count_variable_values(var_name, send_count);
+      const std::string&,
+      const std::function<void(size_t count)>&) noexcept override {
+    return IDataSource::Err::Failed;
   }
 
   MOCK_METHOD4(mock_fetch_variable_values,
@@ -102,18 +98,11 @@ class MockIDataSource : public IDataSource {
                                       send_vale);
   }
 
-  MOCK_METHOD4(mock_count_variable_values,
-               Err(const std::string& var_name,
-                   const std::chrono::system_clock::time_point& start_date,
-                   const std::chrono::system_clock::time_point& end_date,
-                   const std::function<void(size_t count)>& send_count));
   Err count_variable_values(
-      const std::string& var_name,
-      const std::chrono::system_clock::time_point& start_date,
-      const std::chrono::system_clock::time_point& end_date,
-      const std::function<void(size_t count)>& send_count) noexcept override {
-    return mock_count_variable_values(var_name, start_date, end_date,
-                                      send_count);
+      const std::string&, const std::chrono::system_clock::time_point&,
+      const std::chrono::system_clock::time_point&,
+      const std::function<void(size_t count)>&) noexcept override {
+    return IDataSource::Err::Failed;
   }
 };
 
