@@ -52,9 +52,7 @@ VarValue::VarValue(VarValue &&var) noexcept
 
 const Variable &VarValue::variable() const noexcept { return variable_; }
 
-void VarValue::set_vaiable(const Variable &var) noexcept {
-  variable_ = var;
-}
+void VarValue::set_vaiable(const Variable &var) noexcept { variable_ = var; }
 
 double VarValue::val() const noexcept { return val_; }
 

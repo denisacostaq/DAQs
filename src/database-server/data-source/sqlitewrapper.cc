@@ -159,8 +159,8 @@ IDataSource::Err SQLiteWrapper::fetch_variables(
                 return -1;
               }
             }
-            static_cast<callbac_t> (*static_cast<unqualified_callbac_t *>(
-                callback))(var, 0);
+            static_cast<callbac_t> (
+                *static_cast<unqualified_callbac_t *>(callback))(var, 0);
             return 0;
           },
           const_cast<unqualified_callbac_t *>(&send_vale),

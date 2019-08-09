@@ -114,7 +114,8 @@ TEST(DataAccessShouldHandleDataSourceResponses, fetch_variable_values) {
             da.fetch_variable_values("", 0));
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses, fetch_variable_values_in_range) {
+TEST(DataAccessShouldHandleDataSourceResponses,
+     fetch_variable_values_in_range) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_fetch_variable_values(_, _, _, _))
       .WillOnce(Return(IDataSource::Err::Ok))
