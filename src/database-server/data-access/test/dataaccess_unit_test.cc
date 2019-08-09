@@ -70,7 +70,7 @@ std::ostream& operator<<(std::ostream& stream, const VarValue& var) {
                 << "variable=" << var.variable() << ")";
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses, add_variable) {
+TEST(DataAccessHandleDataSourceResponses, add_variable) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_add_variable(_))
       .WillOnce(Return(IDataSource::Err::Ok))
@@ -80,7 +80,7 @@ TEST(DataAccessShouldHandleDataSourceResponses, add_variable) {
   EXPECT_EQ(IDataAccess::Err::Failed, da.add_variable(Variable{}));
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses, add_variable_value) {
+TEST(DataAccessHandleDataSourceResponses, add_variable_value) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_add_variable_value(_))
       .WillOnce(Return(IDataSource::Err::Ok))
@@ -90,7 +90,7 @@ TEST(DataAccessShouldHandleDataSourceResponses, add_variable_value) {
   EXPECT_EQ(IDataAccess::Err::Failed, da.add_variable_value(VarValue{}));
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses, fetch_variables) {
+TEST(DataAccessHandleDataSourceResponses, fetch_variables) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_fetch_variables(_))
       .WillOnce(Return(IDataSource::Err::Ok))
@@ -102,7 +102,7 @@ TEST(DataAccessShouldHandleDataSourceResponses, fetch_variables) {
             da.fetch_variables());
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses, fetch_variable_values) {
+TEST(DataAccessHandleDataSourceResponses, fetch_variable_values) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_fetch_variable_values(_, _))
       .WillOnce(Return(IDataSource::Err::Ok))
@@ -114,8 +114,7 @@ TEST(DataAccessShouldHandleDataSourceResponses, fetch_variable_values) {
             da.fetch_variable_values("", 0));
 }
 
-TEST(DataAccessShouldHandleDataSourceResponses,
-     fetch_variable_values_in_range) {
+TEST(DataAccessHandleDataSourceResponses, fetch_variable_values_in_range) {
   MockIDataSource mds{};
   EXPECT_CALL(mds, mock_fetch_variable_values(_, _, _, _))
       .WillOnce(Return(IDataSource::Err::Ok))
