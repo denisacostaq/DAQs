@@ -100,7 +100,8 @@ else(CMAKE_COMPILER_IS_GNUCXX)
     )
     add_custom_command(TARGET coverage
         COMMENT "Generating coverage files"
-        COMMAND ${COV_EXE} show -format=html -instr-profile=${CMAKE_BINARY_DIR}/default.profdata -object=${CMAKE_BINARY_DIR}/src/database-server/data-source/sqlitedatasource_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_unit_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_test ${ALL_SOURCES} -output-dir html
+        #https://github.com/denisacostaq/DAQs/issues/68
+        #COMMAND ${COV_EXE} show -format=html -instr-profile=${CMAKE_BINARY_DIR}/default.profdata -object=${CMAKE_BINARY_DIR}/src/database-server/data-source/sqlitedatasource_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_unit_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_test ${ALL_SOURCES} -output-dir html
         COMMAND echo "Coverage files have been output to ${CMAKE_BINARY_DIR}/coverage"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
     )
