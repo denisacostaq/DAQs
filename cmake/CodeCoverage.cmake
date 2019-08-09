@@ -56,6 +56,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         COMMAND ${LCOV_EXE} --gcov-tool ${COV_EXE} --capture --directory ${CMAKE_BINARY_DIR}/src/ -o coverage.info
         COMMAND ${LCOV_EXE} --remove coverage.info --output-file coverage.info
           '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-source/test/*'
+          '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-access/test/*'
           '/usr/*'
           '*gtest/*'
         COMMAND echo "Coverage info have been output to ${CMAKE_BINARY_DIR}/coverage/coverage.info"
