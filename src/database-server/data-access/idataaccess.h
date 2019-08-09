@@ -77,7 +77,7 @@ class IDataAccess {
    * @return Ok on success.
    * @sa IDataSource::add_variable_value
    */
-  virtual Err add_variable_value(VarValue&& var) noexcept = 0;
+  virtual Err add_variable_value(const VarValue& var) noexcept = 0;
 
   /**
    * @brief fetch_variables get all variables.

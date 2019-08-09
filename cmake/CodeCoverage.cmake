@@ -56,6 +56,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         COMMAND ${LCOV_EXE} --gcov-tool ${COV_EXE} --capture --directory ${CMAKE_BINARY_DIR}/src/ -o coverage.info
         COMMAND ${LCOV_EXE} --remove coverage.info --output-file coverage.info
           '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-source/test/*'
+          '${CMAKE_CURRENT_SOURCE_DIR}/src/database-server/data-access/test/*'
           '/usr/*'
           '*gtest/*'
         COMMAND echo "Coverage info have been output to ${CMAKE_BINARY_DIR}/coverage/coverage.info"
@@ -92,14 +93,15 @@ else(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_EXE_LINKER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
     add_custom_command(TARGET coverage
         COMMENT "Indexing prof raw data"
-        COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${CMAKE_BINARY_DIR}/src/database-server/data-source/default.profraw -o ${CMAKE_BINARY_DIR}/default.profdata
+        COMMAND ${LLVM_PROFDATA_EXE} merge -sparse=true ${CMAKE_BINARY_DIR}/src/database-server/data-source/default.profraw ${CMAKE_BINARY_DIR}/src/database-server/data-access/default.profraw -o ${CMAKE_BINARY_DIR}/default.profdata
         BYPRODUCTS ${CMAKE_BINARY_DIR}/default.profdata
         MAIN_DEPENDENCY ${CMAKE_BINARY_DIR}/src/database-server/data-source/default.profraw
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
     )
     add_custom_command(TARGET coverage
         COMMENT "Generating coverage files"
-        COMMAND ${COV_EXE} show -format=html -instr-profile=${CMAKE_BINARY_DIR}/default.profdata ${CMAKE_BINARY_DIR}/src/database-server/data-source/sqlitedatasource_test ${ALL_SOURCES} -output-dir html
+        #https://github.com/denisacostaq/DAQs/issues/68
+        #COMMAND ${COV_EXE} show -format=html -instr-profile=${CMAKE_BINARY_DIR}/default.profdata -object=${CMAKE_BINARY_DIR}/src/database-server/data-source/sqlitedatasource_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_unit_test,-object=${CMAKE_BINARY_DIR}/src/database-server/data-access/dataaccess_test ${ALL_SOURCES} -output-dir html
         COMMAND echo "Coverage files have been output to ${CMAKE_BINARY_DIR}/coverage"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/coverage
     )

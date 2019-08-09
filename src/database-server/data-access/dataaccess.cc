@@ -46,10 +46,9 @@ IDataAccess::Err DataAccess::add_variable(const Variable& var) noexcept {
   return ds_->add_variable(var) == IDataSource::Err::Ok ? Err::Ok : Err::Failed;
 }
 
-IDataAccess::Err DataAccess::add_variable_value(VarValue&& var) noexcept {
-  return ds_->add_variable_value(std::move(var)) == IDataSource::Err::Ok
-             ? Err::Ok
-             : Err::Failed;
+IDataAccess::Err DataAccess::add_variable_value(const VarValue& var) noexcept {
+  return ds_->add_variable_value(var) == IDataSource::Err::Ok ? Err::Ok
+                                                              : Err::Failed;
 }
 
 IDataAccess::Err DataAccess::compress(const std::vector<VarValue>& in_vals,
@@ -97,8 +96,8 @@ IDataAccess::Err DataAccess::compress(const std::vector<VarValue>& in_vals,
 std::tuple<std::vector<Variable>, IDataAccess::Err>
 DataAccess::fetch_variables() noexcept {
   std::vector<Variable> variables{};
-  if (ds_->fetch_variables([&variables](Variable&& var, size_t index) {
-        variables.push_back(std::move(var));
+  if (ds_->fetch_variables([&variables](const Variable& var, size_t index) {
+        variables.push_back(var);
       }) != IDataSource::Err::Ok) {
     return std::make_tuple(std::vector<Variable>{}, Err::Failed);
   }
@@ -109,10 +108,10 @@ std::tuple<std::vector<VarValue>, IDataAccess::Err>
 DataAccess::fetch_variable_values(const std::string& var_name,
                                   size_t max_len) noexcept {
   std::vector<VarValue> tmp_values{};
-  if (ds_->fetch_variable_values(var_name,
-                                 [&tmp_values](VarValue&& val, size_t index) {
-                                   tmp_values.push_back(std::move(val));
-                                 }) != IDataSource::Err::Ok) {
+  if (ds_->fetch_variable_values(
+          var_name, [&tmp_values](const VarValue& val, size_t index) {
+            tmp_values.push_back(val);
+          }) != IDataSource::Err::Ok) {
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&
@@ -124,9 +123,9 @@ DataAccess::fetch_variable_values(const std::string& var_name,
     }
     std::clog << "compression from " << tmp_values.size() << " to "
               << values.size() << "\n";
-    return std::make_tuple(std::move(values), Err::Ok);
+    return std::make_tuple(values, Err::Ok);
   }
-  return std::make_tuple(std::move(tmp_values), Err::Ok);
+  return std::make_tuple(tmp_values, Err::Ok);
 }
 
 std::tuple<std::vector<VarValue>, IDataAccess::Err>
@@ -136,10 +135,11 @@ DataAccess::fetch_variable_values(
     const std::chrono::system_clock::time_point& end_date,
     size_t max_len) noexcept {
   std::vector<VarValue> tmp_values{};
-  if (ds_->fetch_variable_values(var_name, start_date, end_date,
-                                 [&tmp_values](VarValue&& val, size_t index) {
-                                   tmp_values.push_back(std::move(val));
-                                 }) != IDataSource::Err::Ok) {
+  if (ds_->fetch_variable_values(
+          var_name, start_date, end_date,
+          [&tmp_values](const VarValue& val, size_t index) {
+            tmp_values.push_back(val);
+          }) != IDataSource::Err::Ok) {
     return std::make_tuple(std::vector<VarValue>{}, Err::Failed);
   }
   if (max_len != std::numeric_limits<decltype(max_len)>::infinity() &&

@@ -117,7 +117,7 @@ TEST_F(SQLiteWrapperTest, FetchVariable) {
   decltype(vars) retrieved{};
   retrieved.reserve(vars.size());
   ASSERT_EQ(IDataSource::Err::Ok,
-            ds_->fetch_variables([&retrieved](Variable&& v, size_t) {
+            ds_->fetch_variables([&retrieved](const Variable& v, size_t) {
               retrieved.emplace_back(v);
             }));
   // NOTE(denisacostaq@gmail.com): Then
@@ -133,13 +133,13 @@ TEST_F(SQLiteWrapperTest, AddVariableValue) {
   Variable variable("var1", "color");
   VarValue var{variable, 23.1, 0};
   EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(variable));
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(var)));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(var));
   // FIXME(denisacostaq@gmail.com)" color
   Variable varNone{"varNone", "color"};
   EXPECT_NE(IDataSource::Err::Ok,
             ds_->add_variable_value(VarValue{varNone, 13.1, 0}));
   VarValue var2{variable, 21.1, 0};
-  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(var2)));
+  EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(var2));
 }
 
 TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
@@ -154,19 +154,19 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValue) {
   EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(var1));
   EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable(varNone));
   for (auto v : var1OrgValues) {
-    auto t = varValue1.DeepCopy();
     auto vv{varValue1.DeepCopy()};
     vv.set_val(v);
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vv));
   }
   for (auto v : varNoneOrgValues) {
     auto vv{varValueNone.DeepCopy()};
     vv.set_val(v);
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vv));
   }
   std::vector<VarValue> var1Values, varNoneValues;
-  auto callback = [](std::vector<VarValue>* container, VarValue&& val) mutable {
-    container->push_back(std::move(val));
+  auto callback = [](std::vector<VarValue>* container,
+                     const VarValue& val) mutable {
+    container->push_back(val);
   };
   auto var1ValuesCallback =
       std::bind(callback, &var1Values, std::placeholders::_1);
@@ -207,7 +207,7 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
   for (size_t i = 0; i < var1OrgValues.size(); ++i) {
     VarValue vvar1{var1, var1OrgValues[i], 0};
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vvar1)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vvar1));
     if (i == 30 || i == 60 || i == 90) {
       laps.push_back(std::chrono::system_clock::now());
       std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -219,28 +219,28 @@ TEST_F(SQLiteWrapperTest, RetrieveVariableValueInDateRanges) {
             ds_->fetch_variable_values(
                 var1.name(), laps[0], laps[1],
                 // TODO(denisacostaq@gmail.com): use index and/or count_
-                [&count](VarValue&&, size_t index) { ++count; }));
+                [&count](const VarValue&, size_t index) { ++count; }));
   EXPECT_EQ(31, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
             ds_->fetch_variable_values(
                 var1.name(), laps[1], laps[2],
                 // TODO(denisacostaq@gmail.com): use index and/or count_
-                [&count](VarValue&&, size_t index) { ++count; }));
+                [&count](const VarValue&, size_t index) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
             ds_->fetch_variable_values(
                 var1.name(), laps[2], laps[3],
                 // TODO(denisacostaq@gmail.com): use index and/or count_
-                [&count](VarValue&&, size_t index) { ++count; }));
+                [&count](const VarValue&, size_t index) { ++count; }));
   EXPECT_EQ(30, count);
   count = 0;
   EXPECT_EQ(IDataSource::Err::Ok,
             ds_->fetch_variable_values(
                 var1.name(), laps[3], laps[4],
                 // TODO(denisacostaq@gmail.com): use index and/or count_
-                [&count](VarValue&&, size_t index) { ++count; }));
+                [&count](const VarValue&, size_t index) { ++count; }));
   EXPECT_EQ(9, count);
 }
 
@@ -259,12 +259,12 @@ TEST_F(SQLiteWrapperTest, CountVariableValues) {
     auto t = varValue1.DeepCopy();
     auto vv{varValue1.DeepCopy()};
     vv.set_val(v);
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vv));
   }
   for (auto v : varNoneOrgValues) {
     auto vv{varValueNone.DeepCopy()};
     vv.set_val(v);
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vv)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vv));
   }
   EXPECT_EQ(IDataSource::Err::Ok,
             ds_->count_variable_values(var1.name(),
@@ -293,7 +293,7 @@ TEST_F(SQLiteWrapperTest, CountVariableValuesInRange) {
   std::this_thread::sleep_for(std::chrono::milliseconds(20));
   for (size_t i = 0; i < var1OrgValues.size(); ++i) {
     VarValue vvar1{var1, var1OrgValues[i], 0};
-    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(std::move(vvar1)));
+    EXPECT_EQ(IDataSource::Err::Ok, ds_->add_variable_value(vvar1));
     if (i == 30 || i == 60 || i == 90) {
       laps.push_back(std::chrono::system_clock::now());
       std::this_thread::sleep_for(std::chrono::milliseconds(20));

@@ -87,9 +87,10 @@ class VarValue {
   VarValue(const Variable &variable, double val, std::uint64_t ts);
   VarValue(Variable &&variable, double &&val, std::uint64_t &&ts);
   VarValue(VarValue &&var) noexcept;
+  VarValue(const VarValue &var) = default;
 
   const Variable &variable() const noexcept;
-  void set_vaiable(Variable &&var) noexcept;
+  void set_vaiable(const Variable &var) noexcept;
   double val() const noexcept;
   void set_val(double val) noexcept;
   std::uint64_t timestamp() const noexcept;

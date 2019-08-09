@@ -110,7 +110,8 @@ IDataSource::Err SQLiteWrapper::add_variable(const Variable &var) noexcept {
   return Err::Ok;
 }
 
-IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
+IDataSource::Err SQLiteWrapper::add_variable_value(
+    const VarValue &var) noexcept {
   auto now{std::chrono::system_clock::now()};
   auto timestamp{std::chrono::duration_cast<std::chrono::milliseconds>(
       now.time_since_epoch())};
@@ -128,7 +129,7 @@ IDataSource::Err SQLiteWrapper::add_variable_value(VarValue &&var) noexcept {
 }
 
 IDataSource::Err SQLiteWrapper::fetch_variables(
-    const std::function<void(Variable &&var, size_t index)>
+    const std::function<void(const Variable &var, size_t index)>
         &send_vale) noexcept {
   char *err_msg = nullptr;
   std::string query = "SELECT COLOR, NAME FROM VARIABLE";
@@ -139,8 +140,7 @@ IDataSource::Err SQLiteWrapper::fetch_variables(
           db_, query.c_str(),
           +[](void *callback, int argc, char **argv, char **azColName) {
             Variable var{};
-            std::cerr << "-----------" << std::endl;
-            for (int i = 0; i < argc; i++) {
+            for (decltype(argc) i = 0; i < argc; i++) {
               if (strcmp("NAME", azColName[i]) == 0) {
                 std::string name{""};
                 if (argv[i] != nullptr && std::strcmp(argv[i], "")) {
@@ -159,8 +159,8 @@ IDataSource::Err SQLiteWrapper::fetch_variables(
                 return -1;
               }
             }
-            static_cast<callbac_t> (*static_cast<unqualified_callbac_t *>(
-                callback))(std::move(var), 0);
+            static_cast<callbac_t> (
+                *static_cast<unqualified_callbac_t *>(callback))(var, 0);
             return 0;
           },
           const_cast<unqualified_callbac_t *>(&send_vale),
@@ -175,12 +175,12 @@ IDataSource::Err SQLiteWrapper::fetch_variables(
 namespace {
 struct CountCallback {
   size_t index;
-  std::function<void(VarValue &&val, size_t)> *send_vale;
+  std::function<void(const VarValue &val, size_t)> *send_vale;
 };
 };  // namespace
 IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
-    const std::function<void(VarValue &&val, size_t index)>
+    const std::function<void(const VarValue &val, size_t index)>
         &send_vale) noexcept {
   char *err_msg = nullptr;
   std::string query = sqlite3_mprintf(
@@ -188,7 +188,8 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
       "ID FROM VARIABLE WHERE NAME = '%q')",
       var_name.c_str());
   CountCallback cc{
-      0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
+      0,
+      const_cast<std::function<void(const VarValue &, size_t)> *>(&send_vale)};
   if (sqlite3_exec(db_, query.c_str(),
                    +[](void *cc, int argc, char **argv, char **azColName) {
                      VarValue val{};
@@ -219,7 +220,7 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
                      }
                      auto count_callback{static_cast<CountCallback *>(cc)};
                      auto cb{count_callback->send_vale};
-                     (*cb)(std::move(val), count_callback->index);
+                     (*cb)(val, count_callback->index);
                      ++count_callback->index;
                      return 0;
                    },
@@ -275,7 +276,7 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
     const std::string &var_name,
     const std::chrono::system_clock::time_point &start_date,
     const std::chrono::system_clock::time_point &end_date,
-    const std::function<void(VarValue &&val, size_t index)>
+    const std::function<void(const VarValue &val, size_t index)>
         &send_vale) noexcept {
   char *err_msg = nullptr;
   const std::int64_t sd{
@@ -294,7 +295,8 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
       "<= %ld;",
       var_name.c_str(), sd, ed);
   CountCallback cc{
-      0, const_cast<std::function<void(VarValue &&, size_t)> *>(&send_vale)};
+      0,
+      const_cast<std::function<void(const VarValue &, size_t)> *>(&send_vale)};
   if (sqlite3_exec(db_, query.c_str(),
                    +[](void *cc, int argc, char **argv, char **azColName) {
                      VarValue val{};
@@ -325,7 +327,7 @@ IDataSource::Err SQLiteWrapper::fetch_variable_values(
                      }
                      auto count_callback{static_cast<CountCallback *>(cc)};
                      auto cb{count_callback->send_vale};
-                     (*cb)(std::move(val), count_callback->index);
+                     (*cb)(val, count_callback->index);
                      ++count_callback->index;
                      return 0;
                    },

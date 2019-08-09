@@ -288,7 +288,7 @@ void Session::read_save_value_request(std::size_t b_size) {
                      // FIXME(denisacostaq@gmail.com)" color
                      Variable var{sv.variable(), "color"};
                      auto vv{VarValue{var, sv.value(), 0}};
-                     auto err{da_->add_variable_value(std::move(vv))};
+                     auto err{da_->add_variable_value(vv)};
                      if (IDataAccess::Err::Ok == err) {
                        send_status_response("Ok", message::ResponseStatus::OK);
                      } else {
