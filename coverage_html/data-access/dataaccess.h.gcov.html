@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Code coverage report for DAQs. - data-access/dataaccess.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">data-access</a> - dataaccess.h<span style="font-size: 80%;"> (source / <a href="dataaccess.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Code coverage report for DAQs.</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntry">1</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-05-07 16:58:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntry">2</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*! @brief This file have the interface for DataAccess class.</a>
+<span class="lineNum">       2 </span>            :     @file dataaccess.h
+<span class="lineNum">       3 </span>            :     @author Alvaro Denis &lt;denisacostaq@gmail.com&gt;
+<span class="lineNum">       4 </span>            :     @date 6/22/2019
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :     @copyright
+<span class="lineNum">       7 </span>            :     @attention &lt;h1&gt;&lt;center&gt;&lt;strong&gt;COPYRIGHT &amp;copy; 2019 &lt;/strong&gt;
+<span class="lineNum">       8 </span>            :     [&lt;strong&gt;denisacostaq&lt;/strong&gt;][denisacostaq-URL].
+<span class="lineNum">       9 </span>            :     All rights reserved.&lt;/center&gt;&lt;/h1&gt;
+<span class="lineNum">      10 </span>            :     @attention This file is part of [&lt;strong&gt;DAQs&lt;/strong&gt;][DAQs-URL].
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :     Redistribution and use in source and binary forms, with or without
+<span class="lineNum">      13 </span>            :     modification, are permitted provided that the following conditions
+<span class="lineNum">      14 </span>            :     are met:
+<span class="lineNum">      15 </span>            :     - 1. Redistributions of source code must retain the above copyright
+<span class="lineNum">      16 </span>            :       notice, this list of conditions and the following disclaimer.
+<span class="lineNum">      17 </span>            :     - 2. Redistributions in binary form must reproduce the above copyright
+<span class="lineNum">      18 </span>            :       notice, this list of conditions and the following disclaimer in the
+<span class="lineNum">      19 </span>            :       documentation and/or other materials provided with the distribution.
+<span class="lineNum">      20 </span>            :     - 3. Neither the name of the University nor the names of its contributors
+<span class="lineNum">      21 </span>            :       may be used to endorse or promote products derived from this software
+<span class="lineNum">      22 </span>            :       without specific prior written permission.
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     THIS PRODUCT IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+<span class="lineNum">      25 </span>            :     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+<span class="lineNum">      26 </span>            :     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+<span class="lineNum">      27 </span>            :     ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+<span class="lineNum">      28 </span>            :     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+<span class="lineNum">      29 </span>            :     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+<span class="lineNum">      30 </span>            :     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+<span class="lineNum">      31 </span>            :     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+<span class="lineNum">      32 </span>            :     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+<span class="lineNum">      33 </span>            :     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :     [denisacostaq-URL]: https://about.me/denisacostaq &quot;Alvaro Denis Acosta&quot;
+<span class="lineNum">      36 </span>            :     [DAQs-URL]: https://github.com/denisacostaq/DAQs &quot;DAQs&quot;
+<span class="lineNum">      37 </span>            :  */
+<span class="lineNum">      38 </span>            : #ifndef DATABASESERVER_DATAACCESS_H
+<span class="lineNum">      39 </span>            : #define DATABASESERVER_DATAACCESS_H
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &quot;src/database-server/data-access/idataaccess.h&quot;
+<a name="42"><span class="lineNum">      42 </span>            : #include &quot;src/database-server/data-source/idatasource.h&quot;</a>
+<span class="lineNum">      43 </span>            : 
+<span class="lineNum">      44 </span><span class="lineCov">         32 : class DataAccess : public IDataAccess {</span>
+<span class="lineNum">      45 </span>            :  public:
+<span class="lineNum">      46 </span>            :   explicit DataAccess(IDataSource* ds) noexcept;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            :   /**
+<span class="lineNum">      49 </span>            :    * @brief add_variable add a new variable.
+<span class="lineNum">      50 </span>            :    * @param var variable info.
+<span class="lineNum">      51 </span>            :    * @return Ok on success.
+<span class="lineNum">      52 </span>            :    * @sa IDataAccess::add_variable
+<span class="lineNum">      53 </span>            :    */
+<span class="lineNum">      54 </span>            :   Err add_variable(const Variable&amp; var) noexcept override;
+<span class="lineNum">      55 </span>            : 
+<span class="lineNum">      56 </span>            :   /**
+<span class="lineNum">      57 </span>            :    * @brief add_variable_value add a new value for a given variable.
+<span class="lineNum">      58 </span>            :    * @param var variable value.
+<span class="lineNum">      59 </span>            :    * @return Ok on success.
+<span class="lineNum">      60 </span>            :    * @sa IDataAccess::add_variable_value
+<span class="lineNum">      61 </span>            :    */
+<span class="lineNum">      62 </span>            :   Err add_variable_value(const VarValue&amp; var) noexcept override;
+<span class="lineNum">      63 </span>            : 
+<span class="lineNum">      64 </span>            :   /**
+<span class="lineNum">      65 </span>            :    * @brief fetch_variables get all variables.
+<span class="lineNum">      66 </span>            :    * @return a vector with the variables.
+<span class="lineNum">      67 </span>            :    * @sa IDataSource::add_variable
+<span class="lineNum">      68 </span>            :    */
+<span class="lineNum">      69 </span>            :   std::tuple&lt;std::vector&lt;Variable&gt;, Err&gt; fetch_variables() noexcept override;
+<span class="lineNum">      70 </span>            : 
+<span class="lineNum">      71 </span>            :   /**
+<span class="lineNum">      72 </span>            :    * @brief fetch_variable_values get values for a given variable.
+<span class="lineNum">      73 </span>            :    * @param var_name variable name.
+<span class="lineNum">      74 </span>            :    * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
+<span class="lineNum">      75 </span>            :    * @return a vector of values if any and an error code.
+<span class="lineNum">      76 </span>            :    * @sa IDataAccess::fetch_variable_values
+<span class="lineNum">      77 </span>            :    */
+<span class="lineNum">      78 </span>            :   std::tuple&lt;std::vector&lt;VarValue&gt;, Err&gt; fetch_variable_values(
+<span class="lineNum">      79 </span>            :       const std::string&amp; var_name, size_t max_len) noexcept override;
+<span class="lineNum">      80 </span>            : 
+<span class="lineNum">      81 </span>            :   /**
+<span class="lineNum">      82 </span>            :    * @brief fetch_variable_values get values for a given variable in a period.
+<span class="lineNum">      83 </span>            :    * @param var variable value.
+<span class="lineNum">      84 </span>            :    * @param start_date start date.
+<span class="lineNum">      85 </span>            :    * @param end_date end date
+<span class="lineNum">      86 </span>            :    * @param max_len TODO(denisacostaq@gmail.com): not implemented yet
+<span class="lineNum">      87 </span>            :    * @return a vector of values if any and an error code.
+<span class="lineNum">      88 </span>            :    * @sa IDataAccess::fetch_variable_values
+<span class="lineNum">      89 </span>            :    */
+<span class="lineNum">      90 </span>            :   std::tuple&lt;std::vector&lt;VarValue&gt;, Err&gt; fetch_variable_values(
+<span class="lineNum">      91 </span>            :       const std::string&amp; var_name,
+<span class="lineNum">      92 </span>            :       const std::chrono::system_clock::time_point&amp; start_date,
+<span class="lineNum">      93 </span>            :       const std::chrono::system_clock::time_point&amp; end_date,
+<span class="lineNum">      94 </span>            :       size_t max_len) noexcept override;
+<span class="lineNum">      95 </span>            : 
+<span class="lineNum">      96 </span>            :   /**
+<span class="lineNum">      97 </span>            :    * @brief compress a dumy compression algorithm
+<span class="lineNum">      98 </span>            :    * @param in_vals input values.
+<span class="lineNum">      99 </span>            :    * @param out_vals output(compressed) values.
+<span class="lineNum">     100 </span>            :    * @param max_len len of the compressed values.
+<span class="lineNum">     101 </span>            :    * @return Err::Ok on success.
+<span class="lineNum">     102 </span>            :    */
+<span class="lineNum">     103 </span>            :   Err compress(const std::vector&lt;VarValue&gt;&amp; in_vals,
+<span class="lineNum">     104 </span>            :                std::vector&lt;VarValue&gt;* out_vals, size_t max_len) noexcept;
+<span class="lineNum">     105 </span>            : 
+<span class="lineNum">     106 </span>            :  private:
+<span class="lineNum">     107 </span>            :   IDataSource* ds_;
+<span class="lineNum">     108 </span>            : };
+<span class="lineNum">     109 </span>            : #endif  // DATABASESERVER_DATAACCESS_H
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

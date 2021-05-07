@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Code coverage report for DAQs. - data-source/sqlitewrapper.cc</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">data-source</a> - sqlitewrapper.cc<span style="font-size: 80%;"> (source / <a href="sqlitewrapper.cc.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Code coverage report for DAQs.</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">162</td>
+            <td class="headerCovTableEntry">219</td>
+            <td class="headerCovTableEntryLo">74.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-05-07 16:58:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntry">28</td>
+            <td class="headerCovTableEntryHi">100.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*! \brief This file have the implementation for SQLiteWrapper class.</a>
+<span class="lineNum">       2 </span>            :     \file sqlitewrapper.cc
+<span class="lineNum">       3 </span>            :     \author Alvaro Denis &lt;denisacostaq@gmail.com&gt;
+<span class="lineNum">       4 </span>            :     \date 6/19/2019
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :     \copyright
+<span class="lineNum">       7 </span>            :     \attention &lt;h1&gt;&lt;center&gt;&lt;strong&gt;COPYRIGHT &amp;copy; 2019 &lt;/strong&gt;
+<span class="lineNum">       8 </span>            :     [&lt;strong&gt;denisacostaq&lt;/strong&gt;][denisacostaq-URL].
+<span class="lineNum">       9 </span>            :     All rights reserved.&lt;/center&gt;&lt;/h1&gt;
+<span class="lineNum">      10 </span>            :     \attention This file is part of [&lt;strong&gt;DAQs&lt;/strong&gt;][DAQs-URL].
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :     Redistribution and use in source and binary forms, with or without
+<span class="lineNum">      13 </span>            :     modification, are permitted provided that the following conditions
+<span class="lineNum">      14 </span>            :     are met:
+<span class="lineNum">      15 </span>            :     - 1. Redistributions of source code must retain the above copyright
+<span class="lineNum">      16 </span>            :       notice, this list of conditions and the following disclaimer.
+<span class="lineNum">      17 </span>            :     - 2. Redistributions in binary form must reproduce the above copyright
+<span class="lineNum">      18 </span>            :       notice, this list of conditions and the following disclaimer in the
+<span class="lineNum">      19 </span>            :       documentation and/or other materials provided with the distribution.
+<span class="lineNum">      20 </span>            :     - 3. Neither the name of the University nor the names of its contributors
+<span class="lineNum">      21 </span>            :       may be used to endorse or promote products derived from this software
+<span class="lineNum">      22 </span>            :       without specific prior written permission.
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     THIS PRODUCT IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+<span class="lineNum">      25 </span>            :     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+<span class="lineNum">      26 </span>            :     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+<span class="lineNum">      27 </span>            :     ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+<span class="lineNum">      28 </span>            :     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+<span class="lineNum">      29 </span>            :     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+<span class="lineNum">      30 </span>            :     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+<span class="lineNum">      31 </span>            :     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+<span class="lineNum">      32 </span>            :     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+<span class="lineNum">      33 </span>            :     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :     [denisacostaq-URL]: https://about.me/denisacostaq &quot;Alvaro Denis Acosta&quot;
+<span class="lineNum">      36 </span>            :     [DAQs-URL]: https://github.com/denisacostaq/DAQs &quot;DAQs&quot;
+<span class="lineNum">      37 </span>            :  */
+<span class="lineNum">      38 </span>            : #include &quot;src/database-server/data-source/sqlitewrapper.h&quot;
+<span class="lineNum">      39 </span>            : 
+<span class="lineNum">      40 </span>            : #include &lt;cerrno&gt;
+<span class="lineNum">      41 </span>            : #include &lt;cstring&gt;
+<span class="lineNum">      42 </span>            : #include &lt;exception&gt;
+<span class="lineNum">      43 </span>            : #include &lt;iostream&gt;
+<span class="lineNum">      44 </span>            : #include &lt;memory&gt;
+<span class="lineNum">      45 </span>            : #include &lt;string&gt;
+<span class="lineNum">      46 </span>            : #include &lt;vector&gt;
+<span class="lineNum">      47 </span>            : 
+<span class="lineNum">      48 </span>            : #include &lt;sqlite3.h&gt;
+<span class="lineNum">      49 </span>            : 
+<span class="lineNum">      50 </span>            : #include &quot;src/database-server/data-model/variable.h&quot;
+<a name="51"><span class="lineNum">      51 </span>            : #include &quot;src/database-server/data-model/varvalue.h&quot;</a>
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span><span class="lineCov">         26 : SQLiteWrapper::SQLiteWrapper(const std::string &amp;db_path) : IDataSource() {</span>
+<span class="lineNum">      54 </span><span class="lineCov">         24 :   int err = sqlite3_open(db_path.c_str(), &amp;db_);</span>
+<span class="lineNum">      55 </span><span class="lineCov">         24 :   if (err != SQLITE_OK) {</span>
+<span class="lineNum">      56 </span><span class="lineCov">          2 :     std::cerr &lt;&lt; sqlite3_errmsg(db_) &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      57 </span><span class="lineCov">          2 :     std::cerr &lt;&lt; std::strerror(sqlite3_system_errno(db_)) &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      58 </span><span class="lineCov">          2 :     throw std::string{&quot;Can't open database &quot; + db_path};</span>
+<span class="lineNum">      59 </span>            :   } else {
+<span class="lineNum">      60 </span><span class="lineCov">         22 :     std::clog &lt;&lt; &quot;Opened database successfully\n&quot;;</span>
+<span class="lineNum">      61 </span>            :   }
+<a name="62"><span class="lineNum">      62 </span><span class="lineCov">         22 : }</span></a>
+<span class="lineNum">      63 </span>            : 
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">         42 : SQLiteWrapper::~SQLiteWrapper() { sqlite3_close(db_); }</span></a>
+<span class="lineNum">      65 </span>            : 
+<span class="lineNum">      66 </span><span class="lineCov">         18 : IDataSource::Err SQLiteWrapper::create_scheme() noexcept {</span>
+<span class="lineNum">      67 </span><span class="lineCov">         36 :   std::vector&lt;std::string&gt; stataments;</span>
+<span class="lineNum">      68 </span><span class="lineCov">         18 :   stataments.reserve(2);</span>
+<span class="lineNum">      69 </span>            :   std::string sql =
+<span class="lineNum">      70 </span>            :       &quot;CREATE TABLE VARIABLE(&quot;
+<span class="lineNum">      71 </span>            :       &quot;ID   INTEGER  PRIMARY KEY AUTOINCREMENT,&quot;
+<span class="lineNum">      72 </span>            :       &quot;COLOR CHAR(50),&quot;
+<span class="lineNum">      73 </span><span class="lineCov">         36 :       &quot;NAME CHAR(50) NOT NULL UNIQUE);&quot;;</span>
+<span class="lineNum">      74 </span><span class="lineCov">         18 :   stataments.push_back(sql);</span>
+<span class="lineNum">      75 </span><span class="lineCov">         18 :   sql =</span>
+<span class="lineNum">      76 </span>            :       &quot;CREATE TABLE VARIABLE_VALUE(&quot;
+<span class="lineNum">      77 </span>            :       &quot;ID          INTEGER  PRIMARY KEY AUTOINCREMENT,&quot;
+<span class="lineNum">      78 </span>            :       &quot;VAL         DOUBLE   NOT NULL,&quot;
+<span class="lineNum">      79 </span>            :       &quot;TIMESTAMP   INTEGER NOT NULL,&quot;
+<span class="lineNum">      80 </span>            :       &quot;VARIABLE_ID INT      NOT NULL,&quot;
+<span class="lineNum">      81 </span>            :       &quot;FOREIGN KEY (VARIABLE_ID) REFERENCES VARIABLE(ID));&quot;;  // FIXME(denisacostaq@gmail.com):
+<span class="lineNum">      82 </span>            :                                                               // add constrints
+<span class="lineNum">      83 </span><span class="lineCov">         18 :   stataments.push_back(sql);</span>
+<span class="lineNum">      84 </span><span class="lineCov">         54 :   for (const auto &amp;s : stataments) {</span>
+<span class="lineNum">      85 </span><span class="lineCov">         36 :     char *err = nullptr;</span>
+<span class="lineNum">      86 </span><span class="lineCov">         36 :     int rc = sqlite3_exec(db_, s.c_str(), nullptr, nullptr, &amp;err);</span>
+<span class="lineNum">      87 </span><span class="lineCov">         36 :     if (rc != SQLITE_OK) {</span>
+<span class="lineNum">      88 </span><span class="lineNoCov">          0 :       std::cerr &lt;&lt; &quot;SQL error: &quot; &lt;&lt; err &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">      89 </span><span class="lineNoCov">          0 :       sqlite3_free(err);</span>
+<span class="lineNum">      90 </span><span class="lineNoCov">          0 :       return Err::Failed;</span>
+<span class="lineNum">      91 </span>            :     } else {
+<span class="lineNum">      92 </span><span class="lineCov">         36 :       std::clog &lt;&lt; &quot;Table created successfully\n&quot;;</span>
+<span class="lineNum">      93 </span>            :     }
+<span class="lineNum">      94 </span>            :   }
+<span class="lineNum">      95 </span><span class="lineCov">         18 :   return Err::Ok;</span>
+<a name="96"><span class="lineNum">      96 </span>            : }</a>
+<span class="lineNum">      97 </span>            : 
+<span class="lineNum">      98 </span><span class="lineCov">         34 : IDataSource::Err SQLiteWrapper::add_variable(const Variable &amp;var) noexcept {</span>
+<span class="lineNum">      99 </span>            :   std::string sql =
+<span class="lineNum">     100 </span><span class="lineCov">         68 :       sqlite3_mprintf(&quot;INSERT INTO VARIABLE(NAME, COLOR) VALUES('%q', '%q')&quot;,</span>
+<span class="lineNum">     101 </span><span class="lineCov">        136 :                       var.name().c_str(), var.color().c_str());</span>
+<span class="lineNum">     102 </span><span class="lineCov">         34 :   char *err = nullptr;</span>
+<span class="lineNum">     103 </span><span class="lineCov">         34 :   int res = sqlite3_exec(db_, sql.c_str(), nullptr, nullptr, &amp;err);</span>
+<span class="lineNum">     104 </span><span class="lineCov">         34 :   if (res != SQLITE_OK) {</span>
+<span class="lineNum">     105 </span><span class="lineCov">          4 :     std::cerr &lt;&lt; &quot;Can not insert &quot; &lt;&lt; var.name() &lt;&lt; &quot;. &quot; &lt;&lt; err &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     106 </span><span class="lineCov">          4 :     sqlite3_free(err);</span>
+<span class="lineNum">     107 </span><span class="lineCov">          4 :     return Err::Failed;</span>
+<span class="lineNum">     108 </span>            :   }
+<span class="lineNum">     109 </span><span class="lineCov">         30 :   std::clog &lt;&lt; &quot;Insertion ok\n&quot;;</span>
+<span class="lineNum">     110 </span><span class="lineCov">         30 :   return Err::Ok;</span>
+<a name="111"><span class="lineNum">     111 </span>            : }</a>
+<span class="lineNum">     112 </span>            : 
+<span class="lineNum">     113 </span><span class="lineCov">        442 : IDataSource::Err SQLiteWrapper::add_variable_value(</span>
+<span class="lineNum">     114 </span>            :     const VarValue &amp;var) noexcept {
+<span class="lineNum">     115 </span><span class="lineCov">        442 :   auto now{std::chrono::system_clock::now()};</span>
+<span class="lineNum">     116 </span>            :   auto timestamp{std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(
+<span class="lineNum">     117 </span><span class="lineCov">        442 :       now.time_since_epoch())};</span>
+<span class="lineNum">     118 </span><span class="lineCov">        442 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     119 </span><span class="lineCov">        442 :   std::string sql = sqlite3_mprintf(</span>
+<span class="lineNum">     120 </span>            :       &quot;INSERT INTO VARIABLE_VALUE(VAL, TIMESTAMP, VARIABLE_ID) VALUES(%f, %ld, &quot;
+<span class="lineNum">     121 </span>            :       &quot;(SELECT ID FROM VARIABLE WHERE NAME = '%q'))&quot;,
+<span class="lineNum">     122 </span><span class="lineCov">       1326 :       var.val(), timestamp.count(), var.name().c_str());</span>
+<span class="lineNum">     123 </span><span class="lineCov">        442 :   if (sqlite3_exec(db_, sql.c_str(), nullptr, this, &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     124 </span><span class="lineCov">          4 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     125 </span><span class="lineCov">          4 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     126 </span><span class="lineCov">          4 :     return Err::Failed;</span>
+<span class="lineNum">     127 </span>            :   }
+<span class="lineNum">     128 </span><span class="lineCov">        438 :   return Err::Ok;</span>
+<a name="129"><span class="lineNum">     129 </span>            : }</a>
+<span class="lineNum">     130 </span>            : 
+<span class="lineNum">     131 </span><span class="lineCov">          2 : IDataSource::Err SQLiteWrapper::fetch_variables(</span>
+<span class="lineNum">     132 </span>            :     const std::function&lt;void(const Variable &amp;var, size_t index)&gt;
+<span class="lineNum">     133 </span>            :         &amp;send_vale) noexcept {
+<span class="lineNum">     134 </span><span class="lineCov">          2 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     135 </span><span class="lineCov">          4 :   std::string query = &quot;SELECT COLOR, NAME FROM VARIABLE&quot;;</span>
+<span class="lineNum">     136 </span>            :   using callbac_t = decltype(send_vale);
+<span class="lineNum">     137 </span>            :   using unqualified_callbac_t =
+<span class="lineNum">     138 </span>            :       std::remove_const_t&lt;std::remove_reference_t&lt;callbac_t&gt;&gt;;
+<a name="139"><span class="lineNum">     139 </span><span class="lineCov">          4 :   if (sqlite3_exec(</span></a>
+<span class="lineNum">     140 </span>            :           db_, query.c_str(),
+<span class="lineNum">     141 </span><span class="lineCov">         14 :           +[](void *callback, int argc, char **argv, char **azColName) {</span>
+<span class="lineNum">     142 </span><span class="lineCov">         12 :             Variable var{};</span>
+<span class="lineNum">     143 </span><span class="lineCov">         18 :             for (decltype(argc) i = 0; i &lt; argc; i++) {</span>
+<span class="lineNum">     144 </span><span class="lineCov">         12 :               if (strcmp(&quot;NAME&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     145 </span><span class="lineCov">         12 :                 std::string name{&quot;&quot;};</span>
+<span class="lineNum">     146 </span><span class="lineCov">          6 :                 if (argv[i] != nullptr &amp;&amp; std::strcmp(argv[i], &quot;&quot;)) {</span>
+<span class="lineNum">     147 </span><span class="lineCov">          6 :                   name = argv[i];</span>
+<span class="lineNum">     148 </span>            :                 }
+<span class="lineNum">     149 </span><span class="lineCov">          6 :                 var.set_name(name);</span>
+<span class="lineNum">     150 </span><span class="lineCov">          6 :               } else if (strcmp(&quot;COLOR&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     151 </span><span class="lineCov">          6 :                 if (strcmp(&quot;COLOR&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     152 </span><span class="lineCov">         12 :                   std::string color{&quot;&quot;};</span>
+<span class="lineNum">     153 </span><span class="lineCov">          6 :                   if (argv[i] != nullptr &amp;&amp; std::strcmp(argv[i], &quot;&quot;)) {</span>
+<span class="lineNum">     154 </span><span class="lineCov">          6 :                     color = argv[i];</span>
+<span class="lineNum">     155 </span>            :                   }
+<span class="lineNum">     156 </span><span class="lineCov">          6 :                   var.set_color(color);</span>
+<span class="lineNum">     157 </span>            :                 }
+<span class="lineNum">     158 </span>            :               } else {
+<span class="lineNum">     159 </span><span class="lineNoCov">          0 :                 return -1;</span>
+<span class="lineNum">     160 </span>            :               }
+<span class="lineNum">     161 </span>            :             }
+<span class="lineNum">     162 </span>            :             static_cast&lt;callbac_t&gt; (
+<span class="lineNum">     163 </span><span class="lineCov">          6 :                 *static_cast&lt;unqualified_callbac_t *&gt;(callback))(var, 0);</span>
+<span class="lineNum">     164 </span><span class="lineCov">          6 :             return 0;</span>
+<span class="lineNum">     165 </span><span class="lineCov">          8 :           },</span>
+<span class="lineNum">     166 </span>            :           const_cast&lt;unqualified_callbac_t *&gt;(&amp;send_vale),
+<span class="lineNum">     167 </span><span class="lineCov">          2 :           &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     168 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     169 </span><span class="lineNoCov">          0 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     170 </span><span class="lineNoCov">          0 :     return Err::Failed;</span>
+<span class="lineNum">     171 </span>            :   }
+<span class="lineNum">     172 </span><span class="lineCov">          2 :   return Err::Ok;</span>
+<span class="lineNum">     173 </span>            : }
+<span class="lineNum">     174 </span>            : 
+<span class="lineNum">     175 </span>            : namespace {
+<span class="lineNum">     176 </span>            : struct CountCallback {
+<span class="lineNum">     177 </span>            :   size_t index;
+<span class="lineNum">     178 </span>            :   std::function&lt;void(const VarValue &amp;val, size_t)&gt; *send_vale;
+<a name="179"><span class="lineNum">     179 </span>            : };</a>
+<span class="lineNum">     180 </span>            : };  // namespace
+<span class="lineNum">     181 </span><span class="lineCov">          8 : IDataSource::Err SQLiteWrapper::fetch_variable_values(</span>
+<span class="lineNum">     182 </span>            :     const std::string &amp;var_name,
+<span class="lineNum">     183 </span>            :     const std::function&lt;void(const VarValue &amp;val, size_t index)&gt;
+<span class="lineNum">     184 </span>            :         &amp;send_vale) noexcept {
+<span class="lineNum">     185 </span><span class="lineCov">          8 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     186 </span><span class="lineCov">          8 :   std::string query = sqlite3_mprintf(</span>
+<span class="lineNum">     187 </span>            :       &quot;SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT &quot;
+<span class="lineNum">     188 </span>            :       &quot;ID FROM VARIABLE WHERE NAME = '%q')&quot;,
+<span class="lineNum">     189 </span><span class="lineCov">         24 :       var_name.c_str());</span>
+<span class="lineNum">     190 </span><span class="lineCov">          8 :   CountCallback cc{</span>
+<span class="lineNum">     191 </span>            :       0,
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">          8 :       const_cast&lt;std::function&lt;void(const VarValue &amp;, size_t)&gt; *&gt;(&amp;send_vale)};</span></a>
+<span class="lineNum">     193 </span><span class="lineCov">         16 :   if (sqlite3_exec(db_, query.c_str(),</span>
+<span class="lineNum">     194 </span><span class="lineCov">         48 :                    +[](void *cc, int argc, char **argv, char **azColName) {</span>
+<span class="lineNum">     195 </span><span class="lineCov">         40 :                      VarValue val{};</span>
+<span class="lineNum">     196 </span><span class="lineCov">         60 :                      for (int i = 0; i &lt; argc; i++) {</span>
+<span class="lineNum">     197 </span><span class="lineCov">         40 :                        if (strcmp(&quot;VAL&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     198 </span>            :                          try {
+<span class="lineNum">     199 </span><span class="lineCov">         20 :                            size_t processed = 0;</span>
+<span class="lineNum">     200 </span><span class="lineCov">         20 :                            val.set_val(std::stod(argv[i], &amp;processed));</span>
+<span class="lineNum">     201 </span><span class="lineNoCov">          0 :                          } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     202 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     203 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     204 </span><span class="lineNoCov">          0 :                          } catch (std::out_of_range e) {</span>
+<span class="lineNum">     205 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     206 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     207 </span>            :                          }
+<span class="lineNum">     208 </span><span class="lineCov">         20 :                        } else if (strcmp(&quot;TIMESTAMP&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     209 </span>            :                          try {
+<span class="lineNum">     210 </span><span class="lineCov">         20 :                            size_t processed = 0;</span>
+<span class="lineNum">     211 </span><span class="lineCov">         20 :                            val.set_timestamp(std::stoull(argv[i], &amp;processed));</span>
+<span class="lineNum">     212 </span><span class="lineNoCov">          0 :                          } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     213 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     214 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     215 </span><span class="lineNoCov">          0 :                          } catch (std::out_of_range e) {</span>
+<span class="lineNum">     216 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     217 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     218 </span>            :                          }
+<span class="lineNum">     219 </span>            :                        }
+<span class="lineNum">     220 </span>            :                      }
+<span class="lineNum">     221 </span><span class="lineCov">         20 :                      auto count_callback{static_cast&lt;CountCallback *&gt;(cc)};</span>
+<span class="lineNum">     222 </span><span class="lineCov">         20 :                      auto cb{count_callback-&gt;send_vale};</span>
+<span class="lineNum">     223 </span><span class="lineCov">         20 :                      (*cb)(val, count_callback-&gt;index);</span>
+<span class="lineNum">     224 </span><span class="lineCov">         20 :                      ++count_callback-&gt;index;</span>
+<span class="lineNum">     225 </span><span class="lineCov">         20 :                      return 0;</span>
+<span class="lineNum">     226 </span><span class="lineCov">         28 :                    },</span>
+<span class="lineNum">     227 </span><span class="lineCov">          8 :                    &amp;cc, &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     228 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     229 </span><span class="lineNoCov">          0 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     230 </span><span class="lineNoCov">          0 :     return Err::Failed;</span>
+<span class="lineNum">     231 </span>            :   }
+<span class="lineNum">     232 </span><span class="lineCov">          8 :   return Err::Ok;</span>
+<a name="233"><span class="lineNum">     233 </span>            : }</a>
+<span class="lineNum">     234 </span>            : 
+<span class="lineNum">     235 </span><span class="lineCov">          4 : IDataSource::Err SQLiteWrapper::count_variable_values(</span>
+<span class="lineNum">     236 </span>            :     const std::string &amp;var_name,
+<span class="lineNum">     237 </span>            :     const std::function&lt;void(size_t count)&gt; &amp;send_count) noexcept {
+<span class="lineNum">     238 </span><span class="lineCov">          4 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     239 </span><span class="lineCov">          4 :   std::string count_query = sqlite3_mprintf(</span>
+<span class="lineNum">     240 </span>            :       &quot;SELECT COUNT(*) FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT &quot;
+<span class="lineNum">     241 </span>            :       &quot;ID FROM VARIABLE WHERE NAME = '%q')&quot;,
+<span class="lineNum">     242 </span><span class="lineCov">         12 :       var_name.c_str());</span>
+<a name="243"><span class="lineNum">     243 </span><span class="lineCov">          8 :   if (sqlite3_exec(</span></a>
+<span class="lineNum">     244 </span>            :           db_, count_query.c_str(),
+<span class="lineNum">     245 </span><span class="lineCov">         12 :           +[](void *callback, int argc, char **argv, char **azColName) {</span>
+<span class="lineNum">     246 </span><span class="lineCov">          4 :             for (int i = 0; i &lt; argc; ++i) {</span>
+<span class="lineNum">     247 </span><span class="lineCov">          4 :               if (strcmp(&quot;COUNT(*)&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     248 </span><span class="lineCov">          4 :                 size_t count{};</span>
+<span class="lineNum">     249 </span>            :                 try {
+<span class="lineNum">     250 </span><span class="lineCov">          4 :                   size_t processed = 0;</span>
+<span class="lineNum">     251 </span><span class="lineCov">          4 :                   count = std::stoull(argv[i], &amp;processed);</span>
+<span class="lineNum">     252 </span><span class="lineNoCov">          0 :                 } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     253 </span><span class="lineNoCov">          0 :                   std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     254 </span><span class="lineNoCov">          0 :                   return -1;</span>
+<span class="lineNum">     255 </span><span class="lineNoCov">          0 :                 } catch (std::out_of_range e) {</span>
+<span class="lineNum">     256 </span><span class="lineNoCov">          0 :                   std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     257 </span><span class="lineNoCov">          0 :                   return -1;</span>
+<span class="lineNum">     258 </span>            :                 }
+<span class="lineNum">     259 </span><span class="lineCov">          4 :                 (*static_cast&lt;std::function&lt;void(size_t count)&gt; *&gt;(callback))(</span>
+<span class="lineNum">     260 </span>            :                     count);
+<span class="lineNum">     261 </span><span class="lineCov">          4 :                 return 0;</span>
+<span class="lineNum">     262 </span>            :               }
+<span class="lineNum">     263 </span>            :             }
+<span class="lineNum">     264 </span><span class="lineNoCov">          0 :             return 0;</span>
+<span class="lineNum">     265 </span><span class="lineCov">          8 :           },</span>
+<span class="lineNum">     266 </span>            :           const_cast&lt;std::function&lt;void(size_t count)&gt; *&gt;(&amp;send_count),
+<span class="lineNum">     267 </span><span class="lineCov">          4 :           &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     268 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     269 </span><span class="lineNoCov">          0 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     270 </span><span class="lineNoCov">          0 :     return Err::Failed;</span>
+<span class="lineNum">     271 </span>            :   }
+<span class="lineNum">     272 </span><span class="lineCov">          4 :   return Err::Ok;</span>
+<a name="273"><span class="lineNum">     273 </span>            : }</a>
+<span class="lineNum">     274 </span>            : 
+<span class="lineNum">     275 </span><span class="lineCov">          8 : IDataSource::Err SQLiteWrapper::fetch_variable_values(</span>
+<span class="lineNum">     276 </span>            :     const std::string &amp;var_name,
+<span class="lineNum">     277 </span>            :     const std::chrono::system_clock::time_point &amp;start_date,
+<span class="lineNum">     278 </span>            :     const std::chrono::system_clock::time_point &amp;end_date,
+<span class="lineNum">     279 </span>            :     const std::function&lt;void(const VarValue &amp;val, size_t index)&gt;
+<span class="lineNum">     280 </span>            :         &amp;send_vale) noexcept {
+<span class="lineNum">     281 </span><span class="lineCov">          8 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     282 </span>            :   const std::int64_t sd{
+<span class="lineNum">     283 </span><span class="lineCov">         16 :       std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(</span>
+<span class="lineNum">     284 </span><span class="lineCov">         16 :           std::chrono::time_point_cast&lt;std::chrono::milliseconds&gt;(start_date)</span>
+<span class="lineNum">     285 </span><span class="lineCov">         16 :               .time_since_epoch())</span>
+<span class="lineNum">     286 </span><span class="lineCov">          8 :           .count()};</span>
+<span class="lineNum">     287 </span>            :   const std::int64_t ed{
+<span class="lineNum">     288 </span><span class="lineCov">         16 :       std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(</span>
+<span class="lineNum">     289 </span><span class="lineCov">         16 :           std::chrono::time_point_cast&lt;std::chrono::milliseconds&gt;(end_date)</span>
+<span class="lineNum">     290 </span><span class="lineCov">         16 :               .time_since_epoch())</span>
+<span class="lineNum">     291 </span><span class="lineCov">          8 :           .count()};</span>
+<span class="lineNum">     292 </span><span class="lineCov">          8 :   std::string query = sqlite3_mprintf(</span>
+<span class="lineNum">     293 </span>            :       &quot;SELECT VAL, TIMESTAMP FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT &quot;
+<span class="lineNum">     294 </span>            :       &quot;ID FROM VARIABLE WHERE NAME = '%q') AND TIMESTAMP &gt;= %ld AND TIMESTAMP &quot;
+<span class="lineNum">     295 </span>            :       &quot;&lt;= %ld;&quot;,
+<span class="lineNum">     296 </span><span class="lineCov">         24 :       var_name.c_str(), sd, ed);</span>
+<span class="lineNum">     297 </span><span class="lineCov">          8 :   CountCallback cc{</span>
+<span class="lineNum">     298 </span>            :       0,
+<a name="299"><span class="lineNum">     299 </span><span class="lineCov">          8 :       const_cast&lt;std::function&lt;void(const VarValue &amp;, size_t)&gt; *&gt;(&amp;send_vale)};</span></a>
+<span class="lineNum">     300 </span><span class="lineCov">         16 :   if (sqlite3_exec(db_, query.c_str(),</span>
+<span class="lineNum">     301 </span><span class="lineCov">        408 :                    +[](void *cc, int argc, char **argv, char **azColName) {</span>
+<span class="lineNum">     302 </span><span class="lineCov">        400 :                      VarValue val{};</span>
+<span class="lineNum">     303 </span><span class="lineCov">        600 :                      for (int i = 0; i &lt; argc; i++) {</span>
+<span class="lineNum">     304 </span><span class="lineCov">        400 :                        if (strcmp(&quot;VAL&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     305 </span>            :                          try {
+<span class="lineNum">     306 </span><span class="lineCov">        200 :                            size_t processed = 0;</span>
+<span class="lineNum">     307 </span><span class="lineCov">        200 :                            val.set_val(std::stod(argv[i], &amp;processed));</span>
+<span class="lineNum">     308 </span><span class="lineNoCov">          0 :                          } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     309 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     310 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     311 </span><span class="lineNoCov">          0 :                          } catch (std::out_of_range e) {</span>
+<span class="lineNum">     312 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     313 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     314 </span>            :                          }
+<span class="lineNum">     315 </span><span class="lineCov">        200 :                        } else if (strcmp(&quot;TIMESTAMP&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     316 </span>            :                          try {
+<span class="lineNum">     317 </span><span class="lineCov">        200 :                            size_t processed = 0;</span>
+<span class="lineNum">     318 </span><span class="lineCov">        200 :                            val.set_timestamp(std::stoull(argv[i], &amp;processed));</span>
+<span class="lineNum">     319 </span><span class="lineNoCov">          0 :                          } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     320 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     321 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     322 </span><span class="lineNoCov">          0 :                          } catch (std::out_of_range e) {</span>
+<span class="lineNum">     323 </span><span class="lineNoCov">          0 :                            std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     324 </span><span class="lineNoCov">          0 :                            return -1;</span>
+<span class="lineNum">     325 </span>            :                          }
+<span class="lineNum">     326 </span>            :                        }
+<span class="lineNum">     327 </span>            :                      }
+<span class="lineNum">     328 </span><span class="lineCov">        200 :                      auto count_callback{static_cast&lt;CountCallback *&gt;(cc)};</span>
+<span class="lineNum">     329 </span><span class="lineCov">        200 :                      auto cb{count_callback-&gt;send_vale};</span>
+<span class="lineNum">     330 </span><span class="lineCov">        200 :                      (*cb)(val, count_callback-&gt;index);</span>
+<span class="lineNum">     331 </span><span class="lineCov">        200 :                      ++count_callback-&gt;index;</span>
+<span class="lineNum">     332 </span><span class="lineCov">        200 :                      return 0;</span>
+<span class="lineNum">     333 </span><span class="lineCov">        208 :                    },</span>
+<span class="lineNum">     334 </span><span class="lineCov">          8 :                    &amp;cc, &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     335 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     336 </span><span class="lineNoCov">          0 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     337 </span><span class="lineNoCov">          0 :     return Err::Failed;</span>
+<span class="lineNum">     338 </span>            :   }
+<span class="lineNum">     339 </span><span class="lineCov">          8 :   return Err::Ok;</span>
+<a name="340"><span class="lineNum">     340 </span>            : }</a>
+<span class="lineNum">     341 </span>            : 
+<span class="lineNum">     342 </span><span class="lineCov">          8 : IDataSource::Err SQLiteWrapper::count_variable_values(</span>
+<span class="lineNum">     343 </span>            :     const std::string &amp;var_name,
+<span class="lineNum">     344 </span>            :     const std::chrono::system_clock::time_point &amp;start_date,
+<span class="lineNum">     345 </span>            :     const std::chrono::system_clock::time_point &amp;end_date,
+<span class="lineNum">     346 </span>            :     const std::function&lt;void(size_t count)&gt; &amp;send_count) noexcept {
+<span class="lineNum">     347 </span><span class="lineCov">          8 :   char *err_msg = nullptr;</span>
+<span class="lineNum">     348 </span><span class="lineCov">         16 :   const std::int64_t sd{std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(</span>
+<span class="lineNum">     349 </span><span class="lineCov">         16 :                             start_date.time_since_epoch())</span>
+<span class="lineNum">     350 </span><span class="lineCov">          8 :                             .count()};</span>
+<span class="lineNum">     351 </span><span class="lineCov">         16 :   const std::int64_t ed{std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(</span>
+<span class="lineNum">     352 </span><span class="lineCov">         16 :                             end_date.time_since_epoch())</span>
+<span class="lineNum">     353 </span><span class="lineCov">          8 :                             .count()};</span>
+<span class="lineNum">     354 </span><span class="lineCov">          8 :   std::string count_query = sqlite3_mprintf(</span>
+<span class="lineNum">     355 </span>            :       &quot;SELECT COUNT(*) FROM VARIABLE_VALUE WHERE VARIABLE_ID = (SELECT ID FROM &quot;
+<span class="lineNum">     356 </span>            :       &quot;VARIABLE WHERE NAME = '%q') AND TIMESTAMP &gt;= %ld AND TIMESTAMP &lt;= %ld;&quot;,
+<span class="lineNum">     357 </span><span class="lineCov">         24 :       var_name.c_str(), sd, ed);</span>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">         16 :   if (sqlite3_exec(</span></a>
+<span class="lineNum">     359 </span>            :           db_, count_query.c_str(),
+<span class="lineNum">     360 </span><span class="lineCov">         24 :           +[](void *callback, int argc, char **argv, char **azColName) {</span>
+<span class="lineNum">     361 </span><span class="lineCov">          8 :             for (int i = 0; i &lt; argc; ++i) {</span>
+<span class="lineNum">     362 </span><span class="lineCov">          8 :               if (strcmp(&quot;COUNT(*)&quot;, azColName[i]) == 0) {</span>
+<span class="lineNum">     363 </span><span class="lineCov">          8 :                 size_t count{};</span>
+<span class="lineNum">     364 </span>            :                 try {
+<span class="lineNum">     365 </span><span class="lineCov">          8 :                   size_t processed = 0;</span>
+<span class="lineNum">     366 </span><span class="lineCov">          8 :                   count = std::stoull(argv[i], &amp;processed);</span>
+<span class="lineNum">     367 </span><span class="lineNoCov">          0 :                 } catch (std::invalid_argument e) {</span>
+<span class="lineNum">     368 </span><span class="lineNoCov">          0 :                   std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     369 </span><span class="lineNoCov">          0 :                   return -1;</span>
+<span class="lineNum">     370 </span><span class="lineNoCov">          0 :                 } catch (std::out_of_range e) {</span>
+<span class="lineNum">     371 </span><span class="lineNoCov">          0 :                   std::cerr &lt;&lt; e.what();</span>
+<span class="lineNum">     372 </span><span class="lineNoCov">          0 :                   return -1;</span>
+<span class="lineNum">     373 </span>            :                 }
+<span class="lineNum">     374 </span><span class="lineCov">          8 :                 (*static_cast&lt;std::function&lt;void(size_t count)&gt; *&gt;(callback))(</span>
+<span class="lineNum">     375 </span>            :                     count);
+<span class="lineNum">     376 </span><span class="lineCov">          8 :                 return 0;</span>
+<span class="lineNum">     377 </span>            :               }
+<span class="lineNum">     378 </span>            :             }
+<span class="lineNum">     379 </span><span class="lineNoCov">          0 :             return 0;</span>
+<span class="lineNum">     380 </span><span class="lineCov">         16 :           },</span>
+<span class="lineNum">     381 </span>            :           const_cast&lt;std::function&lt;void(size_t)&gt; *&gt;(&amp;send_count),
+<span class="lineNum">     382 </span><span class="lineCov">          8 :           &amp;err_msg) != SQLITE_OK) {</span>
+<span class="lineNum">     383 </span><span class="lineNoCov">          0 :     std::cerr &lt;&lt; &quot;error &quot; &lt;&lt; err_msg &lt;&lt; &quot;\n&quot;;</span>
+<span class="lineNum">     384 </span><span class="lineNoCov">          0 :     sqlite3_free(err_msg);</span>
+<span class="lineNum">     385 </span><span class="lineNoCov">          0 :     return Err::Failed;</span>
+<a name="386"><span class="lineNum">     386 </span>            :   }</a>
+<span class="lineNum">     387 </span><span class="lineCov">          8 :   return Err::Ok;</span>
+<span class="lineNum">     388 </span><span class="lineCov">        114 : }</span>
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

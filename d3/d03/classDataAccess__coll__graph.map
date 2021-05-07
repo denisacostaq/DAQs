@@ -1,0 +1,4 @@
+<map id="DataAccess" name="DataAccess">
+<area shape="rect" id="node2" href="$d1/d4f/classIDataAccess.html" title="The IDataAccess interface is like a proxy for the data layer. " alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node3" href="$d8/dd0/classIDataSource.html" title="The IDataSource class is an interface for the physycal storage. " alt="" coords="131,5,232,32"/>
+</map>

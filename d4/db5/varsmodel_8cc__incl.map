@@ -1,0 +1,8 @@
+<map id="/home/travis/build/denisacostaq/DAQs/src/hmi/model/varsmodel.cc" name="/home/travis/build/denisacostaq/DAQs/src/hmi/model/varsmodel.cc">
+<area shape="rect" id="node2" href="$d4/d93/varsmodel_8h.html" title="This file have the interface for VarsModel class. " alt="" coords="371,117,567,143"/>
+<area shape="rect" id="node10" href="$d8/de1/client_8h.html" title="This file have the interface for Client class. " alt="" coords="783,109,933,151"/>
+<area shape="rect" id="node7" href="$d6/db2/varmodel_8h.html" title="This file have the interface for VarModel class. " alt="" coords="33,206,222,233"/>
+<area shape="rect" id="node14" href="$dc/ddb/idatasource_8h.html" title="This file have the interface for the IDataSource class. " alt="" coords="1171,199,1366,240"/>
+<area shape="rect" id="node17" href="$da/d89/variable_8h.html" title="This file have the interface for Variable class. " alt="" coords="1281,377,1448,419"/>
+<area shape="rect" id="node19" href="$d5/d34/varvalue_8h.html" title="This file have the interface for VarValue class. " alt="" coords="1331,288,1502,329"/>
+</map>

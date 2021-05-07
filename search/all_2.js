@@ -1,0 +1,18 @@
+var searchData=
+[
+  ['clear',['clear',['../d6/d39/classVarsModel.html#aa7af0797fc9e6b8e1553703305e5d9c4',1,'VarsModel']]],
+  ['clear_5fvals',['clear_vals',['../d7/dae/classVarValuesModel.html#a3997633d359fbb2b26799a742d39a15a',1,'VarValuesModel']]],
+  ['clear_5fvars',['clear_vars',['../d6/d39/classVarsModel.html#ae308c328dae6c3b9ef520d5083c1b66d',1,'VarsModel']]],
+  ['client',['Client',['../d1/d37/classClient.html',1,'Client'],['../d1/d37/classClient.html#a8750277dd2d0fa84b4a9e60f106a910d',1,'Client::Client()']]],
+  ['client_2ecc',['client.cc',['../d4/d0c/client_8cc.html',1,'']]],
+  ['client_2eh',['client.h',['../d8/de1/client_8h.html',1,'']]],
+  ['code_20coverage_2e',['Code coverage.',['../code_coverage.html',1,'source_code']]],
+  ['color',['color',['../dc/d3c/classVarModel.html#ae86c0e11e8c69d63c0086f261392fd05',1,'VarModel::color()'],['../d6/d1c/classVariable.html#a2553e450638d7132da76541abc3a3077',1,'Variable::color()'],['../dc/d3c/classVarModel.html#a416401f4a84ffaaf4b3f9300ced80373',1,'VarModel::color()']]],
+  ['color_5f',['color_',['../d6/d1c/classVariable.html#a031f773d8e8567913173e6dfaadac3d5',1,'Variable']]],
+  ['colorchanged',['colorChanged',['../dc/d3c/classVarModel.html#a9036ebe61af11575f18a5b4f7909cca2',1,'VarModel']]],
+  ['compress',['compress',['../d3/def/classDataAccess.html#a930809902d5eee3628c419f5eb77ecb3',1,'DataAccess']]],
+  ['connect',['connect',['../d1/d37/classClient.html#ac8dbe9e1012e2721e65290d3967ec636',1,'Client']]],
+  ['connected',['connected',['../d1/d37/classClient.html#a5f3de6434245dc99ceac8601806cb6b1',1,'Client']]],
+  ['count_5fvariable_5fvalues',['count_variable_values',['../d1/dd9/classMockIDataSource.html#a4e05d4572a956720d79b180eba7318e5',1,'MockIDataSource::count_variable_values(const std::string &amp;, const std::function&lt; void(size_t count)&gt; &amp;) noexceptoverride'],['../d1/dd9/classMockIDataSource.html#a61fda47123110e60c8cb36f3c5ec197f',1,'MockIDataSource::count_variable_values(const std::string &amp;, const std::chrono::system_clock::time_point &amp;, const std::chrono::system_clock::time_point &amp;, const std::function&lt; void(size_t count)&gt; &amp;) noexceptoverride'],['../d8/dd0/classIDataSource.html#a79ec6a29b65189ba63591342738512fc',1,'IDataSource::count_variable_values(const std::string &amp;var_name, const std::function&lt; void(size_t count)&gt; &amp;send_count) noexcept=0'],['../d8/dd0/classIDataSource.html#a3466f5936530a9f10473d96dea28db89',1,'IDataSource::count_variable_values(const std::string &amp;var_name, const std::chrono::system_clock::time_point &amp;start_date, const std::chrono::system_clock::time_point &amp;end_date, const std::function&lt; void(size_t count)&gt; &amp;send_count) noexcept=0'],['../d5/d26/classSQLiteWrapper.html#a02bf53cc583611d175889aa8d6895412',1,'SQLiteWrapper::count_variable_values(const std::string &amp;var_name, const std::function&lt; void(size_t count)&gt; &amp;send_count) noexceptoverride'],['../d5/d26/classSQLiteWrapper.html#aa861b43a08c8c0c089b1c048c6fb1660',1,'SQLiteWrapper::count_variable_values(const std::string &amp;var_name, const std::chrono::system_clock::time_point &amp;start_date, const std::chrono::system_clock::time_point &amp;end_date, const std::function&lt; void(size_t count)&gt; &amp;send_count) noexceptoverride']]],
+  ['create_5fscheme',['create_scheme',['../d1/dd9/classMockIDataSource.html#a7edabdc9bd11a733211f016174d006a6',1,'MockIDataSource::create_scheme()'],['../d8/dd0/classIDataSource.html#a576adfaffb007f1d8efd1c90c66614ae',1,'IDataSource::create_scheme()'],['../d5/d26/classSQLiteWrapper.html#a2a8c299b28eeff6a9dd745b1abcaaaa0',1,'SQLiteWrapper::create_scheme()']]]
+];

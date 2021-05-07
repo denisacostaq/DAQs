@@ -1,0 +1,8 @@
+var searchData=
+[
+  ['acceptor_5f',['acceptor_',['../d1/d53/classserver.html#ae5c6600b39a4a8c2ffa548f0f213277f',1,'server']]],
+  ['add_5fval',['add_val',['../d7/dae/classVarValuesModel.html#a5a3f4f0dd8b7839edcba6ce2a4d3cf74',1,'VarValuesModel']]],
+  ['add_5fvar',['add_var',['../d6/d39/classVarsModel.html#a0a4e3312d18622c801fa7267c6978c87',1,'VarsModel::add_var(decltype(m_vars)::value_type var)'],['../d6/d39/classVarsModel.html#a8b2688afa43dc14ebd39d10d9dc4232e',1,'VarsModel::add_var(decltype(m_qml_vars)*property, decltype(m_vars)::value_type var)']]],
+  ['add_5fvariable',['add_variable',['../d3/def/classDataAccess.html#a1cb2c92db4a11fb1d2138a1d26c86dcf',1,'DataAccess::add_variable()'],['../d1/d4f/classIDataAccess.html#a2e387e852ff46b6434923c55ba0de740',1,'IDataAccess::add_variable()'],['../d1/dd9/classMockIDataSource.html#a713090a44c08f6e8296d68726c22cbf1',1,'MockIDataSource::add_variable()'],['../d8/dd0/classIDataSource.html#ae2a8922a1dbe74b63afbe3e57caa7816',1,'IDataSource::add_variable()'],['../d5/d26/classSQLiteWrapper.html#a9fe265a95b23e99a29f8a2ac5fefcf4b',1,'SQLiteWrapper::add_variable()']]],
+  ['add_5fvariable_5fvalue',['add_variable_value',['../d3/def/classDataAccess.html#aac503a56b325c800bfc6519df6515378',1,'DataAccess::add_variable_value()'],['../d1/d4f/classIDataAccess.html#a2c04df680e906993bc51c3558f9b7a48',1,'IDataAccess::add_variable_value()'],['../d1/dd9/classMockIDataSource.html#a6252af51759c449d735ce1b4815626f6',1,'MockIDataSource::add_variable_value()'],['../d8/dd0/classIDataSource.html#ad074b3f149ca624cd0dbb438b8c55ea7',1,'IDataSource::add_variable_value()'],['../d5/d26/classSQLiteWrapper.html#adf42fc121cfe8f0c0214b22f6c62382c',1,'SQLiteWrapper::add_variable_value()']]]
+];

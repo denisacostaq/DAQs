@@ -1,0 +1,7 @@
+<map id="/home/travis/build/denisacostaq/DAQs/src/database&#45;server/client/client.h" name="/home/travis/build/denisacostaq/DAQs/src/database&#45;server/client/client.h">
+<area shape="rect" id="node2" href="$d4/d0c/client_8cc.html" title="This file have the implementation for Client class. " alt="" coords="5,124,180,195"/>
+<area shape="rect" id="node3" href="$d9/d0f/main_8cc.html" title="This file have the startup/seupt for the HMI application. " alt="" coords="204,131,379,187"/>
+<area shape="rect" id="node4" href="$dd/d5a/varsmodel_8cc.html" title="This file have the implementation for VarsModel class. " alt="" coords="403,131,585,187"/>
+<area shape="rect" id="node5" href="$d7/d00/varvaluemodel_8cc.html" title="This file have the interface for VarValueModel class. " alt="" coords="610,131,821,187"/>
+<area shape="rect" id="node6" href="$de/dcd/varvaluesmodel_8cc.html" title="This file have the implementation for VarValuesModel class. " alt="" coords="845,131,1063,187"/>
+</map>

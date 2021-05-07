@@ -1,0 +1,22 @@
+var searchData=
+[
+  ['send_5fmsg',['send_msg',['../de/d41/classSession.html#a277876738423f7ffd208be4a937d19d2',1,'Session']]],
+  ['send_5fstatus_5fresponse',['send_status_response',['../de/d41/classSession.html#a3e60a34411def63b824a8dc66721cfb0',1,'Session']]],
+  ['send_5fvalues_5fresponse',['send_values_response',['../de/d41/classSession.html#ab712ebea27b8241711f72b05724d83c8',1,'Session']]],
+  ['send_5fvar',['send_var',['../d1/d37/classClient.html#a2679b3bb8ca9a483f76ff21b440daf5a',1,'Client']]],
+  ['send_5fvar_5fval',['send_var_val',['../d1/d37/classClient.html#a53855dd050912720c568211bfca82bb2',1,'Client']]],
+  ['send_5fvariables_5fresponse',['send_variables_response',['../de/d41/classSession.html#a45023e370527683eb6b3769a600e45b5',1,'Session']]],
+  ['server',['server',['../d1/d53/classserver.html#a635b93cfa0814c8653a65617ca3d4f17',1,'server']]],
+  ['session',['Session',['../de/d41/classSession.html#acb6dadbab7c9cba3e07e839ab451418e',1,'Session']]],
+  ['set_5fcolor',['set_color',['../d6/d1c/classVariable.html#a2cfd957112d4029d6ccd402f6f60e0c3',1,'Variable']]],
+  ['set_5fname',['set_name',['../d6/d1c/classVariable.html#ad10ee059d458ed69c959a4edb34fb0be',1,'Variable']]],
+  ['set_5ftimestamp',['set_timestamp',['../de/df3/classVarValue.html#a49b695c04315beac54160ebbb3235fca',1,'VarValue']]],
+  ['set_5fvaiable',['set_vaiable',['../de/df3/classVarValue.html#ad13680c6c9ec164c0b58a82b4f74bd54',1,'VarValue']]],
+  ['set_5fval',['set_val',['../de/df3/classVarValue.html#a1271a31daf29fda897b3450295fbfc1c',1,'VarValue']]],
+  ['setcolor',['setColor',['../dc/d3c/classVarModel.html#a8cea76f0b49d91f5023ed0ed70081884',1,'VarModel']]],
+  ['setname',['setName',['../dc/d3c/classVarModel.html#a530d905eee066b48e3884a185407e4c6',1,'VarModel']]],
+  ['setup',['SetUp',['../d6/d9c/classDataAccessTest.html#adc4a3bebda9a9f41ea8d818a9f0e2d48',1,'DataAccessTest::SetUp()'],['../d1/d1e/classSQLiteWrapperTest.html#a6f99b715f3b3d751c6db394ea7b97cc2',1,'SQLiteWrapperTest::SetUp()']]],
+  ['sqlitewrapper',['SQLiteWrapper',['../d5/d26/classSQLiteWrapper.html#a3e9c75af3acdff7068c625c235917d98',1,'SQLiteWrapper']]],
+  ['sqlitewrappertest',['SQLiteWrapperTest',['../d1/d1e/classSQLiteWrapperTest.html#a69bff9a31b927f877a85783e87d79780',1,'SQLiteWrapperTest']]],
+  ['start',['start',['../de/d41/classSession.html#a47baf956cead0046fcbac45c572c70d3',1,'Session']]]
+];

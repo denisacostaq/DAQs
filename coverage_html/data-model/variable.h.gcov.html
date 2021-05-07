@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>LCOV - Code coverage report for DAQs. - data-model/variable.h</title>
+  <link rel="stylesheet" type="text/css" href="../gcov.css">
+</head>
+
+<body>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="title">LCOV - code coverage report</td></tr>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+
+    <tr>
+      <td width="100%">
+        <table cellpadding=1 border=0 width="100%">
+          <tr>
+            <td width="10%" class="headerItem">Current view:</td>
+            <td width="35%" class="headerValue"><a href="../index.html">top level</a> - <a href="index.html">data-model</a> - variable.h<span style="font-size: 80%;"> (source / <a href="variable.h.func-sort-c.html">functions</a>)</span></td>
+            <td width="5%"></td>
+            <td width="15%"></td>
+            <td width="10%" class="headerCovTableHead">Hit</td>
+            <td width="10%" class="headerCovTableHead">Total</td>
+            <td width="15%" class="headerCovTableHead">Coverage</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Test:</td>
+            <td class="headerValue">Code coverage report for DAQs.</td>
+            <td></td>
+            <td class="headerItem">Lines:</td>
+            <td class="headerCovTableEntry">3</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntryMed">75.0 %</td>
+          </tr>
+          <tr>
+            <td class="headerItem">Date:</td>
+            <td class="headerValue">2021-05-07 16:58:01</td>
+            <td></td>
+            <td class="headerItem">Functions:</td>
+            <td class="headerCovTableEntry">4</td>
+            <td class="headerCovTableEntry">5</td>
+            <td class="headerCovTableEntryMed">80.0 %</td>
+          </tr>
+          <tr><td><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+  </table>
+
+  <table cellpadding=0 cellspacing=0 border=0>
+    <tr>
+      <td><br></td>
+    </tr>
+    <tr>
+      <td>
+<pre class="sourceHeading">          Line data    Source code</pre>
+<pre class="source">
+<a name="1"><span class="lineNum">       1 </span>            : /*! @brief This file have the interface for Variable class.</a>
+<span class="lineNum">       2 </span>            :     @file variable.h
+<span class="lineNum">       3 </span>            :     @author Alvaro Denis &lt;denisacostaq@gmail.com&gt;
+<span class="lineNum">       4 </span>            :     @date 7/13/2019
+<span class="lineNum">       5 </span>            : 
+<span class="lineNum">       6 </span>            :     @copyright
+<span class="lineNum">       7 </span>            :     @attention &lt;h1&gt;&lt;center&gt;&lt;strong&gt;COPYRIGHT &amp;copy; 2019 &lt;/strong&gt;
+<span class="lineNum">       8 </span>            :     [&lt;strong&gt;denisacostaq&lt;/strong&gt;][denisacostaq-URL].
+<span class="lineNum">       9 </span>            :     All rights reserved.&lt;/center&gt;&lt;/h1&gt;
+<span class="lineNum">      10 </span>            :     @attention This file is part of [&lt;strong&gt;DAQs&lt;/strong&gt;][DAQs-URL].
+<span class="lineNum">      11 </span>            : 
+<span class="lineNum">      12 </span>            :     Redistribution and use in source and binary forms, with or without
+<span class="lineNum">      13 </span>            :     modification, are permitted provided that the following conditions
+<span class="lineNum">      14 </span>            :     are met:
+<span class="lineNum">      15 </span>            :     - 1. Redistributions of source code must retain the above copyright
+<span class="lineNum">      16 </span>            :       notice, this list of conditions and the following disclaimer.
+<span class="lineNum">      17 </span>            :     - 2. Redistributions in binary form must reproduce the above copyright
+<span class="lineNum">      18 </span>            :       notice, this list of conditions and the following disclaimer in the
+<span class="lineNum">      19 </span>            :       documentation and/or other materials provided with the distribution.
+<span class="lineNum">      20 </span>            :     - 3. Neither the name of the University nor the names of its contributors
+<span class="lineNum">      21 </span>            :       may be used to endorse or promote products derived from this software
+<span class="lineNum">      22 </span>            :       without specific prior written permission.
+<span class="lineNum">      23 </span>            : 
+<span class="lineNum">      24 </span>            :     THIS PRODUCT IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot;
+<span class="lineNum">      25 </span>            :     AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+<span class="lineNum">      26 </span>            :     IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+<span class="lineNum">      27 </span>            :     ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+<span class="lineNum">      28 </span>            :     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+<span class="lineNum">      29 </span>            :     (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+<span class="lineNum">      30 </span>            :     LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+<span class="lineNum">      31 </span>            :     ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+<span class="lineNum">      32 </span>            :     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+<span class="lineNum">      33 </span>            :     THIS PRODUCT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+<span class="lineNum">      34 </span>            : 
+<span class="lineNum">      35 </span>            :     [denisacostaq-URL]: https://about.me/denisacostaq &quot;Alvaro Denis Acosta&quot;
+<span class="lineNum">      36 </span>            :     [DAQs-URL]: https://github.com/denisacostaq/DAQs &quot;DAQs&quot;
+<span class="lineNum">      37 </span>            :  */
+<span class="lineNum">      38 </span>            : #ifndef DATAMODEL_VARIABLE_H
+<span class="lineNum">      39 </span>            : #define DATAMODEL_VARIABLE_H
+<span class="lineNum">      40 </span>            : 
+<span class="lineNum">      41 </span>            : #include &lt;iostream&gt;
+<a name="42"><span class="lineNum">      42 </span>            : #include &lt;string&gt;</a>
+<span class="lineNum">      43 </span>            : 
+<a name="44"><span class="lineNum">      44 </span><span class="lineCov">       2272 : class Variable {</span></a>
+<span class="lineNum">      45 </span>            :  public:
+<a name="46"><span class="lineNum">      46 </span><span class="lineCov">        368 :   Variable() = default;</span></a>
+<a name="47"><span class="lineNum">      47 </span>            :   Variable(const std::string &amp;name, const std::string &amp;color);</a>
+<span class="lineNum">      48 </span><span class="lineCov">       1818 :   Variable(const Variable &amp;var) = default;</span>
+<span class="lineNum">      49 </span><span class="lineNoCov">          0 :   Variable(Variable &amp;&amp;var) noexcept = default;</span>
+<span class="lineNum">      50 </span>            :   Variable &amp;operator=(Variable &amp;&amp;var) = default;
+<span class="lineNum">      51 </span>            :   Variable &amp;operator=(const Variable &amp;var) = default;
+<span class="lineNum">      52 </span>            : 
+<span class="lineNum">      53 </span>            :   void set_name(const std::string &amp;name) noexcept;
+<span class="lineNum">      54 </span>            :   void set_color(const std::string &amp;color) noexcept;
+<span class="lineNum">      55 </span>            :   const std::string &amp;name() const noexcept;
+<span class="lineNum">      56 </span>            :   const std::string &amp;color() const noexcept;
+<span class="lineNum">      57 </span>            : 
+<span class="lineNum">      58 </span>            :  private:
+<span class="lineNum">      59 </span>            :   std::string name_;
+<span class="lineNum">      60 </span>            :   std::string color_;
+<span class="lineNum">      61 </span>            : };
+<span class="lineNum">      62 </span>            : 
+<span class="lineNum">      63 </span>            : #endif  // DATAMODEL_VARIABLE_H
+</pre>
+      </td>
+    </tr>
+  </table>
+  <br>
+
+  <table width="100%" border=0 cellspacing=0 cellpadding=0>
+    <tr><td class="ruler"><img src="../glass.png" width=3 height=3 alt=""></td></tr>
+    <tr><td class="versionInfo">Generated by: <a href="http://ltp.sourceforge.net/coverage/lcov.php" target="_parent">LCOV version 1.12</a></td></tr>
+  </table>
+  <br>
+
+</body>
+</html>

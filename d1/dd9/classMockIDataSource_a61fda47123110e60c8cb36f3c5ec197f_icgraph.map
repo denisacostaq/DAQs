@@ -1,0 +1,9 @@
+<map id="MockIDataSource::count_variable_values" name="MockIDataSource::count_variable_values">
+<area shape="rect" id="node2" href="$d8/d73/dataaccess__unit__test_8cc.html#a269cac0386b51777d1a9f763f3db6856" title="TEST" alt="" coords="297,5,350,32"/>
+<area shape="rect" id="node3" href="$d1/dd9/classMockIDataSource.html#a7edabdc9bd11a733211f016174d006a6" title="create_scheme create data storage persistence, e.g. schema for a relational database ..." alt="" coords="232,57,415,98"/>
+<area shape="rect" id="node4" href="$d1/dd9/classMockIDataSource.html#a713090a44c08f6e8296d68726c22cbf1" title="add_variable add a variable to be tracket for the system (by default the only supported variabe value..." alt="" coords="240,122,407,163"/>
+<area shape="rect" id="node5" href="$d1/dd9/classMockIDataSource.html#a6252af51759c449d735ce1b4815626f6" title="add_variable_value add a new value for the variable. " alt="" coords="240,187,407,229"/>
+<area shape="rect" id="node6" href="$d1/dd9/classMockIDataSource.html#abfb1d1b685bdc16a0be2fd8c410be20c" title="fetch_variables get all variables " alt="" coords="236,253,411,294"/>
+<area shape="rect" id="node7" href="$d1/dd9/classMockIDataSource.html#a1fd000a647067087f9d2876ced76abd9" title="fetch_variable_values get all values of a given variable " alt="" coords="236,318,411,359"/>
+<area shape="rect" id="node8" href="$d1/dd9/classMockIDataSource.html#a4e05d4572a956720d79b180eba7318e5" title="count_variable_values count all values of a given variable " alt="" coords="234,383,413,425"/>
+</map>
